@@ -15,9 +15,7 @@
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->ns ?>;
-
-use Yii;
+namespace common\models\db;
 
 /**
  * This is the model class for table "<?= $generator->generateTableName($tableName) ?>".
@@ -32,53 +30,6 @@ use Yii;
 <?php endforeach; ?>
 <?php endif; ?>
  */
-class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . "\n" ?>
-{
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return '<?= $generator->generateTableName($tableName) ?>';
-    }
-<?php if ($generator->db !== 'db'): ?>
+class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') ?> {
 
-    /**
-     * @return \yii\db\Connection the database connection used by this AR class.
-     */
-    public static function getDb()
-    {
-        return Yii::$app->get('<?= $generator->db ?>');
-    }
-<?php endif; ?>
-
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [<?= "\n            " . implode(",\n            ", $rules) . "\n        " ?>];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-<?php foreach ($labels as $name => $label): ?>
-            <?= "'$name' => " . $generator->generateString($label) . ",\n" ?>
-<?php endforeach; ?>
-        ];
-    }
-<?php foreach ($relations as $name => $relation): ?>
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function get<?= $name ?>()
-    {
-        <?= $relation[0] . "\n" ?>
-    }
-<?php endforeach; ?>
 }

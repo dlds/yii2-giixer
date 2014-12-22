@@ -25,11 +25,36 @@ class Generator extends \yii\gii\generators\model\Generator {
 
     const TMPL_NAME = 'extended';
 
+    /**
+     * @var string namespace
+     */
+    public $ns = 'app\models\dkkkb';
+
+    /**
+     * @var array containing files to be generated
+     */
     public $files = array(
-        'common/models/db/base/' => 'model',
-        'common/models/db/' => 'commonModel',
-        'backend/models/db/' => 'backendModel',
-        'frontend/models/db/' => 'frontendModel',
+        'model' => 'common/models/db/base',
+        'commonModel' => 'common/models/db',
+        'backendModel' => 'backend/models/db',
+        'frontendModel' => 'frontend/models/db',
+    );
+
+    /**
+     * @var array models namespaces
+     */
+    public $namespaces = array(
+        'model' => 'common\models\db\base',
+        'commonModel' => 'common\models\db',
+    );
+
+    /**
+     * @var array models baseClasses
+     */
+    public $baseClasses = array(
+        'commonModel' => 'common\models\db\base\{class}',
+        'backendModel' => 'common\models\db\{class}',
+        'frontendModel' => 'common\models\db\{class}',
     );
 
     /**
@@ -71,24 +96,41 @@ class Generator extends \yii\gii\generators\model\Generator {
                 'relations' => isset($relations[$className]) ? $relations[$className] : [],
             ];
 
-            if ($this->files)
-            {
-                foreach ($this->files as $ns => $tmpl)
-                {
-                    $files[] = new CodeFile(
-                            Yii::getAlias('@' . str_replace('\\', '/', $ns)) . '/' . $className . '.php', $this->render(sprintf('%s.php', $tmpl), $params)
-                    );
-                }
-            }
-            else
+            foreach ($this->files as $tmpl => $ns)
             {
                 $files[] = new CodeFile(
-                        Yii::getAlias('@' . str_replace('\\', '/', $this->ns)) . '/' . $className . '.php', $this->render('model.php', $params)
+                        Yii::getAlias('@' . str_replace('\\', '/', $ns)) . '/' . $className . '.php', $this->render(sprintf('%s.php', $tmpl), $params)
                 );
             }
         }
 
         return $files;
+    }
+
+    /**
+     * @return string current file ns
+     */
+    public function getNs($file)
+    {
+        if (isset($this->namespaces[$file]))
+        {
+            return $this->namespaces[$file];
+        }
+
+        return $this->ns;
+    }
+
+    /**
+     * @return string cuurent file baseClass
+     */
+    public function getBaseClass($file, $class)
+    {
+        if (isset($this->baseClasses[$file]))
+        {
+            return str_replace('{class}', $class, $this->baseClasses[$file]);
+        }
+
+        return $this->baseClass;
     }
 
     /**
