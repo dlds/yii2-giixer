@@ -1,0 +1,26 @@
+{
+    "name": "svobik7/yii2-giixer",
+    "description": "Extended Yii2 Gii module",
+    "keywords": ["yii2", "gii", "extended"],
+    "type": "yii2-extension",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/dlds/yii2-giixer/issues",
+        "wiki": "https://github.com/dlds/yii2-giixer/wiki",
+        "source": "https://github.com/dlds/yii2-giixer"
+    },
+    "authors": [
+        {
+            "name": "Jiri Svoboda",
+            "email": "jiri.svoboda@dlds.cz"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2-gii": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "dlds\\giixer\\": ""
+        }
+    }
+}
