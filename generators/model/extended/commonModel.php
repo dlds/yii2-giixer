@@ -15,7 +15,7 @@
 echo "<?php\n";
 ?>
 
-namespace common\models\db;
+namespace <?= $generator->getNs(basename(__FILE__, '.php')) ?>;
 
 /**
  * This is the model class for table "<?= $generator->generateTableName($tableName) ?>".

@@ -15,7 +15,7 @@
 echo "<?php\n";
 ?>
 
-namespace common\models\db\base;
+namespace <?= $generator->getNs(basename(__FILE__, '.php')) ?>;
 
 use Yii;
 

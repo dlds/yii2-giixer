@@ -28,7 +28,12 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * @var string namespace
      */
-    public $ns = 'app\models\dkkkb';
+    public $ns = 'app\models\db';
+
+    /**
+     * @var string baseClass
+     */
+    public $baseClass = 'dlds\giixer\components\GxActiveRecord';
 
     /**
      * @var array containing files to be generated
@@ -44,17 +49,19 @@ class Generator extends \yii\gii\generators\model\Generator {
      * @var array models namespaces
      */
     public $namespaces = array(
-        'model' => 'common\models\db\base',
-        'commonModel' => 'common\models\db',
+        'model' => 'common\{ns}\base',
+        'commonModel' => 'common\{ns}',
+        'backendModel' => 'backend\{ns}',
+        'frontendModel' => 'frontend\{ns}',
     );
 
     /**
      * @var array models baseClasses
      */
     public $baseClasses = array(
-        'commonModel' => 'common\models\db\base\{class}',
-        'backendModel' => 'common\models\db\{class}',
-        'frontendModel' => 'common\models\db\{class}',
+        'commonModel' => 'common\{ns}\base\{class}',
+        'backendModel' => 'common\{ns}\{class}',
+        'frontendModel' => 'common\{ns}\{class}',
     );
 
     /**
@@ -114,7 +121,9 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         if (isset($this->namespaces[$file]))
         {
-            return $this->namespaces[$file];
+            $namespace = str_replace('app\\', '', $this->ns);
+
+            return str_replace('{ns}', $namespace, $this->namespaces[$file]);
         }
 
         return $this->ns;
@@ -127,10 +136,28 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         if (isset($this->baseClasses[$file]))
         {
-            return str_replace('{class}', $class, $this->baseClasses[$file]);
+            $namespace = str_replace('app\\', '', $this->ns);
+
+            $baseClass = str_replace('{ns}', $namespace, $this->baseClasses[$file]);
+
+            return str_replace('{class}', $class, $baseClass);
         }
 
         return $this->baseClass;
+    }
+
+    /**
+     * Validates the [[ns]] attribute.
+     */
+    public function validateNamespace()
+    {
+        parent::validateNamespace();
+
+        $this->ns = ltrim($this->ns, '\\');
+        if (false === strpos($this->ns, 'app\\'))
+        {
+            $this->addError('ns', '@app namespace must be used.');
+        }
     }
 
     /**
