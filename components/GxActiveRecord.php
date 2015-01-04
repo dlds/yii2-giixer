@@ -17,5 +17,21 @@ use yii\db\ActiveRecord;
  * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
 class GxActiveRecord extends ActiveRecord {
-    
+
+    /**
+     * Retrieves models representing column
+     */
+    public function __toString()
+    {
+        return (string) $this->representingColumn();
+    }
+
+    /**
+     * Retrieves model representing column
+     */
+    protected function representingColumn()
+    {
+        return $this->primaryKey;
+    }
+
 }

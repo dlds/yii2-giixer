@@ -23,7 +23,7 @@ class Module extends \yii\gii\Module {
     {
         return [
             'model' => ['class' => 'dlds\giixer\generators\model\Generator'],
-            'crud' => ['class' => 'yii\gii\generators\crud\Generator'],
+            'crud' => ['class' => 'dlds\giixer\generators\crud\Generator'],
             'controller' => ['class' => 'yii\gii\generators\controller\Generator'],
             'form' => ['class' => 'yii\gii\generators\form\Generator'],
             'module' => ['class' => 'yii\gii\generators\module\Generator'],

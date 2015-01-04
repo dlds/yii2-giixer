@@ -32,8 +32,8 @@ use Yii;
 <?php endforeach; ?>
 <?php endif; ?>
  */
-class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') . "\n" ?>
-{
+class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') ?> {
+    
     /**
      * @inheritdoc
      */
@@ -81,4 +81,5 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basena
         <?= $relation[0] . "\n" ?>
     }
 <?php endforeach; ?>
+    
 }
