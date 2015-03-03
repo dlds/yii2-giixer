@@ -15,7 +15,7 @@
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->getNs(basename(__FILE__, '.php')) ?>;
+namespace <?= $generator->getFileNs(basename(__FILE__, '.php'), $className) ?>;
 
 use Yii;
 
@@ -32,7 +32,7 @@ use Yii;
 <?php endforeach; ?>
 <?php endif; ?>
  */
-class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') ?> {
+abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') ?> {
     
     /**
      * @inheritdoc

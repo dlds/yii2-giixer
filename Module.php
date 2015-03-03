@@ -15,6 +15,8 @@ namespace dlds\giixer;
  */
 class Module extends \yii\gii\Module {
 
+    public $modelsNamespaces;
+
     /**
      * Returns the list of the core code generator configurations.
      * @return array the list of the core code generator configurations.

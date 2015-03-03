@@ -15,7 +15,7 @@
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->getNs(basename(__FILE__, '.php')) ?>;
+namespace <?= $generator->getFileNs(basename(__FILE__, '.php'), $className) ?>;
 
 /**
  * This is the model class for table "<?= $generator->generateTableName($tableName) ?>".
@@ -30,6 +30,6 @@ namespace <?= $generator->getNs(basename(__FILE__, '.php')) ?>;
 <?php endforeach; ?>
 <?php endif; ?>
  */
-class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') ?> {
+abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') ?> {
 
 }
