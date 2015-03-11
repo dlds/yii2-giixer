@@ -79,7 +79,7 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         $this->staticNs = Yii::$app->getModule('gii')->modelsNamespaces;
 
-        if (!is_array($this->staticNs))
+        if (!empty($this->staticNs) && !is_array($this->staticNs))
         {
             throw new \yii\base\ErrorException('Gii Model Namespaces should be array');
         }
