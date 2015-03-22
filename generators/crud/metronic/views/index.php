@@ -9,11 +9,19 @@ use yii\helpers\StringHelper;
 $urlParams = $generator->generateUrlParams();
 $nameAttribute = $generator->getNameAttribute();
 
+$model_id = Inflector::camel2id(StringHelper::basename($generator->modelClass), '_');
+$model_id_plural = Inflector::pluralize($model_id);
+
+$heading_model = $generator->generateString('heading_' . $model_id);
+$heading_model_plural = $generator->generateString('heading_' . $model_id_plural);
+
 echo "<?php\n";
 ?>
 
 <?= $generator->indexWidgetType !== 'grid' ? "use yii\helpers\Html;" : "" ?>
+use dlds\giixer\components\helpers\GxHelper;
 use dlds\metronic\Metronic;
+use dlds\metronic\widgets\Alert;
 use dlds\metronic\widgets\Link;
 use dlds\metronic\widgets\Portlet;
 use <?= $generator->indexWidgetType === 'grid' ? "dlds\\metronic\\widgets\\GridView" : "dlds\\metronic\\widgets\\ListView" ?>;
@@ -22,28 +30,31 @@ use <?= $generator->indexWidgetType === 'grid' ? "dlds\\metronic\\widgets\\GridV
 <?= !empty($generator->searchModelClass) ? "/* @var \$searchModel " . ltrim($generator->searchModelClass, '\\') . " */\n" : '' ?>
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>;
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = \Yii::t('<?= $generator->messageCategory ?>', 'title_overview_{models}', [
+    'models' => <?= $heading_model_plural ?>,
+]);
+
+$this->params['breadcrumbs'][] = <?= $generator->generateString('heading_' . $model_id_plural) ?>;;
 ?>
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-index">
 
     <?php if (!empty($generator->searchModelClass)): ?>
-<?= "<?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
+        <?= "<?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
     <?php endif; ?>
     <?php if ($generator->indexWidgetType === 'grid'): ?>
 
-<?= "<?php 
+        <?= "<?php 
     Portlet::begin([
         'icon' => 'icon-grid',
-        'title' => " . $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) . ",
+        'title' => \$this->title,
         'actions' => [
             Link::widget([
                 'icon' => 'fa fa-plus',
                 'iconPosition' => Link::ICON_POSITION_LEFT,
-                'label' => Yii::t('app', 'New {modelClass}', ['modelClass' => '" . Inflector::camel2words(StringHelper::basename($generator->modelClass)) . "']),
+                'label' => \Yii::t('app', 'call_to_create_new'),
                 'url' => ['" . Inflector::slug(Inflector::camel2words(StringHelper::basename($generator->modelClass))) . "/create'],
                 'options' => [
-                    'class' => 'btn btn-default btn-circle'
+                    'class' => 'btn blue-steel btn-circle'
                 ],
                 'labelOptions' => [
                     'class' => 'hidden-480'
@@ -52,8 +63,18 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]);
     ?>
+    
+    <?=
+    \$this->render('//layouts/blocks/alerts/inline', [
+        'condition' => \Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS_MODEL_CREATE) || \Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS_MODEL_UPDATE),
+        'options' => [
+            'type' => Alert::TYPE_SUCCESS,
+            'body' => (\Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS_MODEL_CREATE)) ? \Yii::\$app->session->getFlash(GxHelper::FLASH_SUCCESS_MODEL_CREATE) : \Yii::\$app->session->getFlash(GxHelper::FLASH_SUCCESS_MODEL_UPDATE),
+        ],
+    ])
+    ?>
 
-    <?php \yii\widgets\Pjax::begin(); ?>" ?>
+    <?php \yii\widgets\Pjax::begin(['id' => '" . Inflector::camel2id(StringHelper::basename($generator->modelClass)) . "-grid']); ?>" ?>
 
         <?= "<?= " ?>GridView::widget([
         'dataProvider' => $dataProvider,
@@ -97,7 +118,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         ]); ?>
 
-    <?= "<?php \yii\widgets\Pjax::end(); ?>
+        <?= "<?php \yii\widgets\Pjax::end(); ?>
 		
     <?php Portlet::end(); ?>" ?>
 
