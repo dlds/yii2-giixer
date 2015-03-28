@@ -38,6 +38,7 @@ use yii\data\ActiveDataProvider;
 <?php endif; ?>
 use <?= ltrim($generator->baseControllerClass, '\\') ?>;
 use dlds\giixer\components\helpers\GxI18nHelper;
+use dlds\giixer\components\helpers\GxHelper;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 

@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = <?= $generator->generateString('heading_' . $mo
                 'label' => \Yii::t('app', 'call_to_create_new'),
                 'url' => ['" . Inflector::slug(Inflector::camel2words(StringHelper::basename($generator->modelClass))) . "/create'],
                 'options' => [
-                    'class' => 'btn blue-steel btn-circle'
+                    'class' => 'btn blue-steel btn-circle action-create'
                 ],
                 'labelOptions' => [
                     'class' => 'hidden-480'

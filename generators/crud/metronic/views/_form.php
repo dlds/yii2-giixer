@@ -18,6 +18,7 @@ echo "<?php\n";
 ?>
 
 use yii\helpers\Html;
+use dlds\metronic\widgets\Alert;
 use dlds\metronic\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -29,6 +30,17 @@ use dlds\metronic\widgets\ActiveForm;
 
     <?= "<?php " ?>$form = ActiveForm::begin(); ?>
 
+    <?= "<?=
+    \$this->render('//layouts/blocks/alerts/inline', [
+        'condition' => \$model->hasErrors(),
+        'options' => [
+            'type' => Alert::TYPE_DANGER,
+            'body' => \$form->errorSummary(\$model),
+        ],
+    ])
+    ?>
+    " ?>
+    
     <?php
     foreach ($generator->getColumnNames() as $attribute)
     {
