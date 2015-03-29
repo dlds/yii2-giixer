@@ -81,7 +81,34 @@ abstract class GxActiveRecord extends ActiveRecord {
             }
         }
     }
-    
+
+    /**
+     * Sets given attributes unsafe
+     * @param array $scenarios
+     * @param string $name scenario name
+     * @param array $attrs given attrs
+     */
+    protected function setAttributesUnsafe(&$scenarios, $name, array $attrs = [])
+    {
+        if (isset($scenarios[$name]))
+        {
+            foreach ($attrs as $attr)
+            {
+                $key = array_search($attr, $scenarios[$name]);
+
+                if ($key)
+                {
+                    $value = $scenarios[$name][$key];
+
+                    if (!StringHelper::startsWith($value, '!'))
+                    {
+                        $scenarios[$name][$key] = sprintf('!%s', $value);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Retrieves model representing column
      */
