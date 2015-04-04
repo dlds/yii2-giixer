@@ -96,7 +96,7 @@ abstract class GxActiveRecord extends ActiveRecord {
             {
                 $key = array_search($attr, $scenarios[$name]);
 
-                if ($key)
+                if (false !== $key)
                 {
                     $value = $scenarios[$name][$key];
 
