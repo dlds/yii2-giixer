@@ -88,6 +88,28 @@ abstract class GxActiveRecord extends ActiveRecord {
      * @param string $name scenario name
      * @param array $attrs given attrs
      */
+    protected function removeScenarioAttributes(&$scenarios, $name, array $attrs = [])
+    {
+        if (isset($scenarios[$name]))
+        {
+            foreach ($attrs as $attr)
+            {
+                $key = array_search($attr, $scenarios[$name]);
+
+                if (false !== $key)
+                {
+                    ArrayHelper::remove($scenarios[$name], $key);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets given attributes unsafe
+     * @param array $scenarios
+     * @param string $name scenario name
+     * @param array $attrs given attrs
+     */
     protected function setAttributesUnsafe(&$scenarios, $name, array $attrs = [])
     {
         if (isset($scenarios[$name]))
