@@ -107,7 +107,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) 
         {
-            \Yii::$app->session->setFlash(GxHelper::FLASH_SUCCESS_MODEL_CREATE, \Yii::t('app', GxI18nHelper::KEY_ALERT_SUCCES_MODEL_CREATE, ['model' => $model->__toString()]));
+            \Yii::$app->session->setFlash(GxHelper::FLASH_SUCCESS, \Yii::t('app', GxI18nHelper::KEY_ALERT_SUCCES_MODEL_CREATE, ['model' => $model->__toString()]));
 
             return $this->redirect(['index']);
         } 
@@ -130,7 +130,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) 
         {
-            \Yii::$app->session->setFlash(GxHelper::FLASH_SUCCESS_MODEL_UPDATE, \Yii::t('app', GxI18nHelper::KEY_ALERT_SUCCES_MODEL_UPDATE, ['model' => $model->__toString()]));
+            \Yii::$app->session->setFlash(GxHelper::FLASH_SUCCESS, \Yii::t('app', GxI18nHelper::KEY_ALERT_SUCCES_MODEL_UPDATE, ['model' => $model->__toString()]));
 
             return $this->redirect(['index']);
         }

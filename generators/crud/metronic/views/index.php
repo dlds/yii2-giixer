@@ -66,10 +66,10 @@ $this->params['breadcrumbs'][] = <?= $generator->generateString('heading_' . $mo
     
     <?=
     \$this->render('//layouts/blocks/alerts/inline', [
-        'condition' => \Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS_MODEL_CREATE) || \Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS_MODEL_UPDATE),
+        'condition' => \Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS) || \Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS),
         'options' => [
             'type' => Alert::TYPE_SUCCESS,
-            'body' => (\Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS_MODEL_CREATE)) ? \Yii::\$app->session->getFlash(GxHelper::FLASH_SUCCESS_MODEL_CREATE) : \Yii::\$app->session->getFlash(GxHelper::FLASH_SUCCESS_MODEL_UPDATE),
+            'body' => (\Yii::\$app->session->hasFlash(GxHelper::FLASH_SUCCESS)) ? \Yii::\$app->session->getFlash(GxHelper::FLASH_SUCCESS) : \Yii::\$app->session->getFlash(GxHelper::FLASH_SUCCESS),
         ],
     ])
     ?>
