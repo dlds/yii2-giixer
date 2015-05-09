@@ -12,14 +12,27 @@ class GxHelper {
 
     /**
      * Retrieves flash by given flash key
-     * @param array $flash given flash key
+     * @param array $key given flash key
      * @return mixed flash value
      */
-    public static function getFlash($flash)
+    public static function setFlash($key, $value)
     {
-        if (\Yii::$app && isset(\Yii::$app->session) && \Yii::$app->session->hasFlash($flash))
+        if (\Yii::$app && isset(\Yii::$app->session))
         {
-            return \Yii::$app->session->getFlash($flash);
+            \Yii::$app->session->setFlash($key, $value);
+        }
+    }
+
+    /**
+     * Retrieves flash by given flash key
+     * @param array $key given flash key
+     * @return mixed flash value
+     */
+    public static function getFlash($key)
+    {
+        if (\Yii::$app && isset(\Yii::$app->session) && \Yii::$app->session->hasFlash($key))
+        {
+            return \Yii::$app->session->getFlash($key);
         }
 
         return null;
@@ -27,19 +40,19 @@ class GxHelper {
 
     /**
      * Retrieves first occures flash
-     * @param array $flashes given flashed to be checked
+     * @param array $keys given flashed to be checked
      * @param mixed $default given default value if no flash occures
      */
-    public static function getFlashesForemost($flashes, $default = false)
+    public static function getFlashesForemost($keys, $default = false)
     {
-        if (!is_array($flashes))
+        if (!is_array($keys))
         {
-            $flashes = [$flashes];
+            $keys = [$keys];
         }
 
-        foreach ($flashes as $flash)
+        foreach ($keys as $key)
         {
-            $value = self::getFlash($flash);
+            $value = self::getFlash($key);
 
             if (null !== $value)
             {
@@ -52,12 +65,12 @@ class GxHelper {
 
     /**
      * Indicates if on of given flash is set in sessions
-     * @param array $flashes given flashes key
+     * @param array $keys given flashes key
      * @return boolean TRUE if has otherwise FALSE
      */
-    public static function hasFlashes($flashes)
+    public static function hasFlashes($keys)
     {
-        return (boolean) self::getFlashesForemost($flashes);
+        return (boolean) self::getFlashesForemost($keys);
     }
 
     /**
@@ -65,13 +78,13 @@ class GxHelper {
      * if al least one of given flashes is occured in current sessions
      * than possitive value will be retrieved
      * otherwise negative value will be retrieved
-     * @param string $flashes given flashes key
+     * @param string $keys given flashes key
      * @param mixed $positive value to be retrieved when flash exists
      * @param mixed $negative value to be retrieved when flash doesn't exist
      * @return mixed
      */
-    public static function decideByFlashes($flashes, $positive, $negative)
+    public static function decideByFlashes($keys, $positive, $negative)
     {
-        return self::hasFlashes($flashes) ? $positive : $negative;
+        return self::hasFlashes($keys) ? $positive : $negative;
     }
 }
