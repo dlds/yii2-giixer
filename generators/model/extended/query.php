@@ -20,6 +20,5 @@ namespace <?= $generator->getFileNs(basename(__FILE__, '.php'), $className) ?>;
 * @see <?= $modelFullClassName."\n" ?>
 */
 class <?= $className ?> extends <?= '\\'.ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className, $generator->queryBaseClass), '\\') ?> {
-{
 
 }
