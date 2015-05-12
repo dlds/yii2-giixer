@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @link http://www.digitaldeals.cz/
  * @copyright Copyright (c) 2014 Digital Deals s.r.o.
@@ -38,9 +37,12 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public $nsMap = array(
         'model' => 'common\{ns}\base',
+        'query' => 'common\{ns}',
         'commonModel' => 'common\{ns}',
         'frontendModel' => 'app\{ns}',
         'backendModel' => 'app\{ns}',
+        'frontendQuery' => 'app\{ns}',
+        'backendQuery' => 'app\{ns}',
     );
 
     /**
@@ -50,16 +52,27 @@ class Generator extends \yii\gii\generators\model\Generator {
         'commonModel' => 'common\{ns}\base\{class}',
         'backendModel' => 'common\{ns}\{class}',
         'frontendModel' => 'common\{ns}\{class}',
+        'backendQuery' => 'common\{ns}\{class}',
+        'frontendQuery' => 'common\{ns}\{class}',
     );
 
     /**
      * @var array containing files to be generated
      */
-    public $filesMap = array(
+    public $modelFilesMap = array(
         'model' => 'common/{ns}/base',
         'commonModel' => 'common/{ns}',
         'backendModel' => 'backend/{ns}',
         'frontendModel' => 'frontend/{ns}',
+    );
+
+    /**
+     * @var array containing files to be generated
+     */
+    public $queryFilesMap = array(
+        'query' => 'common/{ns}',
+        'backendQuery' => 'backend/{ns}',
+        'frontendQuery' => 'frontend/{ns}',
     );
 
     /**
@@ -146,27 +159,50 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         $files = [];
         $relations = $this->generateRelations();
+        //$relations = [];
         $db = $this->getDbConnection();
+
         foreach ($this->getTableNames() as $tableName)
         {
-            $className = $this->generateClassName($tableName);
+            // model :
+            $modelClassName = $this->generateClassName($tableName);
+            $queryClassName = ($this->generateQuery) ? $this->generateQueryClassName($modelClassName) : false;
             $tableSchema = $db->getTableSchema($tableName);
             $params = [
                 'tableName' => $tableName,
-                'className' => $className,
+                'className' => $modelClassName,
+                'queryClassName' => $queryClassName,
                 'tableSchema' => $tableSchema,
                 'labels' => $this->generateLabels($tableSchema),
                 'rules' => $this->generateRules($tableSchema),
-                'relations' => isset($relations[$className]) ? $relations[$className] : [],
+                'relations' => isset($relations[$tableName]) ? $relations[$tableName] : [],
             ];
 
-            foreach ($this->filesMap as $tmpl => $ns)
+            foreach ($this->modelFilesMap as $tmpl => $ns)
             {
-                $path = '@' . str_replace('\\', '/', str_replace('{ns}', $this->getNs($className), $ns));
+                $path = '@'.str_replace('\\', '/', str_replace('{ns}', $this->getNs($modelClassName), $ns));
 
                 $files[] = new CodeFile(
-                        Yii::getAlias($path) . '/' . $className . '.php', $this->render(sprintf('%s.php', $tmpl), $params)
+                    Yii::getAlias($path).'/'.$modelClassName.'.php', $this->render(sprintf('%s.php', $tmpl), $params)
                 );
+            }
+
+            // query :
+            if ($queryClassName)
+            {
+                $params = [
+                    'className' => $queryClassName,
+                    'modelClassName' => $modelClassName,
+                ];
+
+                foreach ($this->queryFilesMap as $tmpl => $ns)
+                {
+                    $path = '@'.str_replace('\\', '/', str_replace('{ns}', $this->getNs($queryClassName), $ns));
+
+                    $files[] = new CodeFile(
+                        Yii::getAlias($path).'/'.$queryClassName.'.php', $this->render(sprintf('%s.php', $tmpl), $params)
+                    );
+                }
             }
         }
 
@@ -185,92 +221,127 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         $db = $this->getDbConnection();
 
-        if (($pos = strpos($this->tableName, '.')) !== false)
-        {
-            $schemaName = substr($this->tableName, 0, $pos);
+        $schema = $db->getSchema();
+        if ($schema->hasMethod('getSchemaNames'))
+        { // keep BC to Yii versions < 2.0.4
+            try
+            {
+                $schemaNames = $schema->getSchemaNames();
+            }
+            catch (\yii\base\NotSupportedException $e)
+            {
+                // schema names are not supported by schema
+            }
         }
-        else
+        if (!isset($schemaNames))
         {
-            $schemaName = '';
+            if (($pos = strpos($this->tableName, '.')) !== false)
+            {
+                $schemaNames = [substr($this->tableName, 0, $pos)];
+            }
+            else
+            {
+                $schemaNames = [''];
+            }
         }
 
         $relations = [];
-        foreach ($db->getSchema()->getTableSchemas($schemaName) as $table)
+        foreach ($schemaNames as $schemaName)
         {
-            $tableName = $table->name;
-            $className = $this->generateClassName($tableName);
-            foreach ($table->foreignKeys as $refs)
+            foreach ($db->getSchema()->getTableSchemas($schemaName) as $table)
             {
-                $refTable = $refs[0];
-                unset($refs[0]);
-                $fks = array_keys($refs);
-                $refClassName = $this->generateClassName($refTable);
-
-                // Add relation for this table
-                $link = $this->generateRelationLink(array_flip($refs));
-                $relationName = $this->generateRelationName($relations, $className, $table, $fks[0], false);
-
-                $relations[$className][$relationName] = [
-                    "return \$this->hasOne(\\" . $this->getNs($refClassName, true) . "\\$refClassName::className(), $link);",
-                    $refClassName,
-                    false,
-                ];
-
-                // Add relation for the referenced table
-                $hasMany = false;
-                if (count($table->primaryKey) > count($fks))
+                $className = $this->generateClassName($table->fullName);
+                foreach ($table->foreignKeys as $refs)
                 {
-                    $hasMany = true;
-                }
-                else
-                {
-                    foreach ($fks as $key)
+                    $refTable = $refs[0];
+                    $refTableSchema = $db->getTableSchema($refTable);
+                    unset($refs[0]);
+                    $fks = array_keys($refs);
+                    $refClassName = $this->generateClassName($refTable);
+
+                    // Add relation for this table
+                    $link = $this->generateRelationLink(array_flip($refs));
+                    $relationName = $this->generateRelationName($relations, $table, $fks[0], false);
+                    $relations[$table->fullName][$relationName] = [
+                        "return \$this->hasOne(\\".$this->getNs($refClassName, true)."\\$refClassName::className(), $link);",
+                        $refClassName,
+                        false,
+                    ];
+
+                    // Add relation for the referenced table
+                    $uniqueKeys = [$table->primaryKey];
+                    try
                     {
-                        if (!in_array($key, $table->primaryKey, true))
+                        $uniqueKeys = array_merge($uniqueKeys, $db->getSchema()->findUniqueIndexes($table));
+                    }
+                    catch (NotSupportedException $e)
+                    {
+                        // ignore
+                    }
+                    $hasMany = true;
+                    foreach ($uniqueKeys as $uniqueKey)
+                    {
+                        if (count(array_diff(array_merge($uniqueKey, $fks), array_intersect($uniqueKey, $fks))) === 0)
                         {
-                            $hasMany = true;
+                            $hasMany = false;
                             break;
                         }
                     }
+                    $link = $this->generateRelationLink($refs);
+                    $relationName = $this->generateRelationName($relations, $refTableSchema, $className, $hasMany);
+                    $relations[$refTableSchema->fullName][$relationName] = [
+                        "return \$this->".($hasMany ? 'hasMany' : 'hasOne')."(\\".$this->getNs($className, true)."\\$className::className(), $link);",
+                        $className,
+                        $hasMany,
+                    ];
                 }
-                $link = $this->generateRelationLink($refs);
-                $relationName = $this->generateRelationName($relations, $refClassName, $refTable, $className, $hasMany);
 
-                $relations[$refClassName][$relationName] = [
-                    "return \$this->" . ($hasMany ? 'hasMany' : 'hasOne') . "(\\" . $this->getNs($className, true) . "\\$className::className(), $link);",
-                    $className,
-                    $hasMany,
-                ];
+                if (($fks = $this->checkPivotTable($table)) === false)
+                {
+                    continue;
+                }
+
+                $relations = $this->generateManyManyRelations($table, $fks, $relations);
             }
-
-            if (($fks = $this->checkPivotTable($table)) === false)
-            {
-                continue;
-            }
-            $table0 = $fks[$table->primaryKey[0]][0];
-            $table1 = $fks[$table->primaryKey[1]][0];
-            $className0 = $this->generateClassName($table0);
-            $className1 = $this->generateClassName($table1);
-
-            $link = $this->generateRelationLink([$fks[$table->primaryKey[1]][1] => $table->primaryKey[1]]);
-            $viaLink = $this->generateRelationLink([$table->primaryKey[0] => $fks[$table->primaryKey[0]][1]]);
-            $relationName = $this->generateRelationName($relations, $className0, $db->getTableSchema($table0), $table->primaryKey[1], true);
-
-            $relations[$className0][$relationName] = [
-                "return \$this->hasMany(\\" . $this->getNs($className1, true) . "\\$className1::className(), $link)->viaTable('" . $this->generateTableName($table->name) . "', $viaLink);",
-                $className1,
-                true,
-            ];
-
-            $link = $this->generateRelationLink([$fks[$table->primaryKey[0]][1] => $table->primaryKey[0]]);
-            $viaLink = $this->generateRelationLink([$table->primaryKey[1] => $fks[$table->primaryKey[1]][1]]);
-            $relationName = $this->generateRelationName($relations, $className1, $db->getTableSchema($table1), $table->primaryKey[0], true);
-            $relations[$className1][$relationName] = [
-                "return \$this->hasMany(\\" . $this->getNs($className0, true) . "\\$className0::className(), $link)->viaTable('" . $this->generateTableName($table->name) . "', $viaLink);",
-                $className0,
-                true,
-            ];
         }
+
+        return $relations;
+    }
+
+    /**
+     * Generates relations using a junction table by adding an extra viaTable().
+     * @param \yii\db\TableSchema the table being checked
+     * @param array $fks obtained from the checkPivotTable() method
+     * @param array $relations
+     * @return array modified $relations
+     */
+    private function generateManyManyRelations($table, $fks, $relations)
+    {
+        $db = $this->getDbConnection();
+        $table0 = $fks[$table->primaryKey[0]][0];
+        $table1 = $fks[$table->primaryKey[1]][0];
+        $className0 = $this->generateClassName($table0);
+        $className1 = $this->generateClassName($table1);
+        $table0Schema = $db->getTableSchema($table0);
+        $table1Schema = $db->getTableSchema($table1);
+
+        $link = $this->generateRelationLink([$fks[$table->primaryKey[1]][1] => $table->primaryKey[1]]);
+        $viaLink = $this->generateRelationLink([$table->primaryKey[0] => $fks[$table->primaryKey[0]][1]]);
+        $relationName = $this->generateRelationName($relations, $table0Schema, $table->primaryKey[1], true);
+        $relations[$table0Schema->fullName][$relationName] = [
+            "return \$this->hasMany(\\".$this->getNs($className1, true)."\\$className1::className(), $link)->viaTable('".$this->generateTableName($table->name)."', $viaLink);",
+            $className1,
+            true,
+        ];
+
+        $link = $this->generateRelationLink([$fks[$table->primaryKey[0]][1] => $table->primaryKey[0]]);
+        $viaLink = $this->generateRelationLink([$table->primaryKey[1] => $fks[$table->primaryKey[1]][1]]);
+        $relationName = $this->generateRelationName($relations, $table1Schema, $table->primaryKey[0], true);
+        $relations[$table1Schema->fullName][$relationName] = [
+            "return \$this->hasMany(\\".$this->getNs($className0, true)."\\$className0::className(), $link)->viaTable('".$this->generateTableName($table->name)."', $viaLink);",
+            $className0,
+            true,
+        ];
 
         return $relations;
     }
@@ -280,13 +351,19 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getNs($className, $root = false)
     {
-        $staticNs = ArrayHelper::getValue($this->staticNs, $className, false);
+        $namespace = false;
 
-        if ($staticNs)
+        foreach ($this->staticNs as $regex => $ns)
         {
-            $namespace = $staticNs;
+            if (preg_match('%'.$regex.'%', $className))
+            {
+                $namespace = $ns;
+
+                break;
+            }
         }
-        else
+
+        if (false === $namespace)
         {
             $namespace = $this->ns;
         }
@@ -315,7 +392,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * @return string cuurent file baseClass
      */
-    public function getBaseClass($file, $className)
+    public function getBaseClass($file, $className, $default = false)
     {
         if (isset($this->baseClassesMap[$file]))
         {
@@ -324,7 +401,7 @@ class Generator extends \yii\gii\generators\model\Generator {
             return str_replace('{class}', $className, $baseClass);
         }
 
-        return $this->baseClass;
+        return (false !== $default) ? $default : $this->baseClass;
     }
 
     /**
@@ -353,7 +430,7 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         $classFileName = str_replace(Yii::getAlias('@dlds/giixer'), Yii::getAlias('@yii/gii'), $class->getFileName());
 
-        return dirname($classFileName) . '/default';
+        return dirname($classFileName).'/default';
     }
 
     /**
@@ -366,7 +443,6 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         $class = new ReflectionClass($this);
 
-        return dirname($class->getFileName()) . '/' . self::TMPL_NAME;
+        return dirname($class->getFileName()).'/'.self::TMPL_NAME;
     }
-
 }

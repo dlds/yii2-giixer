@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "yiisoft/yii2-gii": "*"
+        "yiisoft/yii2-gii": "2.0.4"
     },
     "autoload": {
         "psr-4": {
