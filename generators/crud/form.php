@@ -14,3 +14,12 @@ echo $form->field($generator, 'indexWidgetType')->dropDownList([
 ]);
 echo $form->field($generator, 'enableI18N')->checkbox();
 echo $form->field($generator, 'messageCategory');
+?>
+
+<?=
+    $form->field($generator, 'template')->sticky()
+    ->label('Code Template')
+    ->dropDownList($templates)->hint('
+                        Please select which set of the templates should be used to generated the code.
+                ')
+?>

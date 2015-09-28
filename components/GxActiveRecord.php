@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @link http://www.digitaldeals.cz/
  * @copyright Copyright (c) 2014 Digital Deals s.r.o.
@@ -11,6 +10,7 @@ namespace dlds\giixer\components;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
 use yii\db\ActiveRecord;
+use dlds\giixer\components\helpers\GxModelHelper;
 
 /**
  * GxActiveRecord is the base class for classes representing relational data in terms of objects.
@@ -34,22 +34,7 @@ abstract class GxActiveRecord extends ActiveRecord {
      */
     public function load($data, $formName = null)
     {
-        if ($data)
-        {
-            $className = StringHelper::basename(static::className());
-
-            foreach ($data as $key => $value)
-            {
-                if (preg_match(sprintf('/^%s_.*$/', $className), $key))
-                {
-                    $attr = ltrim(strstr($key, '_'), '_');
-
-                    $data[$className][$attr] = $value;
-
-                    unset($data[$key]);
-                }
-            }
-        }
+        GxModelHelper::adaptData($data, static::className());
 
         return parent::load($data, $formName);
     }
@@ -60,26 +45,7 @@ abstract class GxActiveRecord extends ActiveRecord {
      */
     protected function removeValidationRules(&$rules, $validator, array $attrs = [])
     {
-        foreach ($rules as $i => &$rule)
-        {
-            if ($validator === $rule[1])
-            {
-                if (empty($attrs))
-                {
-                    ArrayHelper::remove($rules, $i);
-                }
-                else
-                {
-                    foreach ($rule[0] as $j => $attr)
-                    {
-                        if (in_array($attr, $attrs))
-                        {
-                            ArrayHelper::remove($rule[0], $j);
-                        }
-                    }
-                }
-            }
-        }
+        GxModelHelper::removeValidationRules($rules, $validator, $attrs);
     }
 
     /**
@@ -90,18 +56,7 @@ abstract class GxActiveRecord extends ActiveRecord {
      */
     protected function removeScenarioAttributes(&$scenarios, $name, array $attrs = [])
     {
-        if (isset($scenarios[$name]))
-        {
-            foreach ($attrs as $attr)
-            {
-                $key = array_search($attr, $scenarios[$name]);
-
-                if (false !== $key)
-                {
-                    ArrayHelper::remove($scenarios[$name], $key);
-                }
-            }
-        }
+        GxModelHelper::removeScenarioAttributes($scenarios, $name, $attrs);
     }
 
     /**
@@ -112,23 +67,7 @@ abstract class GxActiveRecord extends ActiveRecord {
      */
     protected function setAttributesUnsafe(&$scenarios, $name, array $attrs = [])
     {
-        if (isset($scenarios[$name]))
-        {
-            foreach ($attrs as $attr)
-            {
-                $key = array_search($attr, $scenarios[$name]);
-
-                if (false !== $key)
-                {
-                    $value = $scenarios[$name][$key];
-
-                    if (!StringHelper::startsWith($value, '!'))
-                    {
-                        $scenarios[$name][$key] = sprintf('!%s', $value);
-                    }
-                }
-            }
-        }
+        GxModelHelper::setAttributesUnsafe($scenarios, $name, $attrs);
     }
 
     /**
@@ -138,5 +77,4 @@ abstract class GxActiveRecord extends ActiveRecord {
     {
         return $this->primaryKey;
     }
-
 }

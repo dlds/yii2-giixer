@@ -24,6 +24,7 @@ class Module extends \yii\gii\Module {
     protected function coreGenerators()
     {
         return [
+            'ultimate' => ['class' => 'dlds\giixer\generators\ultimate\Generator'],
             'model' => ['class' => 'dlds\giixer\generators\model\Generator'],
             'crud' => ['class' => 'dlds\giixer\generators\crud\Generator'],
             'controller' => ['class' => 'yii\gii\generators\controller\Generator'],
