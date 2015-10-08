@@ -17,7 +17,7 @@ use yii\web\AssetBundle;
  */
 class GiixerAsset extends AssetBundle {
 
-    public $sourcePath = '@dlds/giixes/assets';
+    public $sourcePath = '@dlds/giixer/assets';
     public $css = [
         //'main.css',
     ];
