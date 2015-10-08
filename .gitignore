@@ -8,3 +8,4 @@ netbeans/*
 /nbproject/private/
 /vendor/
 /nbproject/
+!/assets/giixer.js
