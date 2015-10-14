@@ -3,11 +3,13 @@
 namespace dlds\giixer\components\helpers;
 
 class GxHelper {
-
+	
     /**
      * Flashes
      */
+    const FLASH_INFO = 'flash_info';
     const FLASH_SUCCESS = 'flash_success';
+    const FLASH_WARNING = 'flash_warning';
     const FLASH_ERROR = 'flash_error';
 
     /**
