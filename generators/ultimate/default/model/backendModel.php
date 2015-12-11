@@ -1,27 +1,18 @@
 <?php
-/**
- * This is the template for generating the model class of a specified table.
- */
 /* @var $this yii\web\View */
-/* @var $generator gs7\giix\generators\model\Generator */
-/* @var $tableName string full table name */
-/* @var $className string class name */
-/* @var $tableSchema yii\db\TableSchema */
-/* @var $labels string[] list of attribute labels (name => label) */
-/* @var $rules string[] list of validation rules */
-/* @var $relations array list of relations (name => relation declaration) */
+/* @var $generator \dlds\giixer\generators\ultimate\Generator */
 
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->getFileNs(basename(__FILE__, '.php'), $className) ?>;
+namespace <?= $generator->helperModel->getNsByPattern(basename(__FILE__, '.php'), $generator->helperModel->getModelClass(true)) ?>;
 
 /**
- * This is the backend model class for table "<?= $generator->generateTableName($tableName) ?>".
+ * This is the backend model class for table "<?= $generator->generateTableName($generator->tableName) ?>".
  *
  * @inheritdoc
- * @see <?= '\\'.ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\')."\n" ?>
+ * @see <?= $generator->helperModel->getModelParentClass(basename(__FILE__, '.php'), false, true) . "\n" ?>
  */
-class <?= $className ?> extends <?= '\\'.ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') ?> {
+class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $generator->helperModel->getModelParentClass(basename(__FILE__, '.php'), false, true) ?> {
 
 }

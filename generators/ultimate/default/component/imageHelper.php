@@ -16,7 +16,7 @@ use yii\helpers\Inflector;
 
 echo "<?php\n";
 
-$assignedModelClass = sprintf('%s\\%s', $generator->getFileNs('frontendModel', $assignedModelName), $assignedModelName);
+$assignedModelClass = sprintf('%s\\%s', $generator->getNsByPattern('frontendModel', $assignedModelName), $assignedModelName);
 ?>
 
 namespace <?= $namespace ?>;
@@ -29,7 +29,7 @@ use <?= $assignedModelClass ?>;
  * @inheritdoc
  * @see <?= $assignedModelClass."\n" ?>
  */
-abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className, $generator->helperImageBaseClass), '\\') ?> {
+abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className, $generator->baseClassImageHelper), '\\') ?> {
 
     /**
      * Retrieves assigned model class

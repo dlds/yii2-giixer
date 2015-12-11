@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @link http://www.digitaldeals.cz/
  * @copyright Copyright (c) 2014 Digital Deals s.r.o. 
@@ -15,7 +14,17 @@ namespace dlds\giixer;
  */
 class Module extends \yii\gii\Module {
 
-    public $modelsNamespaces;
+    public $nsMap;
+
+    /**
+     * @var string base backend controller class
+     */
+    public $controllerBackendBaseClass = false;
+
+    /**
+     * @var string base frontend controller class
+     */
+    public $controllerFrontendBaseClass = false;
 
     /**
      * Returns the list of the core code generator configurations.
@@ -33,5 +42,4 @@ class Module extends \yii\gii\Module {
             'extension' => ['class' => 'yii\gii\generators\extension\Generator'],
         ];
     }
-
 }

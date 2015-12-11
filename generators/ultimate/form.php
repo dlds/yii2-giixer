@@ -9,6 +9,8 @@ use dlds\giixer\GiixerAsset;
 
 GiixerAsset::register($this);
 
+echo $form->errorSummary($generator);
+
 echo $form->field($generator, 'tableName');
 ?>
 <div class="row">
@@ -90,6 +92,9 @@ echo $form->field($generator, 'tableName');
         echo $form->field($generator, 'queryBaseClass');
         echo $form->field($generator, 'enableI18N')->checkbox();
         echo $form->field($generator, 'messageCategory');
+        echo $form->field($generator, 'controllerClass');
+        echo $form->field($generator, 'searchClass');
+        echo $form->field($generator, 'viewPath');
         ?>
 
         <?=

@@ -15,7 +15,7 @@
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->getFileNs(basename(__FILE__, '.php'), $className) ?>;
+namespace <?= $generator->getNsByPattern(basename(__FILE__, '.php'), $className) ?>;
 
 use Yii;
 
@@ -84,7 +84,7 @@ abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseCla
 
 <?php if ($queryClassName): ?>
 <?php
-    $queryClassFullName = '\\'.$generator->getFileNs('frontendQuery', $queryClassName).'\\'.$queryClassName;
+    $queryClassFullName = '\\'.$generator->getNsByPattern('frontendQuery', $queryClassName).'\\'.$queryClassName;
     echo "\n";
 ?>
     /**

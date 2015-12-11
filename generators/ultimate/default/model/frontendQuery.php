@@ -1,24 +1,17 @@
 <?php
-/**
- * This is the template for generating the ActiveQuery class.
- */
 /* @var $this yii\web\View */
-/* @var $generator yii\gii\generators\model\Generator */
-/* @var $className string class name */
-/* @var $modelClassName string related model class name */
-
-$modelFullClassName = '\\'.$generator->getFileNs(basename(__FILE__, '.php'), $className).'\\'.$modelClassName;
+/* @var $generator \dlds\giixer\generators\ultimate\Generator */
 
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->getFileNs(basename(__FILE__, '.php'), $className) ?>;
+namespace <?= $generator->helperModel->getNsByPattern(basename(__FILE__, '.php'), $generator->helperModel->getQueryClass(true)) ?>;
 
 /**
-* This is the ActiveQuery class for [[<?= $modelFullClassName ?>]].
-*
-* @see <?= $modelFullClassName."\n" ?>
-*/
-class <?= $className ?> extends <?= '\\'.ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className, $generator->queryBaseClass), '\\') ?> {
+ * This is frontend ActiveQuery class for [[<?= $generator->helperModel->getModelClass() ?>]].
+ *
+ * @see <?= $generator->helperModel->getModelClass()."\n" ?>
+ */
+class <?= $generator->helperModel->getQueryClass(true) ?> extends <?= $generator->helperModel->getQueryParentClass(basename(__FILE__, '.php'), false, true) ?> {
 
 }

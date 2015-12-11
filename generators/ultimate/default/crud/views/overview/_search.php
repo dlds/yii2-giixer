@@ -4,7 +4,7 @@ use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
 
 /* @var $this yii\web\View */
-/* @var $generator yii\gii\generators\crud\Generator */
+/* @var $generator \dlds\giixer\generators\ultimate\Generator */
 
 echo "<?php\n";
 ?>
@@ -13,7 +13,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model <?= ltrim($generator->searchModelClass, '\\') ?> */
+/* @var $model <?= ltrim($generator->searchClass, '\\') ?> */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -26,11 +26,11 @@ use yii\widgets\ActiveForm;
 
 <?php
 $count = 0;
-foreach ($generator->getColumnNames() as $attribute) {
+foreach ($columnNames as $attribute) {
     if (++$count < 6) {
-        echo "    <?= " . $generator->generateActiveSearchField($attribute) . " ?>\n\n";
+        echo "    <?= " . $generator->generateActiveSearchField($tableSchema, $attribute) . " ?>\n\n";
     } else {
-        echo "    <?php // echo " . $generator->generateActiveSearchField($attribute) . " ?>\n\n";
+        echo "    <?php // echo " . $generator->generateActiveSearchField($tableSchema, $attribute) . " ?>\n\n";
     }
 }
 ?>

@@ -11,6 +11,10 @@ use Yii;
 use ReflectionClass;
 use yii\gii\CodeFile;
 use yii\helpers\ArrayHelper;
+use yii\db\Schema;
+use yii\helpers\StringHelper;
+use yii\helpers\Inflector;
+use yii\web\View;
 use dlds\giixer\components\helpers\GxModelHelper;
 
 /**
@@ -21,12 +25,9 @@ use dlds\giixer\components\helpers\GxModelHelper;
 class Generator extends \yii\gii\generators\model\Generator {
 
     /**
-     * TMPLs
+     * IDs
      */
-    const TMPL_MODEL_DIR_PATH = 'model';
-    const TMPL_CRUD_DIR_PATH = 'crud';
-    const TMPL_COMPONENT_DIR_PATH = 'component';
-    const TMPL_IDENTICIFATION = 'default';
+    const ID_CURRENT_TMPL = 'default';
 
     /**
      * NSs
@@ -55,24 +56,15 @@ class Generator extends \yii\gii\generators\model\Generator {
     const SUFFIX_CLASS_IMAGE_HELPER = 'ImageHelper';
 
     /**
+     * Widgets
+     */
+    const WIDGET_TYPE_OVERVIEW_GRID = 1;
+    const WIDGET_TYPE_OVERVIEW_LIST = 2;
+
+    /**
      * @var string default ns
      */
-    public $ns = 'app\models\db';
-
-    /**
-     * @var string model baseClass
-     */
-    public $modelBaseClass = 'dlds\giixer\components\GxActiveRecord';
-
-    /**
-     * @var string query baseClass
-     */
-    public $queryBaseClass = 'dlds\giixer\components\GxActiveQuery';
-
-    /**
-     * @var string imageHelper baseClass
-     */
-    public $helperImageBaseClass = 'dlds\giixer\components\helpers\GxImageHelper';
+    public $nsCommon = 'app';
 
     /**
      * @var boolean indicates if language mutations should be generated
@@ -131,32 +123,42 @@ class Generator extends \yii\gii\generators\model\Generator {
     public $generateGalleryBehavior = false;
 
     /**
-     * @var array models namespaces
+     * @var string controller class name
      */
-    public $nsMap = array(
-        'model' => 'common\{ns}\base',
-        'query' => 'common\{ns}',
-        'helper' => 'common\{ns}\components\helpers',
-        'commonModel' => 'common\{ns}',
-        'frontendModel' => 'app\{ns}',
-        'backendModel' => 'app\{ns}',
-        'frontendQuery' => 'app\{ns}',
-        'backendQuery' => 'app\{ns}',
-    );
+    public $controllerClass = false;
 
     /**
-     * @var array models baseClasses
+     * @var string search model class
      */
-    public $baseClassesMap = array(
-        'commonModel' => 'common\{ns}\base\{class}',
-        'backendModel' => 'common\{ns}\{class}',
-        'frontendModel' => 'common\{ns}\{class}',
-        'backendQuery' => 'common\{ns}\{class}',
-        'frontendQuery' => 'common\{ns}\{class}',
-    );
+    public $searchClass = false;
 
     /**
-     * @var array containing files to be generated
+     * @var string path to CRUD views
+     */
+    public $viewPath = false;
+
+    /**
+     * @var type
+     */
+    public $overviewWidgetType = self::WIDGET_TYPE_OVERVIEW_GRID;
+
+    /**
+     * @var helpers\CrudHelper
+     */
+    public $helperCrud;
+
+    /**
+     * @var helpers\ModelHelper
+     */
+    public $helperModel;
+
+    /**
+     * @var helpers\ComponentHelper
+     */
+    public $helperComponent;
+
+    /**
+     * @var array containing model files to be generated
      */
     public $modelFilesMap = array(
         'model' => 'common/{ns}/base',
@@ -166,12 +168,28 @@ class Generator extends \yii\gii\generators\model\Generator {
     );
 
     /**
-     * @var array containing files to be generated
+     * @var array containing query files to be generated
      */
     public $queryFilesMap = array(
         'query' => 'common/{ns}',
         'backendQuery' => 'backend/{ns}',
         'frontendQuery' => 'frontend/{ns}',
+    );
+
+    /**
+     * @var array containing search files to be generated
+     */
+    public $searchFilesMap = array(
+        'backendSearch' => 'backend/{ns}',
+        'frontendSearch' => 'frontend/{ns}',
+    );
+
+    /**
+     * @var array containing controller files to be generated
+     */
+    public $controllerFilesMap = array(
+        'backendController' => 'backend/{ns}',
+        'frontendController' => 'frontend/{ns}',
     );
 
     /**
@@ -184,7 +202,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * @var array static namespaces
      */
-    public $staticNs = [];
+    public $nsMap = [];
 
     /**
      * @var array used classes
@@ -196,25 +214,28 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function init()
     {
-        if (!isset($this->templates[self::TMPL_IDENTICIFATION]))
+        if (!isset($this->templates[self::ID_CURRENT_TMPL]))
         {
-            $this->templates[self::TMPL_IDENTICIFATION] = $this->tmplsRootDir();
+            $this->templates[self::ID_CURRENT_TMPL] = $this->tmplsRootDir();
         }
 
-        $this->staticNs = Yii::$app->getModule('gii')->modelsNamespaces;
+        $this->nsMap = Yii::$app->getModule('gii')->nsMap;
 
-        if (!empty($this->staticNs) && !is_array($this->staticNs))
+        if (!empty($this->nsMap) && !is_array($this->nsMap))
         {
-            throw new \yii\base\ErrorException('Gii Model Namespaces should be array');
+            throw new \yii\base\ErrorException('Giier nsMap should be array');
         }
 
         $this->generateQuery = true;
         $this->generateRelations = true;
         $this->enableI18N = true;
-        $this->template = self::TMPL_IDENTICIFATION;
+        $this->template = self::ID_CURRENT_TMPL;
         $this->messageCategory = null;
         $this->queryNs = null;
-        $this->ns = self::NS_ACTIVE_RECORD;
+
+        $this->helperCrud = new helpers\CrudHelper($this);
+        $this->helperModel = new helpers\ModelHelper($this);
+        $this->helperComponent = new helpers\ComponentHelper($this);
 
         return parent::init();
     }
@@ -296,6 +317,16 @@ class Generator extends \yii\gii\generators\model\Generator {
     }
 
     /**
+     * Retrieves classname
+     * @param string $tableName
+     * @return string
+     */
+    public function getClassName($tableName)
+    {
+        return $this->generateClassName($tableName);
+    }
+
+    /**
      * @inheritdoc
      */
     public function hints()
@@ -365,78 +396,35 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function generate()
     {
-        if (self::TMPL_IDENTICIFATION !== $this->template)
+        if (self::ID_CURRENT_TMPL !== $this->template)
         {
             return parent::generate();
         }
 
         $files = [];
-        $relations = $this->generateRelations();
-        //$relations = [];
+        //$relations = $this->generateRelations();
+
         $db = $this->getDbConnection();
 
-        foreach ($this->getTableNames() as $tableName)
-        {
-            // model :
-            $modelClassName = $this->generateClassName($tableName);
-            $queryClassName = ($this->generateQuery) ? $this->generateQueryClassName($modelClassName) : false;
-            $tableSchema = $db->getTableSchema($tableName);
-            $params = [
-                'tableName' => $tableName,
-                'className' => $modelClassName,
-                'queryClassName' => $queryClassName,
-                'tableSchema' => $tableSchema,
-                'labels' => $this->generateLabels($tableSchema),
-                'rules' => $this->generateRules($tableSchema),
-                'relations' => isset($relations[$tableName]) ? $relations[$tableName] : [],
-            ];
+        $tableSchema = $db->getTableSchema($this->tableName);
 
-            if ($this->generateGalleryBehavior)
-            {
-                $helperClassName = sprintf('%s%s', $modelClassName, self::SUFFIX_CLASS_IMAGE_HELPER);
+        // Generate MODEL components
+        $this->helperComponent->generateComponents($tableSchema, $files);
 
-                $ns = $this->getComponentNs(self::COMPONENT_IMAGE_HELPER, $helperClassName);
+        // Generate MODEL classes
+        $this->helperModel->generateModels($tableSchema, $files);
 
-                $this->usedClasses[] = sprintf('%s\%s', $ns, $helperClassName);
+        // Generate MODEL query classes
+        $this->helperModel->generateQueries($tableSchema, $files);
 
-                $path = str_replace('\\', '/', $ns);
+        // Generate MODEL search classes
+        $this->helperModel->generateSearches($tableSchema, $files);
 
-                $files[] = new CodeFile(
-                    Yii::getAlias('@'.$path).'/'.$helperClassName.'.php', $this->render(sprintf('%s/%s.php', self::TMPL_COMPONENT_DIR_PATH, self::COMPONENT_IMAGE_HELPER), [
-                        'namespace' => $ns,
-                        'className' => $helperClassName,
-                        'assignedModelName' => $modelClassName,
-                    ])
-                );
-            }
+        // Generate CRUD controller
+        $this->helperCrud->generateController($tableSchema, $files);
 
-            foreach ($this->modelFilesMap as $tmpl => $ns)
-            {
-                $path = '@'.str_replace('\\', '/', str_replace('{ns}', $this->getNs($modelClassName), $ns));
-
-                $files[] = new CodeFile(
-                    Yii::getAlias($path).'/'.$modelClassName.'.php', $this->render(sprintf('%s/%s.php', self::TMPL_MODEL_DIR_PATH, $tmpl), $params)
-                );
-            }
-
-            // query :
-            if ($queryClassName)
-            {
-                $params = [
-                    'className' => $queryClassName,
-                    'modelClassName' => $modelClassName,
-                ];
-
-                foreach ($this->queryFilesMap as $tmpl => $ns)
-                {
-                    $path = '@'.str_replace('\\', '/', str_replace('{ns}', $this->getNs($queryClassName), $ns));
-
-                    $files[] = new CodeFile(
-                        Yii::getAlias($path).'/'.$queryClassName.'.php', $this->render(sprintf('%s/%s.php', self::TMPL_MODEL_DIR_PATH, $tmpl), $params)
-                    );
-                }
-            }
-        }
+        // Generate CRUD views
+        $this->helperCrud->generateViews($tableSchema, $files);
 
         return $files;
     }
@@ -444,7 +432,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * @return array the generated relation declarations
      */
-    protected function generateRelations()
+    public function generateRelations()
     {
         if (!$this->generateRelations)
         {
@@ -495,7 +483,7 @@ class Generator extends \yii\gii\generators\model\Generator {
                     $link = $this->generateRelationLink(array_flip($refs));
                     $relationName = $this->generateRelationName($relations, $table, $fks[0], false);
                     $relations[$table->fullName][$relationName] = [
-                        "return \$this->hasOne(\\".$this->getNs($refClassName, true)."\\$refClassName::className(), $link);",
+                        "return \$this->hasOne(\\".$this->helperModel->getNsByMap($refClassName)."\\$refClassName::className(), $link);",
                         $refClassName,
                         false,
                     ];
@@ -522,7 +510,7 @@ class Generator extends \yii\gii\generators\model\Generator {
                     $link = $this->generateRelationLink($refs);
                     $relationName = $this->generateRelationName($relations, $refTableSchema, $className, $hasMany);
                     $relations[$refTableSchema->fullName][$relationName] = [
-                        "return \$this->".($hasMany ? 'hasMany' : 'hasOne')."(\\".$this->getNs($className, true)."\\$className::className(), $link);",
+                        "return \$this->".($hasMany ? 'hasMany' : 'hasOne')."(\\".$this->helperModel->getNsByMap($className)."\\$className::className(), $link);",
                         $className,
                         $hasMany,
                     ];
@@ -561,7 +549,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         $viaLink = $this->generateRelationLink([$table->primaryKey[0] => $fks[$table->primaryKey[0]][1]]);
         $relationName = $this->generateRelationName($relations, $table0Schema, $table->primaryKey[1], true);
         $relations[$table0Schema->fullName][$relationName] = [
-            "return \$this->hasMany(\\".$this->getNs($className1, true)."\\$className1::className(), $link)->viaTable('".$this->generateTableName($table->name)."', $viaLink);",
+            "return \$this->hasMany(\\".$this->helperModel->getNsByMap($className1)."\\$className1::className(), $link)->viaTable('".$this->generateTableName($table->name)."', $viaLink);",
             $className1,
             true,
         ];
@@ -570,12 +558,146 @@ class Generator extends \yii\gii\generators\model\Generator {
         $viaLink = $this->generateRelationLink([$table->primaryKey[1] => $fks[$table->primaryKey[1]][1]]);
         $relationName = $this->generateRelationName($relations, $table1Schema, $table->primaryKey[0], true);
         $relations[$table1Schema->fullName][$relationName] = [
-            "return \$this->hasMany(\\".$this->getNs($className0, true)."\\$className0::className(), $link)->viaTable('".$this->generateTableName($table->name)."', $viaLink);",
+            "return \$this->hasMany(\\".$this->helperModel->getNsByMap($className0)."\\$className0::className(), $link)->viaTable('".$this->generateTableName($table->name)."', $viaLink);",
             $className0,
             true,
         ];
 
         return $relations;
+    }
+
+    
+
+    public function getNameAttribute(\yii\db\TableSchema $table)
+    {
+        foreach ($this->getColumnNames($table) as $name)
+        {
+            if (!strcasecmp($name, 'name') || !strcasecmp($name, 'title'))
+            {
+                return $name;
+            }
+        }
+
+        if (is_array($table->primaryKey))
+        {
+            return ArrayHelper::getValue($table->primaryKey, 0);
+        }
+
+        throw new \yii\base\ErrorException('Primary key is invalid');
+    }
+
+    /**
+     * Generates code for active field
+     * @param string $attribute
+     * @return string
+     */
+    public function generateActiveField($attribute)
+    {
+        $tableSchema = $this->getTableSchema();
+        if ($tableSchema === false || !isset($tableSchema->columns[$attribute]))
+        {
+            if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute))
+            {
+                return "\$form->field(\$model, '$attribute')->passwordInput()";
+            }
+            else
+            {
+                return "\$form->field(\$model, '$attribute')";
+            }
+        }
+        $column = $tableSchema->columns[$attribute];
+        if ($column->phpType === 'boolean')
+        {
+            return "\$form->field(\$model, '$attribute')->checkbox()";
+        }
+        elseif ($column->type === 'text')
+        {
+            return "\$form->field(\$model, '$attribute')->textarea(['rows' => 6])";
+        }
+        else
+        {
+            if (preg_match('/^(password|pass|passwd|passcode)$/i', $column->name))
+            {
+                $input = 'passwordInput';
+            }
+            else
+            {
+                $input = 'textInput';
+            }
+            if (is_array($column->enumValues) && count($column->enumValues) > 0)
+            {
+                $dropDownOptions = [];
+                foreach ($column->enumValues as $enumValue)
+                {
+                    $dropDownOptions[$enumValue] = Inflector::humanize($enumValue);
+                }
+                return "\$form->field(\$model, '$attribute')->dropDownList("
+                    .preg_replace("/\n\s*/", ' ', VarDumper::export($dropDownOptions)).", ['prompt' => ''])";
+            }
+            elseif ($column->phpType !== 'string' || $column->size === null)
+            {
+                return "\$form->field(\$model, '$attribute')->$input()";
+            }
+            else
+            {
+                return "\$form->field(\$model, '$attribute')->$input(['maxlength' => $column->size])";
+            }
+        }
+    }
+
+    /**
+     * Generates code for active search field
+     * @param string $attribute
+     * @return string
+     */
+    public function generateActiveSearchField(\yii\db\TableSchema $tableSchema, $attribute)
+    {
+        if ($tableSchema === false)
+        {
+            return "\$form->field(\$model, '$attribute')";
+        }
+        $column = $tableSchema->columns[$attribute];
+        if ($column->phpType === 'boolean')
+        {
+            return "\$form->field(\$model, '$attribute')->checkbox()";
+        }
+        else
+        {
+            return "\$form->field(\$model, '$attribute')";
+        }
+    }
+
+    /**
+     * Generates column format
+     * @param \yii\db\ColumnSchema $column
+     * @return string
+     */
+    public function generateColumnFormat($column)
+    {
+        if ($column->phpType === 'boolean')
+        {
+            return 'boolean';
+        }
+        elseif ($column->type === 'text')
+        {
+            return 'ntext';
+        }
+        elseif (stripos($column->name, 'time') !== false && $column->phpType === 'integer')
+        {
+            return 'datetime';
+        }
+        elseif (stripos($column->name, 'email') !== false)
+        {
+            return 'email';
+        }
+        elseif (stripos($column->name, 'url') !== false)
+        {
+            return 'url';
+        }
+        else
+        {
+            return 'text';
+        }
     }
 
     /**
@@ -597,105 +719,27 @@ class Generator extends \yii\gii\generators\model\Generator {
     }
 
     /**
-     * Retrieves namespace
-     */
-    public function getNs($className, $root = false)
-    {
-        $namespace = false;
-
-        foreach ($this->staticNs as $regex => $ns)
-        {
-            if (preg_match('%'.$regex.'%', $className))
-            {
-                $namespace = $ns;
-
-                break;
-            }
-        }
-
-        if (false === $namespace)
-        {
-            $namespace = $this->ns;
-        }
-
-        if (!$root)
-        {
-            return str_replace('app\\', '', $namespace);
-        }
-
-        return $namespace;
-    }
-
-    /**
-     * @return string current file ns
-     */
-    public function getFileNs($file, $className = null)
-    {
-        if (isset($this->nsMap[$file]))
-        {
-            return str_replace('{ns}', $this->getNs($className), $this->nsMap[$file]);
-        }
-
-        return $this->ns;
-    }
-
-    /**
-     * @return string cuurent file baseClass
-     */
-    public function getBaseClass($file, $className, $default = false)
-    {
-        if (isset($this->baseClassesMap[$file]))
-        {
-            $baseClass = str_replace('{ns}', $this->getNs($className), $this->baseClassesMap[$file]);
-
-            return str_replace('{class}', $className, $baseClass);
-        }
-
-        return (false !== $default) ? $default : $this->modelBaseClass;
-    }
-
-    /**
      * @return string current component ns
      */
     public function getComponentNs($file, $className)
     {
         if (isset($this->componentsFilesMap[$file]))
         {
-            return str_replace('{ns}', $this->getNs($className), $this->componentsFilesMap[$file]);
+            return str_replace('{ns}', $this->getNsByMap($className, true), $this->componentsFilesMap[$file]);
         }
 
-        return $this->ns;
+        return $this->nsCommon;
     }
 
     /**
      * @inheritdoc
      */
-    public function requiredTemplates()
+    public function requiredTmplFiles()
     {
-        // @todo make 'query.php' to be required before 2.1 release
         return [
-            self::TMPL_MODEL_DIR_PATH => [
-                'model.php',
-                'backendModel.php',
-                'frontendModel.php',
-                'commonModel.php',
-                'query.php',
-                'backendQuery.php',
-                'frontendQuery.php',
-            ],
-            self::TMPL_CRUD_DIR_PATH => [
-                'controller.php',
-                'search.php',
-                'views/view.php',
-                'views/update.php',
-                'views/index.php',
-                'views/create.php',
-                'views/_search.php',
-                'views/_form.php',
-            ],
-            self::TMPL_COMPONENT_DIR_PATH => [
-                'imageHelper.php'
-            ],
+            helpers\ModelHelper::DIR_MODEL_TMPLS_PATH => $this->helperModel->getRequiredTmplFiles(),
+            helpers\CrudHelper::DIR_CRUD_TMPLS_PATH => $this->helperCrud->getRequiredTmplFiles(),
+            helpers\ComponentHelper::DIR_COMPONENT_TMPLS_PATH => $this->helperComponent->getRequiredTmplFiles(),
         ];
     }
 
@@ -706,8 +750,8 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         parent::validateNamespace();
 
-        $this->ns = ltrim($this->ns, '\\');
-        if (false === strpos($this->ns, 'app\\'))
+        $this->nsCommon = ltrim($this->nsCommon, '\\');
+        if (false === strpos($this->nsCommon, 'app'))
         {
             $this->addError('ns', '@app namespace must be used.');
         }
@@ -758,7 +802,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         else
         {
             $templateRoot = $this->templates[$this->template];
-            foreach ($this->requiredTemplates() as $subDir => $tmpls)
+            foreach ($this->requiredTmplFiles() as $subDir => $tmpls)
             {
                 foreach ($tmpls as $tmpl)
                 {
@@ -884,7 +928,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         $class = new ReflectionClass($this);
 
-        return sprintf('%s/%s', dirname($class->getFileName()), self::TMPL_IDENTICIFATION);
+        return sprintf('%s/%s', dirname($class->getFileName()), self::ID_CURRENT_TMPL);
     }
 
     /**
@@ -944,12 +988,12 @@ class Generator extends \yii\gii\generators\model\Generator {
             ];
 
             /*
-            $relation['AppGalleryCover'] = '$this->hasOne(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
-                ->where(['type' => EduPostImageHelper::getType()])
-                ->orderBy(['rank' => SORT_ASC]);';
+              $relation['AppGalleryCover'] = '$this->hasOne(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
+              ->where(['type' => EduPostImageHelper::getType()])
+              ->orderBy(['rank' => SORT_ASC]);';
 
-            $relation['AppGalleryImages'] = '$this->hasMany(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
-                ->where(['type' => EduPostImageHelper::getType()]);'
+              $relation['AppGalleryImages'] = '$this->hasMany(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
+              ->where(['type' => EduPostImageHelper::getType()]);'
              *
              */
         }
@@ -996,5 +1040,21 @@ class Generator extends \yii\gii\generators\model\Generator {
     public function getBehaviorName($key)
     {
         return 'b_'.$key;
+    }
+
+    /**
+     * Generates code using the specified code template and parameters.
+     * Note that the code template will be used as a PHP file.
+     * @param string $template the code template file. This must be specified as a file path
+     * relative to [[templatePath]].
+     * @param array $params list of parameters to be passed to the template file.
+     * @return string the generated code
+     */
+    public function renderFile($file, $params = [])
+    {
+        $view = new View();
+        $params['generator'] = $this;
+
+        return $view->renderFile($file, $params, $this);
     }
 }

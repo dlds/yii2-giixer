@@ -15,7 +15,7 @@
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->getFileNs(basename(__FILE__, '.php'), $className) ?>;
+namespace <?= $generator->getNsByPattern(basename(__FILE__, '.php'), $className) ?>;
 
 /**
  * This is the model class for table "<?= $generator->generateTableName($tableName) ?>".

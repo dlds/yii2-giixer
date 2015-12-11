@@ -90,7 +90,7 @@ class Generator extends \yii\gii\generators\model\Generator {
             $this->templates[self::TMPL_NAME] = $this->extendedTemplate();
         }
 
-        $this->staticNs = Yii::$app->getModule('gii')->modelsNamespaces;
+        $this->staticNs = Yii::$app->getModule('gii')->nsMap;
 
         if (!empty($this->staticNs) && !is_array($this->staticNs))
         {

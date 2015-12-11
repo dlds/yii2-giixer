@@ -1,15 +1,9 @@
 <?php
-/**
- * This is the template for generating the model class of a specified table.
- */
 
 use yii\helpers\Inflector;
 
 /* @var $this yii\web\View */
 /* @var $generator dlds\giixer\generators\ultimate\Generator */
-/* @var $tableName string full table name */
-/* @var $className string class name */
-/* @var $tableSchema yii\db\TableSchema */
 /* @var $labels string[] list of attribute labels (name => label) */
 /* @var $rules string[] list of validation rules */
 /* @var $relations array list of relations (name => relation declaration) */
@@ -17,7 +11,7 @@ use yii\helpers\Inflector;
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->getFileNs(basename(__FILE__, '.php'), $className) ?>;
+namespace <?= $generator->helperModel->getNsByPattern(basename(__FILE__, '.php'), $generator->helperModel->getModelClass(true)) ?>;
 
 use Yii;
 <?php foreach ($generator->usedClasses as $class): ?>
@@ -25,19 +19,19 @@ use <?= $class.";\n" ?>
 <?php endforeach; ?>
 
 /**
- * This is the model class for table "<?= $generator->generateTableName($tableName) ?>".
+ * This is base model class for table "<?= $generator->generateTableName($generator->tableName) ?>".
  *
-<?php foreach ($tableSchema->columns as $column): ?>
+<?php foreach ($columns as $column): ?>
  * @property <?= "{$column->phpType} \${$column->name}\n" ?>
 <?php endforeach; ?>
 <?php if (!empty($relations)): ?>
  *
 <?php foreach ($relations as $name => $relation): ?>
- * @property <?= $relation[1] . ($relation[2] ? '[]' : '') . ' $' . lcfirst($name) . "\n" ?>
+ * @property <?= $generator->helperModel->getFullyQualifiedName($relation[1], true) . ($relation[2] ? '[]' : '') . ' $' . lcfirst($name) . "\n" ?>
 <?php endforeach; ?>
 <?php endif; ?>
  */
-abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className), '\\') ?> {
+abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $generator->helperModel->getModelParentClass(basename(__FILE__, '.php'), false, true) ?> {
 
     <?= '// <editor-fold defaultstate="collapsed" desc="CONSTANTS: Relations names">'."\n" ?>
 <?php foreach ($relations as $name => $relation): ?>
@@ -58,7 +52,7 @@ abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseCla
      */
     public static function tableName()
     {
-        return '<?= $generator->generateTableName($tableName) ?>';
+        return '<?= $generator->generateTableName($generator->tableName) ?>';
     }
 <?php if ($generator->db !== 'db'): ?>
 
@@ -106,7 +100,13 @@ abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseCla
      */
     public function rules()
     {
-        return [<?= "\n            " . implode(",\n            ", $rules) . "\n        " ?>];
+        $rules = [<?= "\n            " . implode(",\n            ", $rules) . "\n        " ?>];
+
+<?php if($generator->generateTimestampBehavior): ?>
+        $this->removeValidationRules($rules, 'required', ['<?= $generator->timestampCreatedAtAttribute ?>', '<?= $generator->timestampUpdatedAtAttribute ?>']);
+
+<?php endif; ?>
+        return $rules;
     }
 
     /**
@@ -130,18 +130,13 @@ abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseCla
         <?= $relation[0] . "\n" ?>
     }
 <?php endforeach; ?>
-<?php if ($queryClassName): ?>
-<?php
-    $queryClassFullName = '\\'.$generator->getFileNs('frontendQuery', $queryClassName).'\\'.$queryClassName;
-    echo "\n";
-?>
+    
     /**
      * @inheritdoc
-     * @return <?= $queryClassFullName ?> the active query used by this AR class.
+     * @return <?= $generator->helperModel->getQueryClass(false, true) ?> the active query used by this AR class.
      */
     public static function find()
     {
-        return new <?= $queryClassFullName ?>(get_called_class());
+        return new <?= $generator->helperModel->getQueryClass(false, true) ?>(get_called_class());
     }
-<?php endif; ?>
 }
