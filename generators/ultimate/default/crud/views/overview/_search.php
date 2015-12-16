@@ -11,26 +11,27 @@ echo "<?php\n";
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true) ?>;
 
 /* @var $this yii\web\View */
-/* @var $model <?= ltrim($generator->searchClass, '\\') ?> */
+/* @var $model <?= $generator->helperModel->getSearchClass(false, true) ?> */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-search">
 
     <?= "<?php " ?>$form = ActiveForm::begin([
-        'action' => ['index'],
+        'action' => <?= $generator->helperComponent->getHelperClass('backendRouteHelper', true, false) ?>::index(),
         'method' => 'get',
     ]); ?>
 
 <?php
 $count = 0;
-foreach ($columnNames as $attribute) {
+foreach ($safeAttributes as $attribute) {
     if (++$count < 6) {
-        echo "    <?= " . $generator->generateActiveSearchField($tableSchema, $attribute) . " ?>\n\n";
+        echo "    <?= " . $generator->generateActiveSearchField($attribute->name) . " ?>\n\n";
     } else {
-        echo "    <?php // echo " . $generator->generateActiveSearchField($tableSchema, $attribute) . " ?>\n\n";
+        echo "    <?php // echo " . $generator->generateActiveSearchField($attribute->name) . " ?>\n\n";
     }
 }
 ?>

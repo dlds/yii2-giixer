@@ -1,5 +1,7 @@
 <?php
 
+/* @var $generator dlds\giixer\generators\ultimate\Generator */
+
 use dlds\giixer\generators\ultimate\helpers\CrudHelper;
 
 ?>
@@ -13,7 +15,7 @@ use backend\widgets\dynagrid\DynaGrid;
 use backend\components\helpers\AppHelper;
 
 /* @var \$this yii\web\View */
-/* @var \$filter \app\modules\social\models\db\search\SocialChallengeSearch */
+/* @var \$filter ".$generator->helperModel->getSearchClass(false, true)." */
 ?>
 
 <?php

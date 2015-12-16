@@ -10,6 +10,8 @@ class BaseHelper {
      * TMPLs dirs
      */
     const DIR_COMPONENT_TMPLS_PATH = 'component';
+    const DIR_COMPONENT_HANDLERS_PATH = self::DIR_COMPONENT_TMPLS_PATH.'/handlers';
+    const DIR_COMPONENT_HELPERS_PATH = self::DIR_COMPONENT_TMPLS_PATH.'/helpers';
     const DIR_CRUD_TMPLS_PATH = 'crud';
     const DIR_CRUD_VIEWS_PATH = self::DIR_CRUD_TMPLS_PATH.'/views';
     const DIR_MODEL_TMPLS_PATH = 'model';
@@ -35,6 +37,11 @@ class BaseHelper {
     protected $baseClassModel = 'dlds\giixer\components\GxActiveRecord';
 
     /**
+     * @var string model baseClass
+     */
+    protected $baseClassCrudHandler = 'dlds\giixer\components\handlers\GxCrudHandler';
+
+    /**
      * @var string query baseClass
      */
     protected $baseClassQuery = 'dlds\giixer\components\GxActiveQuery';
@@ -43,6 +50,11 @@ class BaseHelper {
      * @var string imageHelper baseClass
      */
     protected $baseClassImageHelper = 'dlds\giixer\components\helpers\GxImageHelper';
+
+    /**
+     * @var string base route helper class
+     */
+    protected $baseClassRouteHelper = 'dlds\giixer\components\helpers\GxRouteHelper';
 
     /**
      * @var array parent classes
@@ -55,6 +67,8 @@ class BaseHelper {
         'frontendQuery' => 'common\{ns}\{class}',
         'backendSearch' => 'app\{ns}\{class}',
         'frontendSearch' => 'app\{ns}\{class}',
+        'backendCrudHandler' => 'common\{ns}\{class}',
+        'frontendCrudHandler' => 'common\{ns}\{class}',
     );
 
     /**
@@ -73,6 +87,14 @@ class BaseHelper {
         'backendQuery' => 'app\{ns}',
         'backendController' => 'backend\{ns}',
         'frontendController' => 'frontend\{ns}',
+        'commonCrudHandler' => 'common\{ns}',
+        'backendCrudHandler' => 'backend\{ns}',
+        'frontendCrudHandler' => 'frontend\{ns}',
+        'backendSearchHandler' => 'backend\{ns}',
+        'frontendSearchHandler' => 'frontend\{ns}',
+        'backendRouteHelper' => 'backend\{ns}',
+        'frontendRouteHelper' => 'frontend\{ns}',
+        'frontendUrlRuleHelper' => 'frontend\{ns}',
     );
 
     /**
@@ -147,7 +169,11 @@ class BaseHelper {
 
         if ($removeRootNs)
         {
-            return str_replace('app\\', '', $namespace);
+            $parts = explode('\\', $namespace);
+
+            \yii\helpers\ArrayHelper::remove($parts, 0);
+
+            return implode('\\', $parts);
         }
 
         return $namespace;
@@ -158,12 +184,12 @@ class BaseHelper {
      */
     public function getNsByPattern($file, $className = null)
     {
-        if (isset($this->nsPatterns[$file]))
+        if ($file && isset($this->nsPatterns[$file]))
         {
             return str_replace('{ns}', $this->getNsByMap($className, true), $this->nsPatterns[$file]);
         }
 
-        return self::$generator->nsCommon;
+        return false;
     }
 
     /**
@@ -171,9 +197,16 @@ class BaseHelper {
      * @param string $classname
      * @return string
      */
-    public function getFullyQualifiedName($classname, $root = false)
+    public function getFullyQualifiedName($classname, $root = false, $key = false)
     {
-        $fqn = sprintf('%s\\%s', $this->getNsByMap($classname), $classname);
+        $ns = $this->getNsByPattern($key, $classname);
+
+        if (!$ns)
+        {
+            $ns = $this->getNsByMap($classname);
+        }
+
+        $fqn = sprintf('%s\\%s', $ns, $classname);
 
         if ($root)
         {

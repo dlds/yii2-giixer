@@ -27,6 +27,11 @@ class Module extends \yii\gii\Module {
     public $controllerFrontendBaseClass = false;
 
     /**
+     * @var string base route helper class
+     */
+    public $helperRouteBaseClass = false;
+
+    /**
      * Returns the list of the core code generator configurations.
      * @return array the list of the core code generator configurations.
      */

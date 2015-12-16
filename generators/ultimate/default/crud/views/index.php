@@ -13,6 +13,7 @@ use dlds\metronic\widgets\Alert;
 use dlds\metronic\widgets\Link;
 use dlds\metronic\widgets\Portlet;
 use dlds\giixer\components\helpers\GxHelper;
+use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true) ?>;
 
 /* @var $this yii\web\View */
 
@@ -34,7 +35,7 @@ $this->params['breadcrumbs'][] = <?= $generator->helperCrud->getHeading(true) ?>
                 'icon' => 'fa fa-plus',
                 'iconPosition' => Link::ICON_POSITION_LEFT,
                 'label' => \Yii::t('app', 'call_to_create_new'),
-                'url' => ['social-challenge/create'],
+                'url' => ".$generator->helperComponent->getHelperClass('backendRouteHelper', true, false)."::create(),
                 'options' => [
                     'class' => 'btn blue-steel btn-circle action-create'
                 ],

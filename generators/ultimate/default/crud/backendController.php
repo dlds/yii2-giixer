@@ -11,6 +11,7 @@ echo "<?php\n";
 namespace <?= $generator->helperCrud->getNsByPattern(basename(__FILE__, '.php'), $generator->helperCrud->getControllerClass(true)) ?>;
 
 use yii\filters\VerbFilter;
+use <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', false, true, true) ?>;
 
 /**
  * <?= $generator->helperCrud->getControllerClass(true) ?> implements the CRUD actions for <?= $generator->helperModel->getModelClass(true) ?> model.
@@ -38,7 +39,7 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
      */
     public function actionIndex()
     {
-        $filter = new ToolsCompassValueSearchHandler(\Yii::$app->request->queryParams);
+        $filter = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>(\Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'filter' => $filter,
@@ -52,10 +53,10 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
      */
     public function actionView(<?= $actionParams ?>)
     {
-        $handler = new ToolsCompassValueCrudHandler(<?= $actionParams ?>);
+        $handler = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>();
 
         return $this->render('view', [
-            'model' => $handler->read(),
+            'model' => $handler->read(<?= $actionParams ?>),
         ]);
     }
 
@@ -66,10 +67,10 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
      */
     public function actionCreate()
     {
-        $handler = new ToolsCompassValueCrudHandler();
+        $handler = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>();
 
         return $this->render('create', [
-            'model' => $handler->create(),
+            'model' => $handler->create(\Yii::$app->request->post()),
         ]);
 
     }
@@ -82,10 +83,10 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
      */
     public function actionUpdate(<?= $actionParams ?>)
     {
-        $handler = new ToolsCompassValueCrudHandler(<?= $actionParams ?>);
+        $handler = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>();
 
         return $this->render('update', [
-            'model' => $handler->update(),
+            'model' => $handler->update(<?= $actionParams ?>, \Yii::$app->request->post()),
         ]);
     }
 
@@ -97,10 +98,10 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
      */
     public function actionDelete(<?= $actionParams ?>)
     {
-        $handler = new ToolsCompassValueCrudHandler(<?= $actionParams ?>);
+        $handler = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>();
 
-        $handler->delete();
-
-        return $this->redirect(['index']);
+        return $handler->delete(<?= $actionParams ?>, function($result) {
+                return $this->redirect(['index']);
+            });
     }
 }

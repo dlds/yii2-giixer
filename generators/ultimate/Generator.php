@@ -9,10 +9,7 @@ namespace dlds\giixer\generators\ultimate;
 
 use Yii;
 use ReflectionClass;
-use yii\gii\CodeFile;
 use yii\helpers\ArrayHelper;
-use yii\db\Schema;
-use yii\helpers\StringHelper;
 use yii\helpers\Inflector;
 use yii\web\View;
 use dlds\giixer\components\helpers\GxModelHelper;
@@ -160,44 +157,64 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * @var array containing model files to be generated
      */
-    public $modelFilesMap = array(
+    public $modelFilesMap = [
         'model' => 'common/{ns}/base',
         'commonModel' => 'common/{ns}',
         'backendModel' => 'backend/{ns}',
         'frontendModel' => 'frontend/{ns}',
-    );
+    ];
 
     /**
      * @var array containing query files to be generated
      */
-    public $queryFilesMap = array(
+    public $queryFilesMap = [
         'query' => 'common/{ns}',
         'backendQuery' => 'backend/{ns}',
         'frontendQuery' => 'frontend/{ns}',
-    );
+    ];
 
     /**
      * @var array containing search files to be generated
      */
-    public $searchFilesMap = array(
+    public $searchFilesMap = [
         'backendSearch' => 'backend/{ns}',
         'frontendSearch' => 'frontend/{ns}',
-    );
+    ];
 
     /**
      * @var array containing controller files to be generated
      */
-    public $controllerFilesMap = array(
+    public $controllerFilesMap = [
         'backendController' => 'backend/{ns}',
         'frontendController' => 'frontend/{ns}',
-    );
+    ];
+
+    /**
+     * @var array containing handlers files to be generated
+     */
+    public $handlerFilesMap = [
+        'backendCrudHandler' => 'backend/{ns}',
+        'frontendCrudHandler' => 'frontend/{ns}',
+        'commonCrudHandler' => 'common/{ns}',
+        'backendSearchHandler' => 'backend/{ns}',
+        'frontendSearchHandler' => 'frontend/{ns}',
+    ];
+
+    /**
+     * @var array containing helpers files to be generated
+     */
+    public $helperFilesMap = [
+        'backendRouteHelper' => 'backend/{ns}',
+        'frontendRouteHelper' => 'frontend/{ns}',
+        'frontendUrlRuleHelper' => 'frontend/{ns}',
+    ];
 
     /**
      * @var array components map
      */
-    public $componentsFilesMap = array(
+    public $componentsFilesMap = [
         self::COMPONENT_IMAGE_HELPER => 'common\{ns}\images',
-    );
+    ];
 
     /**
      * @var array static namespaces
@@ -403,14 +420,8 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         $files = [];
         //$relations = $this->generateRelations();
-
-        $db = $this->getDbConnection();
-
-        $tableSchema = $db->getTableSchema($this->tableName);
-
-        // Generate MODEL components
-        $this->helperComponent->generateComponents($tableSchema, $files);
-
+        $tableSchema = $this->getTableSchema();
+        
         // Generate MODEL classes
         $this->helperModel->generateModels($tableSchema, $files);
 
@@ -425,6 +436,9 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         // Generate CRUD views
         $this->helperCrud->generateViews($tableSchema, $files);
+
+        // Generate COMPONENTS
+        $this->helperComponent->generateComponents($tableSchema, $files);
 
         return $files;
     }
@@ -566,8 +580,23 @@ class Generator extends \yii\gii\generators\model\Generator {
         return $relations;
     }
 
-    
+    /**
+     * Retrieves table schema
+     * @return \yii\db\TableSchema
+     */
+    public function getTableSchema()
+    {
+        $db = $this->getDbConnection();
 
+        return $db->getTableSchema($this->tableName);
+    }
+
+    /**
+     * Retrieves model name attribute
+     * @param \yii\db\TableSchema $table
+     * @return type
+     * @throws \yii\base\ErrorException
+     */
     public function getNameAttribute(\yii\db\TableSchema $table)
     {
         foreach ($this->getColumnNames($table) as $name)
@@ -650,8 +679,9 @@ class Generator extends \yii\gii\generators\model\Generator {
      * @param string $attribute
      * @return string
      */
-    public function generateActiveSearchField(\yii\db\TableSchema $tableSchema, $attribute)
+    public function generateActiveSearchField($attribute)
     {
+        $tableSchema = $this->getTableSchema();
         if ($tableSchema === false)
         {
             return "\$form->field(\$model, '$attribute')";

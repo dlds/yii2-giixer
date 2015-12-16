@@ -14,6 +14,7 @@ class CrudHelper extends BaseHelper {
      */
     const MODAL_SEARCH = 'MODAL_SEARCH';
     const GRID_OVERVIEW = 'GRID_OVERVIEW';
+
     /**
      * Suffixes
      */
@@ -35,6 +36,43 @@ class CrudHelper extends BaseHelper {
             'views/overview/_grid.php',
             'views/crud/_form.php',
         ];
+    }
+
+    /**
+     * Retrieves route for current controller and given action
+     * @param string $action given action
+     * @return string route
+     */
+    public function getRoute($action)
+    {
+        $classname = strtolower($this->getBaseClassKey('-'));
+
+        $module = $this->getModule();
+
+        if ($module)
+        {
+            return sprintf('%s/%s/%s', $module, $classname, $action);
+        }
+
+        return sprintf('%s/%s', $classname, $action);
+    }
+
+    /**
+     * Retrieves module name if CRUD is under module
+     * @return string module name
+     */
+    public function getModule()
+    {
+        $ns = $this->getNsByMap($this->getBaseClassName(), true);
+
+        if (false !== strpos($ns, 'modules'))
+        {
+            $parts = explode('\\', $ns);
+
+            return \yii\helpers\ArrayHelper::getValue($parts, 1, false);
+        }
+
+        return false;
     }
 
     /**
@@ -81,7 +119,7 @@ class CrudHelper extends BaseHelper {
     {
         $customBaseClass = \Yii::$app->getModule('gii')->controllerBackendBaseClass;
 
-        $class = ($customBaseClass) ? $customBaseClass : self::$generator->baseClassController;
+        $class = ($customBaseClass) ? $customBaseClass : $this->baseClassController;
 
         if ($basename)
         {
@@ -255,11 +293,6 @@ class CrudHelper extends BaseHelper {
         foreach (scandir($sourceDir) as $filename)
         {
             $tmplPath = sprintf('%s/%s', $sourceDir, $filename);
-
-            if (empty(self::$generator->searchClass) && $filename === '_search.php')
-            {
-                continue;
-            }
 
             if (is_file($tmplPath) && pathinfo($filename, PATHINFO_EXTENSION) === 'php')
             {

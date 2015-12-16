@@ -10,6 +10,8 @@ echo "<?php\n";
 
 namespace <?= $generator->helperCrud->getNsByPattern(basename(__FILE__, '.php'), $generator->helperCrud->getControllerClass(true)) ?>;
 
+use <?= $generator->helperComponent->getHandlerClass('frontendCrudHandler', false, true, true) ?>;
+
 /**
  * <?= $generator->helperCrud->getControllerClass(true) ?> implements the CRUD actions for <?= $generator->helperModel->getModelClass(true) ?> model.
  */
@@ -35,7 +37,7 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
      */
     public function actionView(<?= $actionParams ?>)
     {
-        $handler = new ToolsCompassValueCrudHandler(<?= $actionParams ?>);
+        $handler = new <?= $generator->helperComponent->getHandlerClass('frontendCrudHandler', true) ?>(<?= $actionParams ?>);
 
         return $this->render('view', [
             'model' => $handler->read(),
