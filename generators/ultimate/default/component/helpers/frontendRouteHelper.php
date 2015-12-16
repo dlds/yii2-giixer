@@ -20,8 +20,8 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     /**
      * Valid routes
      */
-    const ROUTE_INDEX = 'edu/edu-post/index';
-    const ROUTE_VIEW = 'edu/edu-post/view';
+    const ROUTE_INDEX = '<?= $generator->helperCrud->getRoute('index') ?>';
+    const ROUTE_VIEW = '<?= $generator->helperCrud->getRoute('view') ?>';
 
     /**
      * Retrieves index route
