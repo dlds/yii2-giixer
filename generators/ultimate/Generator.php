@@ -281,14 +281,12 @@ class Generator extends \yii\gii\generators\model\Generator {
         $rules = parent::rules();
 
         GxModelHelper::removeValidationRules($rules, 'required', ['queryNs']);
+        GxModelHelper::removeValidationRules($rules, 'validateMessageCategory', ['messageCategory']);
+        GxModelHelper::removeValidationRules($rules, 'validateModelClass', ['modelClass']);
 
         return ArrayHelper::merge([
-                ['modelClass', 'default', 'value' => function($model, $attribute) {
-                        return $this->generateModelClass();
-                    }],
-                ['messageCategory', 'default', 'value' => function($model, $attribute) {
-                        return $this->generateModelMessageCategory();
-                    }],
+                [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
+                [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
                 [['generateMutation', 'generateSluggableMutation', 'sluggableMutationEnsureUnique', 'sluggableMutationImutable', 'generateTimestampBehavior', 'generateGalleryBehavior'], 'boolean'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
@@ -421,7 +419,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         $files = [];
         //$relations = $this->generateRelations();
         $tableSchema = $this->getTableSchema();
-        
+
         // Generate MODEL classes
         $this->helperModel->generateModels($tableSchema, $files);
 
@@ -749,6 +747,32 @@ class Generator extends \yii\gii\generators\model\Generator {
     }
 
     /**
+     * Retrieves translation category
+     */
+    public function getTranslationCategory()
+    {
+        if ($this->messageCategory)
+        {
+            return $this->messageCategory;
+        }
+
+        return $this->generateModelMessageCategory();
+    }
+
+    /**
+     * Retrieves translation category
+     */
+    public function getModelClassName()
+    {
+        if ($this->modelClass)
+        {
+            return $this->modelClass;
+        }
+
+        return $this->generateModelClass();
+    }
+
+    /**
      * @return string current component ns
      */
     public function getComponentNs($file, $className)
@@ -895,6 +919,51 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * @return array the table names that match the pattern specified by [[tableName]].
      */
+    protected function getTableNames()
+    {
+        if ($this->tableNames !== null)
+        {
+            return $this->tableNames;
+        }
+        $db = $this->getDbConnection();
+        if ($db === null)
+        {
+            return [];
+        }
+        $tableNames = [];
+        if (strpos($this->tableName, '*') !== false)
+        {
+            if (($pos = strrpos($this->tableName, '.')) !== false)
+            {
+                $schema = substr($this->tableName, 0, $pos);
+                $pattern = '/^'.str_replace('*', '\w+', substr($this->tableName, $pos + 1)).'$/';
+            }
+            else
+            {
+                $schema = '';
+                $pattern = '/^'.str_replace('*', '\w+', $this->tableName).'$/';
+            }
+
+            foreach ($db->schema->getTableNames($schema) as $table)
+            {
+                if (preg_match($pattern, $table))
+                {
+                    $tableNames[] = $schema === '' ? $table : ($schema.'.'.$table);
+                }
+            }
+        }
+        elseif (($table = $db->getTableSchema($this->tableName, true)) !== null)
+        {
+            $tableNames[] = $this->tableName;
+            $this->classNames[$this->tableName] = $this->getModelClassName();
+        }
+
+        return $this->tableNames = $tableNames;
+    }
+
+    /**
+     * @return array the table names that match the pattern specified by [[tableName]].
+     */
     protected function getTableNamesExtended($attribute)
     {
         $db = $this->getDbConnection();
@@ -927,7 +996,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         elseif (($table = $db->getTableSchema($this->$attribute, true)) !== null)
         {
             $tableNames[] = $this->$attribute;
-            $this->classNames[$this->$attribute] = $this->modelClass;
+            $this->classNames[$this->$attribute] = $this->getModelClassName();
         }
 
         return $tableNames;
@@ -1086,5 +1155,48 @@ class Generator extends \yii\gii\generators\model\Generator {
         $params['generator'] = $this;
 
         return $view->renderFile($file, $params, $this);
+    }
+
+    /**
+     * Generates a string depending on enableI18N property
+     *
+     * @param string $string the text be generated
+     * @param array $placeholders the placeholders to use by `Yii::t()`
+     * @return string
+     */
+    public function generateString($string = '', $placeholders = [])
+    {
+        $string = addslashes($string);
+        if ($this->enableI18N)
+        {
+            // If there are placeholders, use them
+            if (!empty($placeholders))
+            {
+                $ph = ', '.VarDumper::export($placeholders);
+            }
+            else
+            {
+                $ph = '';
+            }
+            $str = "Yii::t('".$this->getTranslationCategory()."', '".$string."'".$ph.")";
+        }
+        else
+        {
+            // No I18N, replace placeholders by real words, if any
+            if (!empty($placeholders))
+            {
+                $phKeys = array_map(function($word) {
+                    return '{'.$word.'}';
+                }, array_keys($placeholders));
+                $phValues = array_values($placeholders);
+                $str = "'".str_replace($phKeys, $phValues, $string)."'";
+            }
+            else
+            {
+                // No placeholders, just the given string
+                $str = "'".$string."'";
+            }
+        }
+        return $str;
     }
 }

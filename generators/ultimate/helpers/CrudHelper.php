@@ -181,7 +181,7 @@ class CrudHelper extends BaseHelper {
 
         if (count($pks) === 1)
         {
-            if (is_subclass_of($this->modelClass, 'yii\mongodb\ActiveRecord'))
+            if (is_subclass_of(self::$generator->getModelClassName(), 'yii\mongodb\ActiveRecord'))
             {
                 return "'id' => (string)\$model->{$pks[0]}";
             }
@@ -195,7 +195,7 @@ class CrudHelper extends BaseHelper {
             $params = [];
             foreach ($pks as $pk)
             {
-                if (is_subclass_of($this->modelClass, 'yii\mongodb\ActiveRecord'))
+                if (is_subclass_of(self::$generator->getModelClassName(), 'yii\mongodb\ActiveRecord'))
                 {
                     $params[] = "'$pk' => (string)\$model->$pk";
                 }

@@ -16,11 +16,11 @@ use dlds\metronic\widgets\Alert;
 use dlds\metronic\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model <?= ltrim($generator->modelClass, '\\') ?> */
+/* @var $model <?= ltrim($generator->getModelClassName(), '\\') ?> */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-form">
+<div class="<?= Inflector::camel2id(StringHelper::basename($generator->getModelClassName())) ?>-form">
 
     <?= "<?php " ?>$form = ActiveForm::begin(); ?>
 

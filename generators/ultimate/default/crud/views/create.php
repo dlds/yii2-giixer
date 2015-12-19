@@ -15,7 +15,7 @@ use dlds\metronic\widgets\Portlet;
 /* @var $this yii\web\View */
 /* @var $model <?= $generator->helperModel->getModelClass(false, true) ?> */
 
-$this->title = \Yii::t('<?= $generator->messageCategory ?>', 'title_create_new_{model}', [
+$this->title = \Yii::t('<?= $generator->getTranslationCategory() ?>', 'title_create_new_{model}', [
         'model' => \<?= $generator->helperCrud->getHeading() ?>,
     ]);
 

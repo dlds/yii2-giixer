@@ -18,7 +18,7 @@ use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false,
 /* @var $this yii\web\View */
 /* @var $searchHandler <?= $generator->helperComponent->getHandlerClass('backendSearchHandler', false, true, true) ?> */
 
-$this->title = \Yii::t('<?= $generator->messageCategory ?>', 'title_overview_{models}', [
+$this->title = \Yii::t('<?= $generator->getTranslationCategory() ?>', 'title_overview_{models}', [
     'models' => <?= $generator->helperCrud->getHeading(true) ?>,
 ]);
 

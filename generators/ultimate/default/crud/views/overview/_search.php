@@ -18,7 +18,7 @@ use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false,
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-search">
+<div class="<?= Inflector::camel2id(StringHelper::basename($generator->getModelClassName())) ?>-search">
 
     <?= "<?php " ?>$form = ActiveForm::begin([
         'action' => <?= $generator->helperComponent->getHelperClass('backendRouteHelper', true, false) ?>::index(),
