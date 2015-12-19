@@ -13,21 +13,9 @@ namespace <?= $generator->helperComponent->getNsByPattern(basename(__FILE__, '.p
  * @inheritdoc
  * @see <?= $generator->helperModel->getModelClass(false, true)."\n" ?>
  */
-class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'), true) ?> extends <?= $generator->helperModel->getModelClass(false, true) ?> {
+class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'), true) ?> extends <?= $generator->helperModel->getSearchClass(false, true) ?> {
 
-    /**
-     * Retrieves data provider for given query data
-     * @param array $query given query params
-     * @return \yii\data\ActiveDataProvider data provider
-     */
-    public function getDataProvider(array $query)
-    {
-        $dataProvider = $this->search($query);
-        
-        $this->applyDefaultSearchQuery($dataProvider);
-
-        return $dataProvider;
-    }
+    use \dlds\giixer\components\traits\GxSearchHandlerTrait;
 
     /**
      * Applies default query to given dataprovider

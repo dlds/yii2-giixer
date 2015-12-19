@@ -16,6 +16,7 @@ use dlds\giixer\components\helpers\GxHelper;
 use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true) ?>;
 
 /* @var $this yii\web\View */
+/* @var $searchHandler <?= $generator->helperComponent->getHandlerClass('backendSearchHandler', false, true, true) ?> */
 
 $this->title = \Yii::t('<?= $generator->messageCategory ?>', 'title_overview_{models}', [
     'models' => <?= $generator->helperCrud->getHeading(true) ?>,
@@ -59,7 +60,7 @@ $this->params['breadcrumbs'][] = <?= $generator->helperCrud->getHeading(true) ?>
 
     <?=
     \$this->render('overview/_grid', [
-        'filter' => \$filter,
+        'searchHandler' => \$searchHandler,
     ])
     ?>
 

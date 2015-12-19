@@ -75,7 +75,7 @@ class ModelHelper extends BaseHelper {
      */
     public function getSearchParentClass($key, $basename = false, $root = false)
     {
-        $class = $this->getParentClass($key, $this->getSearchClass(true));
+        $class = $this->getParentClass($key, $this->getModelClass(true));
 
         if ($basename)
         {
@@ -298,7 +298,7 @@ class ModelHelper extends BaseHelper {
      */
     public function getQueryParentClass($key, $basename = false, $root = false)
     {
-        $class = $this->getParentClass($key, $this->getQueryClass(true));
+        $class = $this->getParentClass($key, $this->getQueryClass(true), $this->baseClassQuery);
 
         if ($basename)
         {
@@ -374,7 +374,7 @@ class ModelHelper extends BaseHelper {
      */
     public function getModelParentClass($key, $basename = false, $root = false)
     {
-        $class = $this->getParentClass($key, $this->getModelClass(true));
+        $class = $this->getParentClass($key, $this->getModelClass(true), $this->baseClassModel);
 
         if ($basename)
         {

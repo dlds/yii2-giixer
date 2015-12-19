@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = \<?= $generator->generateString('heading_new_en
     ?>
 
     <?=
-    \$this->render('_form', [
+    \$this->render('crud/_form', [
         'model' => \$model,
     ])
     ?>

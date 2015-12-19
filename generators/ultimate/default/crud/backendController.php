@@ -12,6 +12,7 @@ namespace <?= $generator->helperCrud->getNsByPattern(basename(__FILE__, '.php'),
 
 use yii\filters\VerbFilter;
 use <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', false, true, true) ?>;
+use <?= $generator->helperComponent->getHandlerClass('backendSearchHandler', false, true, true) ?>;
 
 /**
  * <?= $generator->helperCrud->getControllerClass(true) ?> implements the CRUD actions for <?= $generator->helperModel->getModelClass(true) ?> model.
@@ -39,10 +40,10 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
      */
     public function actionIndex()
     {
-        $filter = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>(\Yii::$app->request->queryParams);
+        $handler = new <?= $generator->helperComponent->getHandlerClass('backendSearchHandler', true) ?>(\Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'filter' => $filter,
+            'searchHandler' => $handler,
         ]);
     }
 

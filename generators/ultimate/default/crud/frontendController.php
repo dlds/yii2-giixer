@@ -11,6 +11,7 @@ echo "<?php\n";
 namespace <?= $generator->helperCrud->getNsByPattern(basename(__FILE__, '.php'), $generator->helperCrud->getControllerClass(true)) ?>;
 
 use <?= $generator->helperComponent->getHandlerClass('frontendCrudHandler', false, true, true) ?>;
+use <?= $generator->helperComponent->getHandlerClass('frontendSearchHandler', false, true, true) ?>;
 
 /**
  * <?= $generator->helperCrud->getControllerClass(true) ?> implements the CRUD actions for <?= $generator->helperModel->getModelClass(true) ?> model.
@@ -23,10 +24,10 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
      */
     public function actionIndex()
     {
-        $filter = new ToolsCompassValueSearchHandler(\Yii::$app->request->queryParams);
+        $handler = new <?= $generator->helperComponent->getHandlerClass('frontendSearchHandler', true) ?>(\Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'filter' => $filter,
+            'searchHandler' => $handler,
         ]);
     }
 

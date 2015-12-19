@@ -13,9 +13,10 @@ use yii\bootstrap\Modal;
 use kartik\grid\GridView;
 use backend\widgets\dynagrid\DynaGrid;
 use backend\components\helpers\AppHelper;
+use ".$generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true).";
 
 /* @var \$this yii\web\View */
-/* @var \$filter ".$generator->helperModel->getSearchClass(false, true)." */
+/* @var \$searchHandler ".$generator->helperComponent->getHandlerClass('backendSearchHandler', false, true, true)." */
 ?>
 
 <?php
@@ -59,8 +60,8 @@ DynaGrid::widget([
     'theme' => 'panel-default',
     'allowThemeSetting' => false,
     'gridOptions' => [
-        'dataProvider' => \$filter->getDataProvider(),
-        'filterModel' => \$filter,
+        'dataProvider' => \$searchHandler->getDataProvider(),
+        'filterModel' => \$searchHandler,
         'panel' => ['heading' => \Yii::t('app', 'heading_entries_found')],
         'pjax' => true,
         'toolbar' => [
@@ -71,7 +72,7 @@ DynaGrid::widget([
             //'{dynagridSort}',
             '{dynagrid}',
             [
-                'content' => Html::a('<i class=\"glyphicon glyphicon-remove\"></i>', SocialChallengeRoute::index(), ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('kvgrid', 'call_to_reset_grid')])
+                'content' => Html::a('<i class=\"glyphicon glyphicon-remove\"></i>', ".$generator->helperComponent->getHelperClass('backendRouteHelper', true)."::index(), ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('kvgrid', 'call_to_reset_grid')])
             ],
             '{export}',
             '{toggleData}',
@@ -104,7 +105,7 @@ Modal::begin([
 ])
 ?>
 
-<?= \$this->render('_search', ['model' => \$filter]); ?>
+<?= \$this->render('_search', ['model' => \$searchHandler]); ?>
 
 <?php Modal::end() ?>
 " ?>

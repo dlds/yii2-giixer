@@ -38,7 +38,7 @@ use dlds\metronic\widgets\ActiveForm;
     <?php
     foreach ($columnNames as $attribute)
     {
-        if (in_array($attribute, $safeAttributes))
+        if (isset($safeAttributes[$attribute]) && !$safeAttributes[$attribute]->isPrimaryKey)
         {
             echo "    <?= " . $generator->generateActiveField($attribute) . " ?>\n\n";
         }

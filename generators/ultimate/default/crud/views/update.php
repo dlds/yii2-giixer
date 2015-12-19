@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = ['label' => $model->__toString()];
     ?>
 
     <?=
-    \$this->render('_form', [
+    \$this->render('crud/_form', [
         'model' => \$model,
     ])
     ?>
