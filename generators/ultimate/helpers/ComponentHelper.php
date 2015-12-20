@@ -39,6 +39,8 @@ class ComponentHelper extends BaseHelper {
 
         $this->generateHelpers($tableSchema, $files);
 
+        $this->generateTranslations($tableSchema, $files);
+
         // generate gallery behavior
         if (self::$generator->generateGalleryBehavior)
         {
@@ -266,5 +268,44 @@ class ComponentHelper extends BaseHelper {
         $namespace = str_replace('{ns}', $this->getNsByMap($this->getHelperClass($key, true, false), true), $ns);
 
         return sprintf('@%s', str_replace('\\', '/', $namespace));
+    }
+
+    /**
+     * Generates CRUD and Search handlers
+     * @param \yii\db\mssql\TableSchema $tableSchema
+     * @param array $files
+     */
+    protected function generateTranslations(\yii\db\TableSchema $tableSchema, array &$files)
+    {
+        $renderParams = [
+            'labels' => self::$generator->generateLabels($tableSchema),
+        ];
+
+        foreach (self::$generator->translationsFilesMap as $tmpl => $ns)
+        {
+            foreach (self::$generator->translations as $lang)
+            {
+                $filePath = sprintf('%s.php', \Yii::getAlias($this->getTranslationFilePathAlias($lang, $ns)));
+
+                $tmplPath = sprintf('%s/%s.php', self::DIR_TRANSLATIONS_PATH, $tmpl);
+
+                $fileContent = self::$generator->render($tmplPath, $renderParams);
+
+                $files[] = new CodeFile(
+                    $filePath, $fileContent
+                );
+            }
+        }
+    }
+
+    /**
+     * Retrieves HELPER file path alias
+     * @param string $ns namespace
+     */
+    public function getTranslationFilePathAlias($lang, $ns)
+    {
+        $path = sprintf('messages/%s/%s', $lang, $this->getBaseClassKey('/'));
+
+        return sprintf('@%s', str_replace('{ns}', $path, $ns));
     }
 }

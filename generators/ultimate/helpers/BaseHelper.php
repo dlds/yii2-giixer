@@ -15,6 +15,8 @@ class BaseHelper {
     const DIR_CRUD_TMPLS_PATH = 'crud';
     const DIR_CRUD_VIEWS_PATH = self::DIR_CRUD_TMPLS_PATH.'/views';
     const DIR_MODEL_TMPLS_PATH = 'model';
+    const DIR_TRANSLATIONS_PATH = 'messages';
+
 
     /**
      * @var string base classname used as name of AR model

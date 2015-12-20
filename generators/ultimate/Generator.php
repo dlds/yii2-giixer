@@ -64,6 +64,11 @@ class Generator extends \yii\gii\generators\model\Generator {
     public $nsCommon = 'app';
 
     /**
+     * @var array translations to be generated
+     */
+    public $translations = [];
+
+    /**
      * @var boolean indicates if language mutations should be generated
      */
     public $generateMutation = false;
@@ -210,6 +215,15 @@ class Generator extends \yii\gii\generators\model\Generator {
     ];
 
     /**
+     * @var array containing helpers files to be generated
+     */
+    public $translationsFilesMap = [
+        'backendTranslation' => 'backend/{ns}',
+        'frontendTranslation' => 'frontend/{ns}',
+        'commonTranslation' => 'common/{ns}',
+    ];
+
+    /**
      * @var array components map
      */
     public $componentsFilesMap = [
@@ -242,6 +256,15 @@ class Generator extends \yii\gii\generators\model\Generator {
         {
             throw new \yii\base\ErrorException('Giier nsMap should be array');
         }
+
+        $translations = Yii::$app->getModule('gii')->translationLangs;
+
+        if ($translations)
+        {
+            $this->translations = $translations;
+        }
+
+        $this->nsMap = Yii::$app->getModule('gii')->nsMap;
 
         $this->generateQuery = true;
         $this->generateRelations = true;
