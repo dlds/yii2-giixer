@@ -32,6 +32,11 @@ class Module extends \yii\gii\Module {
     public $helperRouteBaseClass = false;
 
     /**
+     * @var array translations to be generated
+     */
+    public $translationLangs = ['en'];
+
+    /**
      * Returns the list of the core code generator configurations.
      * @return array the list of the core code generator configurations.
      */
