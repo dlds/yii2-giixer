@@ -66,19 +66,19 @@ DynaGrid::widget([
         'pjax' => true,
         'toolbar' => [
             [
-                'content' => Html::a('<i class=\"glyphicon glyphicon-search\"></i>', sprintf('#%s', AppHelper::".$generator->helperCrud->getIdConstantName(CrudHelper::MODAL_SEARCH)."), ['data' => ['pjax' => 0, 'toggle' => 'modal'], 'class' => 'btn btn-default', 'title' => Yii::t('kvgrid', 'call_to_extended_search')])
+                'content' => Html::a('<i class=\"glyphicon glyphicon-search\"></i>', sprintf('#%s', AppHelper::".$generator->helperCrud->getIdConstantName(CrudHelper::MODAL_SEARCH)."), ['data' => ['pjax' => 0, 'toggle' => 'modal'], 'class' => 'btn btn-default', 'title' => Yii::t('kvgrid', 'cta_extended_search')])
             ],
             //'{dynagridFilter}',
             //'{dynagridSort}',
             '{dynagrid}',
             [
-                'content' => Html::a('<i class=\"glyphicon glyphicon-remove\"></i>', ".$generator->helperComponent->getHelperClass('backendRouteHelper', true)."::index(), ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('kvgrid', 'call_to_reset_grid')])
+                'content' => Html::a('<i class=\"glyphicon glyphicon-remove\"></i>', ".$generator->helperComponent->getHelperClass('backendRouteHelper', true)."::index(), ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('kvgrid', 'cta_reset_grid')])
             ],
             '{export}',
             '{toggleData}',
         ],
         'export' => [
-            'header' => Html::tag('li', Yii::t('kvgrid', 'call_to_export_data'), ['role' => 'presentation', 'class' => 'dropdown-header']),
+            'header' => Html::tag('li', Yii::t('kvgrid', 'cta_export_data'), ['role' => 'presentation', 'class' => 'dropdown-header']),
             'menuOptions' => ['class' => 'dropdown-menu pull-right'],
             'messages' => [
                 'allowPopups' => \Yii::t('kvgrid', 'alert_allow_popups'),

@@ -13,7 +13,7 @@ class GxRouteHelper {
      */
     public static function isCurrent(array $route, $strict = true)
     {
-        if (\Yii::$app->requestedRoute != ArrayHelper::remove($route, 0))
+        if (\Yii::$app->requestedRoute !== trim(ArrayHelper::remove($route, 0), '/'))
         {
             return false;
         }

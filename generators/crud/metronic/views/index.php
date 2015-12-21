@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = <?= $generator->generateString('heading_' . $mo
             Link::widget([
                 'icon' => 'fa fa-plus',
                 'iconPosition' => Link::ICON_POSITION_LEFT,
-                'label' => \Yii::t('app', 'call_to_create_new'),
+                'label' => \Yii::t('app', 'cta_create_new'),
                 'url' => ['" . Inflector::slug(Inflector::camel2words(StringHelper::basename($generator->modelClass))) . "/create'],
                 'options' => [
                     'class' => 'btn blue-steel btn-circle action-create'

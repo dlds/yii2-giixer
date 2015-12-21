@@ -28,8 +28,8 @@ $this->params['breadcrumbs'][] = ['label' => $model->__toString()];
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-view">
 
     <p>
-        <?= "<?= " ?>Html::a(<?= $generator->generateString('call_to_update') ?>, ['update', <?= $urlParams ?>], ['class' => 'btn btn-primary']) ?>
-        <?= "<?= " ?>Html::a(<?= $generator->generateString('call_to_delete') ?>, ['delete', <?= $urlParams ?>], [
+        <?= "<?= " ?>Html::a(<?= $generator->generateString('cta_update') ?>, ['update', <?= $urlParams ?>], ['class' => 'btn btn-primary']) ?>
+        <?= "<?= " ?>Html::a(<?= $generator->generateString('cta_delete') ?>, ['delete', <?= $urlParams ?>], [
         'class' => 'btn btn-danger',
         'data' => [
         'confirm' => <?= $generator->generateString('alert_delete_confirmation') ?>,

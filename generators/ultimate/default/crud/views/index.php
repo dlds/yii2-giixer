@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = <?= $generator->helperCrud->getHeading(true) ?>
             Link::widget([
                 'icon' => 'fa fa-plus',
                 'iconPosition' => Link::ICON_POSITION_LEFT,
-                'label' => \Yii::t('app', 'call_to_create_new'),
+                'label' => \Yii::t('app', 'cta_create_new'),
                 'url' => ".$generator->helperComponent->getHelperClass('backendRouteHelper', true, false)."::create(),
                 'options' => [
                     'class' => 'btn blue-steel btn-circle action-create'
