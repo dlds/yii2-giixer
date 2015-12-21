@@ -95,7 +95,7 @@ class GxRouteHelper {
      * Retrieves param name which disable lacale urls
      * @return mixed param name or FALSE if param does not exist
      */
-    private static function getRouteExtraParams()
+    protected static function getRouteExtraParams()
     {
         return [];
     }

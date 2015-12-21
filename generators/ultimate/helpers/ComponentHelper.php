@@ -197,9 +197,9 @@ class ComponentHelper extends BaseHelper {
      */
     public function getHelperParentClass($key, $basename = false, $root = true)
     {
-        $customBaseClass = \Yii::$app->getModule('gii')->helperRouteBaseClass;
+        $customBaseClass = $this->getHelperParentCustomClass($key);
 
-        $class = ($customBaseClass) ? $customBaseClass : $this->getParentClass($key, $this->getHelperClass($key, true), $this->baseClassRouteHelper);
+        $class = ($customBaseClass) ? $customBaseClass : $this->getParentClass($key, $this->getHelperClass($key, true), $this->baseClassRuleHelper);
 
         if ($basename)
         {
@@ -212,6 +212,20 @@ class ComponentHelper extends BaseHelper {
         }
 
         return $class;
+    }
+
+    /**
+     * Retrieves helper custom parent class
+     * @param type $key
+     */
+    protected function getHelperParentCustomClass($key)
+    {
+        if (strpos($key, 'Rule'))
+        {
+            return \Yii::$app->getModule('gii')->helperRuleBaseClass;
+        }
+
+        return \Yii::$app->getModule('gii')->helperRouteBaseClass;
     }
 
     /**

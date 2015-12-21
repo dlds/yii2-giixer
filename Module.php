@@ -32,6 +32,11 @@ class Module extends \yii\gii\Module {
     public $helperRouteBaseClass = false;
 
     /**
+     * @var string base rule helper class
+     */
+    public $helperRuleBaseClass = false;
+
+    /**
      * @var array translations to be generated
      */
     public $translationLangs = ['en'];

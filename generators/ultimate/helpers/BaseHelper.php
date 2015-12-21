@@ -17,7 +17,6 @@ class BaseHelper {
     const DIR_MODEL_TMPLS_PATH = 'model';
     const DIR_TRANSLATIONS_PATH = 'messages';
 
-
     /**
      * @var string base classname used as name of AR model
      */
@@ -59,9 +58,14 @@ class BaseHelper {
     protected $baseClassRouteHelper = 'dlds\giixer\components\helpers\GxRouteHelper';
 
     /**
+     * @var string base route helper class
+     */
+    protected $baseClassRuleHelper = 'dlds\giixer\components\helpers\GxUrlRouteHelper';
+
+    /**
      * @var array parent classes
      */
-    public $mapParentClasses = array(
+    public $mapParentClasses = [
         'commonModel' => 'common\{ns}\base\{class}',
         'backendModel' => 'common\{ns}\{class}',
         'frontendModel' => 'common\{ns}\{class}',
@@ -71,12 +75,12 @@ class BaseHelper {
         'frontendSearch' => 'app\{ns}\{class}',
         'backendCrudHandler' => 'common\{ns}\{class}',
         'frontendCrudHandler' => 'common\{ns}\{class}',
-    );
+    ];
 
     /**
      * @var array namespaces patterns
      */
-    public $nsPatterns = array(
+    public $nsPatterns = [
         'model' => 'common\{ns}\base',
         'query' => 'common\{ns}',
         'helper' => 'common\{ns}\components\helpers',
@@ -97,7 +101,7 @@ class BaseHelper {
         'backendRouteHelper' => 'backend\{ns}',
         'frontendRouteHelper' => 'frontend\{ns}',
         'frontendUrlRuleHelper' => 'frontend\{ns}',
-    );
+    ];
 
     /**
      * @inheritdoc

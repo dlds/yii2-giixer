@@ -20,13 +20,13 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
      * @param boolean $root if rule should be retrieved with leading slash
      * @return string rule
      */
-    public static function index($root = false)
+    public static function index()
     {
         $route = <?= $generator->helperComponent->getHelperClass('frontendRouteHelper') ?>::ROUTE_INDEX;
 
         $pattern = $route;
 
-        return self::getRule($rule, $root);
+        return self::getRule($pattern, $route);
     }
 
     /**

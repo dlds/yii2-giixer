@@ -4,7 +4,7 @@ namespace dlds\giixer\components\helpers;
 
 use yii\web\UrlRule;
 
-class GxUrlRuleHleper extends UrlRule {
+class GxUrlRuleHelper extends UrlRule {
 
     /**
      * @var string connection ID
@@ -31,10 +31,8 @@ class GxUrlRuleHleper extends UrlRule {
      */
     public static function getRule($pattern, $route, $host = false, $verb = false, $mode = false)
     {
-        $class = $this->name;
-
         $rule = [
-            'class' => $class::classname(),
+            'class' => self::className(),
             'pattern' => $pattern,
             'route' => $route,
         ];
