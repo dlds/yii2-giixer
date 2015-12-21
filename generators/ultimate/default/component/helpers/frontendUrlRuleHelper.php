@@ -17,7 +17,6 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 
     /**
      * Retrieves index rule
-     * @param boolean $root if rule should be retrieved with leading slash
      * @return string rule
      */
     public static function index()
@@ -30,8 +29,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     }
 
     /**
-     * Retrieves index rule
-     * @param boolean $root if rule should be retrieved with leading slash
+     * Retrieves view rule
      * @return string rule
      */
     public static function view($route = false)
