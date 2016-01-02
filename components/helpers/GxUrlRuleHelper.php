@@ -37,9 +37,11 @@ class GxUrlRuleHelper extends UrlRule {
             'route' => $route,
         ];
 
-        if (false !== $host)
+        $definition = static::getHostDefinition($host);
+
+        if ($definition)
         {
-            $rule['host'] = $host;
+            $rule['host'] = $definition;
         }
 
         if (false !== $verb)
@@ -47,11 +49,27 @@ class GxUrlRuleHelper extends UrlRule {
             $rule['verb'] = $verb;
         }
 
-        if (false !== $verb)
+        if (false !== $mode)
         {
             $rule['mode'] = $mode;
         }
 
         return $rule;
+    }
+
+    /**
+     * Retrieves host defintion
+     */
+    public static function getHostDefinition($host = false)
+    {
+        return false;
+    }
+
+    /**
+     * Retrieves default host identifiacatin
+     */
+    public static function getHostDefault()
+    {
+        return false;
     }
 }
