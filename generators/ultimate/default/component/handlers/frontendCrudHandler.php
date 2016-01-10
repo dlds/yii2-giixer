@@ -26,9 +26,9 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
     /**
      * @inheritdoc
      */
-    public function read($pk) 
+    public function read($pk, \Closure $callback = null)
     {
-        return parent::read($pk);
+        return parent::read($pk, $callback);
     }
     
     /**

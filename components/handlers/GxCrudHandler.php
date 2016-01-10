@@ -34,11 +34,12 @@ abstract class GxCrudHandler {
     /**
      * Read and retrieves AR model based on given primary key
      * @param mixed $pk given primary key
+     * @param \Closure $callback after read callback
      * @return \yii\db\ActiveRecord instance or null if model was not found
      */
-    public function read($pk)
+    public function read($pk, \Closure $callback = null)
     {
-        return $this->findModel($pk);
+        return $this->findModel($pk, $callback);
     }
 
     /**
@@ -82,13 +83,31 @@ abstract class GxCrudHandler {
     /**
      * Finds and retrieves AR model instance if found, otherwise null will be retrieved
      * @param mixed $pk primary key in form of integer or array
+     * @param \Closure $callback callback after find is done and model is succesfully found
      * @return mixed
      */
-    protected function findModel($pk)
+    protected function findModel($pk, \Closure $callback = null)
     {
-        $model = ${$this->modelClass()}::findOne($pk);
+        $class = $this->modelClass();
 
-        return $model ? $model : $this->notFoundFallback();
+        $model = $class::findOne($pk);
+
+        if (!$model)
+        {
+            return $this->notFoundFallback();
+        }
+
+        if (null !== $callback)
+        {
+            $return = $callback($model);
+
+            if (null !== $return)
+            {
+                return $return;
+            }
+        }
+
+        return $model;
     }
 
     /**

@@ -44,6 +44,7 @@ class ComponentHelper extends BaseHelper {
         // generate gallery behavior
         if (self::$generator->generateGalleryBehavior)
         {
+            return;
             throw new \yii\base\NotSupportedException('Component generator has not been implemented yet');
 
             $classname = sprintf('%s%s', $this->getBaseClassName(), self::SUFFIX_IMAGE_HELPER);
