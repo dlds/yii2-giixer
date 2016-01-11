@@ -62,7 +62,7 @@ abstract class GxCrudHandler {
      * @param \Closure $callback after delete callback
      * @return boolean
      */
-    public function delete($pk, \Closure $callback)
+    public function delete($pk, \Closure $callback = null)
     {
         $model = $this->findModel($pk);
 
