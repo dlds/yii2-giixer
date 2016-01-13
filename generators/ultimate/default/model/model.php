@@ -134,6 +134,29 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
         <?= $relation[0] . "\n" ?>
     }
 <?php endforeach; ?>
+<?php if ($generator->generateGalleryBehavior): ?>
+
+    /**
+     * Gallelry image relation
+     * @return ActiveQuery relation
+     */
+    public function getAppGalleryCover()
+    {
+        return $this->hasOne(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
+                ->where(['type' => <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_HELPER, true) ?>::getType()])
+                ->orderBy(['rank' => SORT_ASC]);
+    }
+
+    /**
+     * Gallelry image relation
+     * @return ActiveQuery relation
+     */
+    public function getAppGalleryImages()
+    {
+        return $this->hasMany(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
+                ->where(['type' => <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_HELPER, true) ?>::getType()]);
+    }
+<?php endif; ?>
     
     /**
      * @inheritdoc
