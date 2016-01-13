@@ -101,6 +101,7 @@ class BaseHelper {
         'backendRouteHelper' => 'backend\{ns}',
         'frontendRouteHelper' => 'frontend\{ns}',
         'frontendUrlRuleHelper' => 'frontend\{ns}',
+        'imageHelper' => 'common\{ns}\images',
     ];
 
     /**

@@ -16,6 +16,11 @@ class ComponentHelper extends BaseHelper {
     const SUFFIX_IMAGE_HELPER = 'Image'.self::SUFFIX_HELPER;
 
     /**
+     * Static Tmpls
+     */
+    const TMPL_IMAGE_HELPER = 'imageHelper';
+
+    /**
      * Retrieves required template files
      * @return array
      */
@@ -44,27 +49,24 @@ class ComponentHelper extends BaseHelper {
         // generate gallery behavior
         if (self::$generator->generateGalleryBehavior)
         {
-            return;
-            throw new \yii\base\NotSupportedException('Component generator has not been implemented yet');
 
-            $classname = sprintf('%s%s', $this->getBaseClassName(), self::SUFFIX_IMAGE_HELPER);
+            $renderParams = [
+                'baseClass' => $this->baseClassImageHelper,
+            ];
 
-            $class = $this->getFullyQualifiedName($classname, $root);
+            self::$generator->usedClasses[] = self::$generator->helperModel->getModelClass(false);
 
-            $helperClassName = sprintf('%s%s', $modelClassName, self::SUFFIX_CLASS_IMAGE_HELPER);
+            $class = $this->getHelperClass(self::TMPL_IMAGE_HELPER, true);
+            $ns = $this->getNsByPattern(self::TMPL_IMAGE_HELPER, $class);
 
-            $ns = $this->getComponentNs(self::COMPONENT_IMAGE_HELPER, $helperClassName);
+            $filePath = sprintf('%s/%s.php', \Yii::getAlias($this->getHelperFilePathAlias(self::TMPL_IMAGE_HELPER, $ns)), $class);
 
-            $this->usedClasses[] = sprintf('%s\%s', $ns, $helperClassName);
+            $tmplPath = sprintf('%s/%s.php', self::DIR_COMPONENT_HELPERS_PATH, self::TMPL_IMAGE_HELPER);
 
-            $path = str_replace('\\', '/', $ns);
+            $fileContent = self::$generator->render($tmplPath, $renderParams);
 
             $files[] = new CodeFile(
-                Yii::getAlias('@'.$path).'/'.$helperClassName.'.php', $this->render(sprintf('%s/%s.php', self::DIR_COMPONENT_TMPLS_PATH, self::COMPONENT_IMAGE_HELPER), [
-                    'namespace' => $ns,
-                    'className' => $helperClassName,
-                    'assignedModelName' => $modelClassName,
-                ])
+                $filePath, $fileContent
             );
         }
     }
@@ -263,15 +265,15 @@ class ComponentHelper extends BaseHelper {
 
         if (strpos($key, 'backend') !== false)
         {
-            return str_replace('backend', '', $type);
+            return ucfirst(str_replace('backend', '', $type));
         }
 
         if (strpos($key, 'frontend') !== false)
         {
-            return str_replace('frontend', '', $type);
+            return ucfirst(str_replace('frontend', '', $type));
         }
 
-        return str_replace('common', '', $type);
+        return ucfirst(str_replace('common', '', $type));
     }
 
     /**

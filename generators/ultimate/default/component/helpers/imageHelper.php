@@ -1,41 +1,51 @@
 <?php
-/**
- * This is the template for generating the model class of a specified table.
- */
-
-use yii\helpers\Inflector;
-
 /* @var $this yii\web\View */
-/* @var $generator dlds\giixer\generators\ultimate\Generator */
-/* @var $tableName string full table name */
-/* @var $className string class name */
-/* @var $tableSchema yii\db\TableSchema */
-/* @var $labels string[] list of attribute labels (name => label) */
-/* @var $rules string[] list of validation rules */
-/* @var $relations array list of relations (name => relation declaration) */
+/* @var $generator \dlds\giixer\generators\ultimate\Generator */
 
 echo "<?php\n";
-
-$assignedModelClass = sprintf('%s\\%s', $generator->getNsByPattern('frontendModel', $assignedModelName), $assignedModelName);
 ?>
 
-namespace <?= $namespace ?>;
+namespace <?= $generator->helperComponent->getNsByPattern(basename(__FILE__, '.php'), $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true)) ?>;
 
-use <?= $assignedModelClass ?>;
+use yii\helpers\ArrayHelper;
+<?php foreach ($generator->usedClasses as $class): ?>
+use <?= $class.";\n" ?>
+<?php endforeach; ?>
 
 /**
- * This image helper class for model class "<?= $assignedModelName ?>".
+ * This is common IMAGE helper for table "<?= $generator->generateTableName($generator->tableName) ?>".
  *
- * @inheritdoc
- * @see <?= $assignedModelClass."\n" ?>
  */
-abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className, $generator->baseClassImageHelper), '\\') ?> {
+class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true) ?> extends <?= $baseClass ?> {
+
+    /**
+     * Specific versions
+     */
+    //const VERSION_DEFAULT_AVATAR = 10;
+
+    /**
+     * Retrieves image versions
+     * @return type
+     */
+    public static function getVersions()
+    {
+        $versions = parent::getVersions();
+
+        return ArrayHelper::merge($versions, [
+            self::VERSION_XS => function($img) {
+                return $img->thumbnail(new \Imagine\Image\Box(65, 65), \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND);
+            },
+            self::VERSION_SM => function($img) {
+                return $img->thumbnail(new \Imagine\Image\Box(135, 135), \Imagine\Image\ImageInterface::THUMBNAIL_OUTBOUND);
+            },
+        ]);
+    }
 
     /**
      * Retrieves assigned model class
      */
     public static function modelClass()
     {
-        return <?= $assignedModelName ?>::className();
+        return <?= $generator->helperModel->getModelClass(true) ?>::className();
     }
 }
