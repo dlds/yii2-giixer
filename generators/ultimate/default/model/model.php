@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Inflector;
+use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
 
 /* @var $this yii\web\View */
 /* @var $generator dlds\giixer\generators\ultimate\Generator */
@@ -17,6 +18,9 @@ use Yii;
 <?php foreach ($generator->usedClasses as $class): ?>
 use <?= $class.";\n" ?>
 <?php endforeach; ?>
+<?php if ($generator->generateGalleryBehavior): ?>
+use <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_HELPER, false, false).";\n" ?>
+<?php endif; ?>
 
 /**
  * This is base model class for table "<?= $generator->generateTableName($generator->tableName) ?>".
