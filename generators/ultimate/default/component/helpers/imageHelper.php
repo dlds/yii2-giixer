@@ -16,7 +16,7 @@ use <?= $class.";\n" ?>
  * This is common IMAGE helper for table "<?= $generator->generateTableName($generator->tableName) ?>".
  *
  */
-class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true) ?> extends <?= $baseClass ?> {
+class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true) ?> extends <?= sprintf('\\%s', $baseClass) ?> {
 
     /**
      * Specific versions
