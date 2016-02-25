@@ -65,6 +65,31 @@ echo $form->field($generator, 'tableName');
     <div class="col-md-12" style="background-color: #FFFFE0;margin-bottom:15px">
         <div class="row" style="margin-top:15px">
             <div class="col-md-12">
+                <?= $form->field($generator, 'generateSortableBehavior')->sticky()->checkbox() ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $form->field($generator, 'sortableColumnAttribute') ?>
+            </div>
+            <div class="col-md-6">
+                <?= $form->field($generator, 'sortableIndexAttribute') ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $form->field($generator, 'sortableKeyAttribute') ?>
+            </div>
+            <div class="col-md-6">
+                <?= $form->field($generator, 'sortableRestrictionsAttribute') ?>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12" style="background-color: #FFFFE0;margin-bottom:15px">
+        <div class="row" style="margin-top:15px">
+            <div class="col-md-12">
                 <?= $form->field($generator, 'generateGalleryBehavior')->sticky()->checkbox() ?>
             </div>
         </div>

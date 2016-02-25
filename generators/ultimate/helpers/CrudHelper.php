@@ -115,10 +115,8 @@ class CrudHelper extends BaseHelper {
      * Retrieves CRUD Controller parent class
      * @return string base class
      */
-    public function getControllerParentClass($basename = false, $root = false)
+    public function getControllerParentClass($basename = false, $root = false, $customBaseClass = false)
     {
-        $customBaseClass = \Yii::$app->getModule('gii')->controllerBackendBaseClass;
-
         $class = ($customBaseClass) ? $customBaseClass : $this->baseClassController;
 
         if ($basename)

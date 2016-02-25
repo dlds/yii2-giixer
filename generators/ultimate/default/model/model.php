@@ -83,14 +83,14 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
                 '<?= $name ?>' => [
 <?php foreach ($value as $i => $j): ?>
 <?php if(is_int($i)): ?>
-                    <?= $j ?>,
+                    <?= $generator->shouldBeQuoted($j) ? "'$j'" : $j ?>,
 <?php else: ?>
-                    <?= $i .' => '.$j ?>,
+                    <?= $i .' => '.$generator->shouldBeQuoted($j) ? "'$j'" : $j ?>,
 <?php endif; ?>
 <?php endforeach; ?>
                 ],
 <?php else: ?>
-                '<?= $name ?>' => <?= $value ?>,
+                '<?= $name ?>' => <?= $generator->shouldBeQuoted($value) ? "'$value'" : $value ?>,
 <?php endif; ?>
 <?php endforeach; ?>
             ],

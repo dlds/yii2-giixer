@@ -33,7 +33,6 @@ yii.giixer = (function ($) {
             // inits link (a[href="#taget"]) visibility togglers
             initLinkVisibilityToggler();
 
-
             // register on check visibility toggler callback
             var generateMutationToggler = $('form #generator-generatemutation');
             var generateMutationTogglerTargets = [
@@ -53,10 +52,21 @@ yii.giixer = (function ($) {
                 'form .field-generator-timestampupdatedatattribute',
             ];
             initOnChangeVisibilityToggle(generateTimestampBehaviorToggler, generateTimestampBehaviorTogglerTargets, ':checked');
+            
+            // register on check visibility toggler callback
+            var generateSortableBehaviorToggler = $('form #generator-generatesortablebehavior');
+            var generateSortableBehaviorTogglerTargets = [
+                'form .field-generator-sortablecolumnattribute',
+                'form .field-generator-sortableindexattribute',
+                'form .field-generator-sortablekeyattribute',
+                'form .field-generator-sortablerestrictionsattribute',
+            ];
+            initOnChangeVisibilityToggle(generateSortableBehaviorToggler, generateSortableBehaviorTogglerTargets, ':checked');
 
             // toggle visibility once at begin to ensure elements are in proper state
             toggleVisibility(generateMutationToggler, generateMutationTogglerTargets, ':checked');
             toggleVisibility(generateTimestampBehaviorToggler, generateTimestampBehaviorTogglerTargets, ':checked');
+            toggleVisibility(generateSortableBehaviorToggler, generateSortableBehaviorTogglerTargets, ':checked');
         }
     };
 })(jQuery);

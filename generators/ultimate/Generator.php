@@ -125,6 +125,31 @@ class Generator extends \yii\gii\generators\model\Generator {
     public $generateGalleryBehavior = false;
 
     /**
+     * @var string defines sortable column attribute
+     */
+    public $sortableColumnAttribute = 'position';
+
+    /**
+     * @var string defines sortable column attribute
+     */
+    public $sortableIndexAttribute = 'items';
+
+    /**
+     * @var string defines restrictions
+     */
+    public $sortableRestrictionsAttribute = false;
+
+    /**
+     * @var string defines restrictions column attribute
+     */
+    public $sortableKeyAttribute = false;
+
+    /**
+     * @var boolean indicates if sortable behavior should be generated
+     */
+    public $generateSortableBehavior = false;
+
+    /**
      * @var string controller class name
      */
     public $controllerClass = false;
@@ -310,7 +335,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         return ArrayHelper::merge([
                 [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
                 [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
-                [['generateMutation', 'generateSluggableMutation', 'sluggableMutationEnsureUnique', 'sluggableMutationImutable', 'generateTimestampBehavior', 'generateGalleryBehavior'], 'boolean'],
+                [['generateMutation', 'generateSluggableMutation', 'sluggableMutationEnsureUnique', 'sluggableMutationImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
                     return $model->generateMutation;
@@ -334,6 +359,17 @@ class Generator extends \yii\gii\generators\model\Generator {
                     return $model->generateTimestampBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
+                    }"],
+                [['sortableIndexAttribute'], 'string'],
+                [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                    return $model->generateSortableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generatesortablebehavior').is(':checked');
+                    }"],
+                [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function($model) {
+                    return $model->generateSortableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
                 ], $rules);
     }
@@ -397,8 +433,14 @@ class Generator extends \yii\gii\generators\model\Generator {
             'mutationSourceTableName' => 'This is the name of the source table holds application languages used in many-to-many relationship.',
             'generateSluggable' => 'This indicates whether the generator should generate Yii2 Sluggable behavior in main model class.',
             'generateTimestampBehavior' => 'This indicates whether the generator should generate Yii2 Timestamp behavior in main model class.',
-            'timestampCreatedAtAttribute' => 'This is the name of the table attribute which should be used ad created at timestamp value.',
-            'timestampUpdatedAtAttribute' => 'This is the name of the table attribute which should be used ad updated at timestamp value.',
+            'timestampCreatedAtAttribute' => 'This is the name of the table attribute which should be used as created at timestamp value.',
+            'timestampUpdatedAtAttribute' => 'This is the name of the table attribute which should be used as updated at timestamp value.',
+            'generateSortableBehavior' => 'This indicates whether the generator should generate Dlds Sortable behavior in main model class.',
+            'sortableColumnAtAttribute' => 'This is the name of the table attribute which should be used as sortable column.',
+            'sortableIndexAtAttribute' => 'This is the name of the attribute which will hold sortable values in sortable element.',
+            'sortableRestrictionsAtAttribute' => 'This holds custom sortable restrictions array rule.',
+            'sortableKeyAtAttribute' => 'This defines table primary key if is different from standart.',
+            'timestampUpdatedAtAttribute' => 'This is the name of the table attribute which should be used as updated at timestamp value.',
             'generateGalleryBehavior' => 'This indicates whether the generator should generate dlds/yii2-gallerymanager behavior in main model class.',
         ]);
     }
@@ -1082,10 +1124,10 @@ class Generator extends \yii\gii\generators\model\Generator {
             $behaviors['languages'] = [
                 'class' => '\dlds\rels\components\Behavior::className()',
                 'config' => [
-                    'AppCategoryLanguage::className()',
-                    'AppCategoryLanguage::RELNAME_CATEGORY',
-                    'AppCategoryLanguage::RELNAME_LANGUAGE',
-                    'static::RELNAME_CURRENT_LANGUAGE',
+                    sprintf('%s::className()', $modelClassName),
+                    sprintf('%s::RN_CATEGORY', $modelClassName),
+                    sprintf('%s::RN_LANGUAGE', $modelClassName),
+                    sprintf('%s::Rn_CURRENT_LANGUAGE', $modelClassName),
                 ],
                 'attrs' => $mutationableAttrs,
             ];
@@ -1128,16 +1170,39 @@ class Generator extends \yii\gii\generators\model\Generator {
 
             if ($this->timestampCreatedAtAttribute && self::DEFAULT_TIMESTAMP_CREATED_AT_ATTR != $this->timestampCreatedAtAttribute)
             {
-                $behaviors['timestamp'] = [
-                    'createdAtAttribute' => $this->timestampCreatedAtAttribute,
-                ];
+                $behaviors['timestamp']['createdAtAttribute'] = $this->timestampCreatedAtAttribute;
             }
 
             if ($this->timestampUpdatedAtAttribute && self::DEFAULT_TIMESTAMP_UPDATED_AT_ATTR != $this->timestampUpdatedAtAttribute)
             {
-                $behaviors['timestamp'] = [
-                    'updatedAtAttribute' => $this->timestampUpdatedAtAttribute,
-                ];
+                $behaviors['timestamp']['updatedAtAttribute'] = $this->timestampUpdatedAtAttribute;
+            }
+        }
+
+        if ($this->generateSortableBehavior)
+        {
+            $behaviors['sortable'] = [
+                'class' => '\dlds\sortable\components\Behavior::className()',
+            ];
+
+            if ($this->sortableKeyAttribute)
+            {
+                $behaviors['sortable']['key'] = $this->sortableKeyAttribute;
+            }
+
+            if ($this->sortableColumnAttribute)
+            {
+                $behaviors['sortable']['column'] = $this->sortableColumnAttribute;
+            }
+
+            if ($this->sortableIndexAttribute)
+            {
+                $behaviors['sortable']['index'] = $this->sortableIndexAttribute;
+            }
+
+            if ($this->sortableRestrictionsAttribute)
+            {
+                $behaviors['sortable']['restrictions'] = $this->sortableRestrictionsAttribute;
             }
         }
 
@@ -1221,5 +1286,20 @@ class Generator extends \yii\gii\generators\model\Generator {
             }
         }
         return $str;
+    }
+
+    /**
+     * Indicates if given value should be quoted or not
+     * - quoted are simple string values
+     * @param mixed $value
+     */
+    public function shouldBeQuoted($value)
+    {
+        if (is_callable($value, true) && 'false' !== $value && 'true' !== $value && 'null' !== $value && false === strpos($value, '::') && !is_numeric($value))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -13,13 +13,13 @@ namespace <?= $generator->helperModel->getNsByPattern(basename(__FILE__, '.php')
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php'), false) ?>;
 
 /**
  * <?= $generator->helperModel->getSearchClass(true) ?> represents the model behind the search form about `<?= $generator->helperModel->getModelClass(true) ?>`.
  */
-class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php'), false, true) ?>
+class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php'), true) ?> {
 
-{
     /**
      * @inheritdoc
      */
@@ -48,7 +48,7 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
      */
     public function search($params)
     {
-        $query = self::find();
+        $query = <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php'), true) ?>::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

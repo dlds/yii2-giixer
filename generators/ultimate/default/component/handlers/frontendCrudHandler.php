@@ -42,7 +42,7 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
     /**
      * @inheritdoc
      */
-    public function delete($pk, \Closure $callback)
+    public function delete($pk, \Closure $callback = null)
     {
         throw new \yii\web\ForbiddenHttpException;
     }
