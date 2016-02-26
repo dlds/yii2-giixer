@@ -825,7 +825,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     }
 
     /**
-     * Retrieves translation category
+     * Retrieves model classname
      */
     public function getModelClassName()
     {

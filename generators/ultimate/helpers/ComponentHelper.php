@@ -13,6 +13,7 @@ class ComponentHelper extends BaseHelper {
      */
     const SUFFIX_HANDLER = 'Handler';
     const SUFFIX_HELPER = 'Helper';
+    const SUFFIX_TRANSLATION = 'Translation';
     const SUFFIX_IMAGE_HELPER = 'Image'.self::SUFFIX_HELPER;
 
     /**
@@ -302,7 +303,7 @@ class ComponentHelper extends BaseHelper {
         {
             foreach (self::$generator->translations as $lang)
             {
-                $filePath = sprintf('%s.php', \Yii::getAlias($this->getTranslationFilePathAlias($lang, $ns)));
+                $filePath = sprintf('%s.php', \Yii::getAlias($this->getTranslationFilePathAlias($lang, $ns, $tmpl)));
 
                 $tmplPath = sprintf('%s/%s.php', self::DIR_TRANSLATIONS_PATH, $tmpl);
 
@@ -316,13 +317,45 @@ class ComponentHelper extends BaseHelper {
     }
 
     /**
+     * Retrieves TRANSLATION class
+     * @return type
+     */
+    public function getTranslationClass($basename = false, $root = true, $asUse = false)
+    {
+        $classname = sprintf('%s%s', $this->getBaseClassName(), self::SUFFIX_TRANSLATION);
+
+        $class = $this->getFullyQualifiedName($classname, $root);
+
+        if ($basename)
+        {
+            return StringHelper::basename($class);
+        }
+
+        if ($asUse)
+        {
+            return trim($class, '\\');
+        }
+
+        return $class;
+    }
+
+    /**
      * Retrieves HELPER file path alias
      * @param string $ns namespace
      */
-    public function getTranslationFilePathAlias($lang, $ns)
+    public function getTranslationFilePathAlias($lang, $ns, $tmpl)
     {
-        $path = sprintf('messages/%s/%s', $lang, $this->getBaseClassKey('/'));
+        $namespace = str_replace('{ns}', $this->getNsByMap($this->getTranslationClass(true, false), true), $ns);
 
-        return sprintf('@%s', str_replace('{ns}', $path, $ns));
+        $parts = explode('/', $this->getBaseClassKey('/'));
+
+        $module = \yii\helpers\ArrayHelper::getValue($parts, 0, false);
+
+        if (false !== $module && false !== strpos($namespace, $module))
+        {
+            \yii\helpers\ArrayHelper::remove($parts, 0);
+        }
+
+        return sprintf('@%s/%s/%s', str_replace('\\', '/', $namespace), $lang, implode('/', $parts));
     }
 }
