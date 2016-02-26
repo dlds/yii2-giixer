@@ -22,13 +22,14 @@ abstract class GxCrudHandler {
      * Creates new AR model instance
      * @param array $attrs given attributes
      * @param \Closure $callback after create callback
+     * @param string $scope given scope for massive assignment
      * @return mixed callback if defined or model instance
      */
-    public function create(array $attrs, \Closure $callback = null)
+    public function create(array $attrs, \Closure $callback = null, $scope = null)
     {
         $model = $this->createModel();
 
-        return $this->changeModel($model, $attrs, $callback);
+        return $this->changeModel($model, $attrs, $callback, $scope);
     }
 
     /**
@@ -47,13 +48,14 @@ abstract class GxCrudHandler {
      * @param mixed $pk given primary key
      * @param array $attrs given attributes to be changed
      * @param \Closure $callback after update callback
+     * @param string $scope given scope for massive assignment
      * @return mixed
      */
-    public function update($pk, array $attrs, \Closure $callback = null)
+    public function update($pk, array $attrs, \Closure $callback = null, $scope = null)
     {
         $model = $this->findModel($pk);
 
-        return $this->changeModel($model, $attrs, $callback);
+        return $this->changeModel($model, $attrs, $callback, $scope);
     }
 
     /**
@@ -66,7 +68,12 @@ abstract class GxCrudHandler {
     {
         $model = $this->findModel($pk);
 
-        return $callback($model->delete());
+        if (null !== $callback)
+        {
+            return $callback($model->delete());
+        }
+
+        return $model->delete();
     }
 
     /**
@@ -117,9 +124,9 @@ abstract class GxCrudHandler {
      * @param \Closure $callback callback after change is done no matter if succesfully or not
      * @return mixed
      */
-    protected function changeModel(\yii\db\ActiveRecord $model, array $attrs, \Closure $callback = null)
+    protected function changeModel(\yii\db\ActiveRecord $model, array $attrs, \Closure $callback = null, $scope = null)
     {
-        if ($model->load($attrs) && $model->save())
+        if ($model->load($attrs, $scope) && $model->save())
         {
             if (null !== $callback)
             {

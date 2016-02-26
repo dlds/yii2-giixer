@@ -18,7 +18,7 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
     /**
      * @inheritdoc
      */
-    public function create(array $attrs, \Closure $callback = null)
+    public function create(array $attrs, \Closure $callback = null, $scope = null)
     {
         throw new \yii\web\ForbiddenHttpException;
     }
@@ -34,7 +34,7 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
     /**
      * @inheritdoc
      */
-    public function update($pk, array $attrs, \Closure $callback = null)
+    public function update($pk, array $attrs, \Closure $callback = null, $scope = null)
     {
         throw new \yii\web\ForbiddenHttpException;
     }

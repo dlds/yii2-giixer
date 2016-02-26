@@ -36,6 +36,11 @@ abstract class GxActiveRecord extends ActiveRecord {
     {
         GxModelHelper::adaptData($data, static::className());
 
+        if (false === $formName)
+        {
+            $formName = '';
+        }
+
         return parent::load($data, $formName);
     }
 
