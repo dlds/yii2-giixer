@@ -45,6 +45,23 @@ abstract class GxActiveRecord extends ActiveRecord {
     }
 
     /**
+     * Instantiate multiple models
+     * @param array $data given data
+     * @return array
+     */
+    public static function instantiateMultiple(array $data)
+    {
+        $records = [];
+
+        foreach ($data as $row)
+        {
+            $records[] = new static($row);
+        }
+
+        return $records;
+    }
+
+    /**
      * Removes validation rule from given rules
      * @param array $rules
      */
