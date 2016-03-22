@@ -33,6 +33,28 @@ class GxModelHelper {
     }
 
     /**
+     * Adapts given query params to match form submit query requirements
+     * @param array $params given params
+     * @param string $classname given classname
+     */
+    public static function adaptQueryParams($params, $classname)
+    {
+        if ($params)
+        {
+            $basename = StringHelper::basename($classname);
+
+            foreach ($params as $key => $value)
+            {
+                unset($params[$key]);
+
+                $params[$basename][$key] = $value;
+            }
+        }
+
+        return $params;
+    }
+
+    /**
      * Removes validation rule from given rules
      * @param array $rules
      */
