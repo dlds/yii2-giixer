@@ -28,6 +28,33 @@ to the `require` section of your `composer.json` file.
 
 There is not any migration required to run. Module itself does not store data in DB.
 
+## Structure
+
+Giixer defines its own easy to maintain and extend application structure which
+is sligtly different than default gii generated structure. Below you can find 
+what all and how giixer generates.
+
+### AR models
+Giixer uses it own AR models nested strucutre. Below are single AR models 
+described what they stand for on adequate levels they work in.
+
+1. Base AR model
+    * top AR model which is maintained by giixer itself only.
+    * this AR model always extends **GxActiveRecord**
+    * manual changes to this model may be lost after next giixer generation
+    * this AR model file is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
+2. Common AR model
+    * first editable AR model which extends previous **Base AR model**
+    * changes to this model will not be lost after following giixer generation
+3. Frontend/Backend AR model
+    * bottom level AR model which extends **Common AR model**
+    * these AR models lie in separate yii2 application `frontend` and `backend`
+    * these models are the only ones which should be used directly by each aplication
+
+> This AR model structure gives you opportunity to easily change your DB strucutre
+and still be able to regenerate your AR models without loosing your current code changes
+Above structure is shown on [this diagram](https://drive.google.com/file/d/0B4fdy0PlE1nyTS14ZEFsUFBBZDQ/view?usp=sharing)
+
 ## Configuration
 
 Enables gii module in your config file by adding it to app bootstrap.
@@ -83,8 +110,7 @@ Otherwise the **GxController** will be used directly as parent class.
 ]
 ```
 
-For option above configuration the backend generated controller 
-will `extend backend\\controllers\\base\\BaseController`
+For option above the backend generated controller will `extend backend\\controllers\\base\\BaseController`
 
 ---
 
