@@ -36,24 +36,28 @@ what all and how giixer generates.
 
 ### ActiveRecords
 
-Giixer uses it own ActiveRecords (AR) nested strucutre. Below are all 4 ARs 
-with descriptions about what they stand for. Each is places on adequate levels as in applicaiton.
+Giixer uses its own ActiveRecords (AR) nested strucutre. Below are all 4 ARs 
+with descriptions about what they stand for. Each is placed on notional level as in application.
 
 1. **Base AR**
-    * top AR which is maintained by giixer itself only.
-    * this AR always extends **GxActiveRecord**
-    * manual changes to this AR may be lost after next giixer generation
-    * file for this AR is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
+    * Top level and not editable AR 
+    * Maintained only by giixer itself.
+    * Always extends **GxActiveRecord**
+    * Manual changes may be lost after next giixer generation
+    * File is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
 2. **Common AR**
-    * first editable AR which extends previous **Base AR**
-    * changes to this AR **will not** be lost after following giixer generation
-    * file for this AR is placed in `common\models\db` or `common\modules\modulename\models\db`
+    * Extends **Base AR**
+    * Editable and maintained by developer
+    * Changes **will not** be lost after any giixer generation
+    * File is placed in `common\models\db` or `common\modules\modulename\models\db`
 3. **Frontend/Backend AR**
-    * low level AR which extends **Common AR**
-    * these AR models lie in separate yii2 application `frontend` and `backend`
-    * these models are the only ones which should be used directly by each aplication
-    * these AR's namespaces can be `app\models\db` or `app\modules\modulename\models\db` 
-    * files for these ARs are places in corresponding location as their namespaces but `app` part is replaces by `frontend` or `backend`
+    * Extends **Common AR**
+    * Low level AR 
+    * Editable and maintained by developer
+    * Lie in separate application scopes `frontend` or `backend`
+    * Only these can be directly used by application
+    * Namespaces are usually `app\models\db` or `app\modules\modulename\models\db` 
+    * Files are placed in corresponding location to their namespaces with `app` replaced by `frontend` or `backend`
 
 This AR model structure gives you opportunity to easily change your DB strucutre
 and still be able to regenerate your AR models without loosing your current code changes
@@ -65,23 +69,23 @@ and avoid code duplication while AR models will be still found.
 
 ### ActiveQueries
 
-Each AR model is generated with its custom ActiveQuery class which is asigned to
-**Base AR**.
+Each AR model is generated with its custom ActiveQuery class which is assigned to **Base AR**.
 
-Giixer creates following 3 ActiveQuery (AQ) class during AR model generation.
+Giixer creates following 3 ActiveQuery (AQ) classes during ARs generation.
 
 1. **Common AQ**
-    * this AQ always extends `\yii\db\ActiveQuery`
-    * this AQ file is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
+    * Extends `\yii\db\ActiveQuery`
+    * Editable and maintained by developer
+    * File is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
 2. **Frontend/Backend AQ**
-    * low level AQ which extends **Common AQ**
-    * these AQ are always used by **Base AR**
-    * these AQ's namespaces can be `app\models\db\query` or `app\modules\modulename\models\db\query` 
-    * files for these AQs are places in corresponding location as their namespaces but `app` part is replaces by `frontend` or `backend`
-
+    * Low level AQ which extends **Common AQ**
+    * Editable and maintained by developer
+    * Always loaded in **Base AR** (Only these can be directly used by application)
+    * Namespaces are usually `app\models\db\query` or `app\modules\modulename\models\db\query` 
+    * Files are placed in corresponding location to their namespaces with `app` part replaced by `frontend` or `backend`
 
 Base AR will automatically loads appropriate AQ based on current application scope even 
-both low level AQ has same namespace for backend and frontend. That is because frontend application 
+both low level AQs have same namespace. That is because frontend application 
 does not have access to backend application scope and vice versa.
 
 > Above structure is shown on [this diagram](https://drive.google.com/file/d/0B4fdy0PlE1nyM1ZjZmRMZWdhS2c/view?usp=sharing)
