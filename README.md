@@ -34,26 +34,57 @@ Giixer defines its own easy to maintain and extend application structure which
 is sligtly different than default gii generated structure. Below you can find 
 what all and how giixer generates.
 
-### AR models
-Giixer uses it own AR models nested strucutre. Below are single AR models 
-described what they stand for on adequate levels they work in.
+### ActiveRecords
 
-1. Base AR model
-    * top AR model which is maintained by giixer itself only.
-    * this AR model always extends **GxActiveRecord**
-    * manual changes to this model may be lost after next giixer generation
-    * this AR model file is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
-2. Common AR model
-    * first editable AR model which extends previous **Base AR model**
-    * changes to this model will not be lost after following giixer generation
-3. Frontend/Backend AR model
-    * bottom level AR model which extends **Common AR model**
+Giixer uses it own ActiveRecords (AR) nested strucutre. Below are all 4 ARs 
+with descriptions about what they stand for. Each is places on adequate levels as in applicaiton.
+
+1. **Base AR**
+    * top AR which is maintained by giixer itself only.
+    * this AR always extends **GxActiveRecord**
+    * manual changes to this AR may be lost after next giixer generation
+    * file for this AR is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
+2. **Common AR**
+    * first editable AR which extends previous **Base AR**
+    * changes to this AR **will not** be lost after following giixer generation
+    * file for this AR is placed in `common\models\db` or `common\modules\modulename\models\db`
+3. **Frontend/Backend AR**
+    * low level AR which extends **Common AR**
     * these AR models lie in separate yii2 application `frontend` and `backend`
     * these models are the only ones which should be used directly by each aplication
+    * these AR's namespaces can be `app\models\db` or `app\modules\modulename\models\db` 
+    * files for these ARs are places in corresponding location as their namespaces but `app` part is replaces by `frontend` or `backend`
 
-> This AR model structure gives you opportunity to easily change your DB strucutre
+This AR model structure gives you opportunity to easily change your DB strucutre
 and still be able to regenerate your AR models without loosing your current code changes
-Above structure is shown on [this diagram](https://drive.google.com/file/d/0B4fdy0PlE1nyTS14ZEFsUFBBZDQ/view?usp=sharing)
+
+Because of same namespace for backend and frontend AR you can easily move some application logic to common scope
+and avoid code duplication while AR models will be still found.
+
+> Above structure is shown on [this diagram](https://drive.google.com/file/d/0B4fdy0PlE1nybUhLUFBiOTU0VnM/view?usp=sharing)
+
+### ActiveQueries
+
+Each AR model is generated with its custom ActiveQuery class which is asigned to
+**Base AR**.
+
+Giixer creates following 3 ActiveQuery (AQ) class during AR model generation.
+
+1. **Common AQ**
+    * this AQ always extends `\yii\db\ActiveQuery`
+    * this AQ file is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
+2. **Frontend/Backend AQ**
+    * low level AQ which extends **Common AQ**
+    * these AQ are always used by **Base AR**
+    * these AQ's namespaces can be `app\models\db\query` or `app\modules\modulename\models\db\query` 
+    * files for these AQs are places in corresponding location as their namespaces but `app` part is replaces by `frontend` or `backend`
+
+
+Base AR will automatically loads appropriate AQ based on current application scope even 
+both low level AQ has same namespace for backend and frontend. That is because frontend application 
+does not have access to backend application scope and vice versa.
+
+> Above structure is shown on [this diagram](https://drive.google.com/file/d/0B4fdy0PlE1nyM1ZjZmRMZWdhS2c/view?usp=sharing)
 
 ## Configuration
 
