@@ -35,7 +35,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * @var array models namespaces
      */
-    public $nsMap = array(
+    public $namespaces = array(
         'model' => 'common\{ns}\base',
         'query' => 'common\{ns}',
         'commonModel' => 'common\{ns}',
@@ -90,7 +90,7 @@ class Generator extends \yii\gii\generators\model\Generator {
             $this->templates[self::TMPL_NAME] = $this->extendedTemplate();
         }
 
-        $this->staticNs = Yii::$app->getModule('gii')->nsMap;
+        $this->staticNs = Yii::$app->getModule('gii')->namespaces;
 
         if (!empty($this->staticNs) && !is_array($this->staticNs))
         {
@@ -381,9 +381,9 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getFileNs($file, $className = null)
     {
-        if (isset($this->nsMap[$file]))
+        if (isset($this->namespaces[$file]))
         {
-            return str_replace('{ns}', $this->getNs($className), $this->nsMap[$file]);
+            return str_replace('{ns}', $this->getNs($className), $this->namespaces[$file]);
         }
 
         return $this->ns;

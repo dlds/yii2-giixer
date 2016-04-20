@@ -159,7 +159,7 @@ class BaseHelper {
     {
         $namespace = false;
 
-        foreach (self::$generator->nsMap as $regex => $ns)
+        foreach (self::$generator->namespaces as $regex => $ns)
         {
             if (preg_match('%'.$regex.'%', $subject))
             {

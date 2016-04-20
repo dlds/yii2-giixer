@@ -1,7 +1,7 @@
 <?php
 /**
  * @link http://www.digitaldeals.cz/
- * @copyright Copyright (c) 2014 Digital Deals s.r.o. 
+ * @copyright Copyright (c) Digital Deals s.r.o. 
  * @license http://www.digitaldeals.cz/license/
  */
 
@@ -9,12 +9,18 @@ namespace dlds\giixer;
 
 /**
  * This is the main module class for the Giixer module.
+ * Giixer module replaces default Gii module and enhances default functionality.
  *
  * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
 class Module extends \yii\gii\Module {
 
-    public $nsMap;
+    /**
+     * @var array preddefined namespaces map
+     * each entry contains classname regex as array key and namespace as value
+     * ['^App[a-zA-Z]+Model$' => 'app\\models']
+     */
+    public $namespaces;
 
     /**
      * @var string base backend controller class
@@ -39,7 +45,7 @@ class Module extends \yii\gii\Module {
     /**
      * @var array translations to be generated
      */
-    public $translationLangs = ['en'];
+    public $translations = ['en'];
 
     /**
      * Returns the list of the core code generator configurations.
@@ -51,8 +57,6 @@ class Module extends \yii\gii\Module {
             'ultimate' => ['class' => 'dlds\giixer\generators\ultimate\Generator'],
             'model' => ['class' => 'dlds\giixer\generators\model\Generator'],
             'crud' => ['class' => 'dlds\giixer\generators\crud\Generator'],
-            'controller' => ['class' => 'yii\gii\generators\controller\Generator'],
-            'form' => ['class' => 'yii\gii\generators\form\Generator'],
             'module' => ['class' => 'yii\gii\generators\module\Generator'],
             'extension' => ['class' => 'yii\gii\generators\extension\Generator'],
         ];

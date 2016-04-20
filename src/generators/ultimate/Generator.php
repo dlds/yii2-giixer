@@ -258,7 +258,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * @var array static namespaces
      */
-    public $nsMap = [];
+    public $namespaces = [];
 
     /**
      * @var array used classes
@@ -275,21 +275,21 @@ class Generator extends \yii\gii\generators\model\Generator {
             $this->templates[self::ID_CURRENT_TMPL] = $this->tmplsRootDir();
         }
 
-        $this->nsMap = Yii::$app->getModule('gii')->nsMap;
+        $this->namespaces = Yii::$app->getModule('gii')->namespaces;
 
-        if (!empty($this->nsMap) && !is_array($this->nsMap))
+        if (!empty($this->namespaces) && !is_array($this->namespaces))
         {
-            throw new \yii\base\ErrorException('Giier nsMap should be array');
+            throw new \yii\base\ErrorException('Giier namespaces should be array');
         }
 
-        $translations = Yii::$app->getModule('gii')->translationLangs;
+        $translations = Yii::$app->getModule('gii')->translations;
 
         if ($translations)
         {
             $this->translations = $translations;
         }
 
-        $this->nsMap = Yii::$app->getModule('gii')->nsMap;
+        $this->namespaces = Yii::$app->getModule('gii')->namespaces;
 
         $this->generateQuery = true;
         $this->generateRelations = true;
