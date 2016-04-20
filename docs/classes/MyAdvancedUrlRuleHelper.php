@@ -1,4 +1,9 @@
 <?php
+/**
+ * @copyright Copyright 2016  &copy; Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
+ */
 
 namespace frontend\components\helpers\url\rules;
 

@@ -1,6 +1,9 @@
-yii2-giixer
+Yii2 Giixer
 ===========
 
+Copyright 2016  &copy; Digital Deals s.r.o.
+Author Jiri Svoboda <jiri.svoboda@dlds.cz>
+ 
 Extended gii module for Yii2 including a bunch of useful handler, helpers, traits
 and other components. This module generates required models, controllers and other
 classes with dependency on own components. Default yii-gii generator is not available
@@ -140,7 +143,7 @@ class AppBootstrapHandler implements \yii\base\BootstrapInterface {
 Where `@frontend/config/url/rules.php` should look like below.
 
 ```
-@rules = [
+$rules = [
     // ...
     MyBasicUrlRuleHelper::index(),
     MyBasicUrlRuleHelper::view(),
