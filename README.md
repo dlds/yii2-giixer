@@ -1,8 +1,7 @@
 Yii2 Giixer
 ===========
 
-Copyright 2016  &copy; Digital Deals s.r.o.
-Author Jiri Svoboda <jiri.svoboda@dlds.cz>
+Copyright 2016  &copy; Digital Deals s.r.o. | Jiri Svoboda <jiri.svoboda@dlds.cz>
  
 Extended gii module for Yii2 including a bunch of useful handler, helpers, traits
 and other components. This module generates required models, controllers and other
