@@ -2,7 +2,22 @@
 
 namespace dlds\giixer\components\handlers;
 
-abstract class GxCrudHandler {
+use dlds\giixer\components\events\GxCrudEvent;
+
+abstract class GxCrudHandler extends \yii\base\Component {
+
+    // AFTER events
+    const EVENT_AFTER_CREATE = 'e_after_create';
+    const EVENT_AFTER_READ = 'e_after_read';
+    const EVENT_AFTER_UPDATE = 'e_after_update';
+    const EVENT_AFTER_DELETE = 'e_after_delete';
+    const EVENT_AFTER_CHANGE = 'e_after_change';
+    // BEFORE events
+    const EVENT_BEFORE_CREATE = 'e_before_create';
+    const EVENT_BEFORE_READ = 'e_before_read';
+    const EVENT_BEFORE_UPDATE = 'e_before_update';
+    const EVENT_BEFORE_DELETE = 'e_before_delete';
+    const EVENT_BEFORE_CHANGE = 'e_before_change';
 
     /**
      * Initializes CRUD handler
@@ -14,64 +29,55 @@ abstract class GxCrudHandler {
 
         if (!is_subclass_of($class, \yii\db\ActiveRecord::className()))
         {
-            throw new \yii\base\ErrorException('Invalid model class. Method "getModelClass" have to retrieve ActiveRecord descendant class.');
+            throw new \yii\base\ErrorException('Invalid model class. Method "getModelClass" has to retrieve ActiveRecord descendant class.');
         }
     }
 
     /**
      * Creates new AR model instance
      * @param array $attrs given attributes
-     * @param \Closure $callback after create callback
      * @param string $scope given scope for massive assignment
-     * @return mixed callback if defined or model instance
+     * @return mixed model instance
      */
-    public function create(array $attrs, \Closure $callback = null, $scope = null)
+    public function create(array $attrs, $scope = null)
     {
         $model = $this->createModel();
 
-        return $this->changeModel($model, $attrs, $callback, $scope);
+        return $this->changeModel($model, $attrs, $scope);
     }
 
     /**
      * Read and retrieves AR model based on given primary key
      * @param mixed $pk given primary key
-     * @param \Closure $callback after read callback
      * @return \yii\db\ActiveRecord instance or null if model was not found
      */
-    public function read($pk, \Closure $callback = null)
+    public function read($pk)
     {
-        return $this->findModel($pk, $callback);
+        return $this->findModel($pk);
     }
 
     /**
      * Finds and update AR model based on given primary key
      * @param mixed $pk given primary key
      * @param array $attrs given attributes to be changed
-     * @param \Closure $callback after update callback
      * @param string $scope given scope for massive assignment
      * @return mixed
      */
-    public function update($pk, array $attrs, \Closure $callback = null, $scope = null)
+    public function update($pk, array $attrs, $scope = null)
     {
         $model = $this->findModel($pk);
 
-        return $this->changeModel($model, $attrs, $callback, $scope);
+        return $this->changeModel($model, $attrs, $scope);
     }
 
     /**
      * Deletes ar model based on given primary key
      * @param mixed $pk given primary key
-     * @param \Closure $callback after delete callback
      * @return boolean
      */
-    public function delete($pk, \Closure $callback = null)
+    public function delete($pk)
     {
         $model = $this->findModel($pk);
-
-        if (null !== $callback)
-        {
-            return $callback($model->delete());
-        }
 
         return $model->delete();
     }
@@ -90,55 +96,34 @@ abstract class GxCrudHandler {
     /**
      * Finds and retrieves AR model instance if found, otherwise null will be retrieved
      * @param mixed $pk primary key in form of integer or array
-     * @param \Closure $callback callback after find is done and model is succesfully found
      * @return mixed
      */
-    protected function findModel($pk, \Closure $callback = null)
+    protected function findModel($pk)
     {
         $class = $this->modelClass();
 
-        $model = $class::findOne($pk);
-
-        if (!$model)
-        {
-            return $this->notFoundFallback();
-        }
-
-        if (null !== $callback)
-        {
-            $return = $callback($model);
-
-            if (null !== $return)
-            {
-                return $return;
-            }
-        }
-
-        return $model;
+        return $class::findOne($pk);
     }
 
     /**
      * Changes model based on given attributes
      * @param \yii\db\ActiveRecord $model given model to be changed
      * @param array $attrs given attributes
-     * @param \Closure $callback callback after change is done no matter if succesfully or not
      * @return mixed
      */
-    protected function changeModel(\yii\db\ActiveRecord $model, array $attrs, \Closure $callback = null, $scope = null)
+    protected function changeModel(\yii\db\ActiveRecord $model, array $attrs, $scope = null)
     {
-        if ($model->load($attrs, $scope) && $model->save())
+        if ($model->load($attrs, $scope))
         {
-            if (null !== $callback)
-            {
-                return $callback(true, $model);
-            }
+            $event = new GxCrudEvent([
+                'model' => $model,
+            ]);
 
-            return $model;
-        }
+            $this->trigger(self::EVENT_BEFORE_CHANGE, $event);
 
-        if (null !== $callback)
-        {
-            return $callback(false, $model);
+            $event->result = $model->save();
+
+            $this->trigger(self::EVENT_AFTER_CHANGE, $event);
         }
 
         return $model;
