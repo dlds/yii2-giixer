@@ -8,10 +8,9 @@ use dlds\giixer\generators\ultimate\helpers\CrudHelper;
 <?= "<?php
 
 use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
 use yii\bootstrap\Modal;
 use kartik\grid\GridView;
-use backend\widgets\dynagrid\DynaGrid;
+use kartik\dynagrid\DynaGrid;
 use backend\components\helpers\AppHelper;
 use ".$generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true).";
 
@@ -26,15 +25,44 @@ use ".$generator->helperComponent->getHelperClass('backendRouteHelper', false, t
         'contentOptions' => [
             'class' => 'w60 text-center',
         ],
-    ],
-    /*
-    [
-        'attribute' => 'attr_name',
-        'value' => function(\$model, \$key, \$index, \$column) {
-            return 'attr_value';
-        },
-    ],
-     */
+    ],"
+?>
+
+<?php
+$count = 0;
+if (($tableSchema = $generator->getTableSchema()) === false)
+{
+    foreach ($generator->getColumnNames() as $name)
+    {
+        if (++$count < 6)
+        {
+            echo "'" . $name . "',\n";
+        }
+        else
+        {
+            echo "// '" . $name . "',\n";
+        }
+    }
+}
+else
+{
+    foreach ($tableSchema->columns as $column)
+    {
+        $format = $generator->generateColumnFormat($column);
+        if (++$count < 6)
+        {
+            ?>
+<?= "      '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n" ?>
+            <?php
+        }
+        else
+        {
+            echo "      // '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
+        }
+    }
+}
+?>
+<?= "
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => false,
@@ -42,13 +70,15 @@ use ".$generator->helperComponent->getHelperClass('backendRouteHelper', false, t
     ],
 ];
 ?>
+" ?>
 
+<?= "
 <?php
 \$exportConfig = [
     GridView::CSV => [
-        'label' => Yii::t('kvgrid', 'CSV'),
-        'alertMsg' => Yii::t('kvgrid', 'The CSV export file will be generated for download.'),
-        'options' => ['title' => Yii::t('kvgrid', 'Comma Separated Values')],
+        'label' => Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'CSV'),
+        'alertMsg' => Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'The CSV export file will be generated for download.'),
+        'options' => ['title' => Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'Comma Separated Values')],
     ],
 ];
 ?>

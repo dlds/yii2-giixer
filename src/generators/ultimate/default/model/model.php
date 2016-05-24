@@ -39,7 +39,7 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
 
     <?= '// <editor-fold defaultstate="collapsed" desc="CONSTANTS: Relations names">'."\n" ?>
 <?php foreach ($relations as $name => $relation): ?>
-    const RN_<?= strtoupper(Inflector::camel2id($name, '_')) ?> = '<?= lcfirst($name) ?>';
+    const <?= sprintf('%s%s', dlds\giixer\Module::RELATION_NAME_PREFIX, strtoupper(Inflector::camel2id($name, '_'))) ?> = '<?= lcfirst($name) ?>';
 <?php endforeach; ?>
     <?= '// </editor-fold>'."\n" ?>
 

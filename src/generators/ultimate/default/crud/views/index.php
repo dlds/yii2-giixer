@@ -12,7 +12,7 @@ echo "<?php\n";
 use dlds\metronic\widgets\Alert;
 use dlds\metronic\widgets\Link;
 use dlds\metronic\widgets\Portlet;
-use dlds\giixer\components\helpers\GxHelper;
+use dlds\giixer\components\helpers\GxFlashHelper;
 use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true) ?>;
 
 /* @var $this yii\web\View */
@@ -49,12 +49,9 @@ $this->params['breadcrumbs'][] = <?= $generator->helperCrud->getHeading(true) ?>
     ?>
 
     <?=
-    \$this->render('//layouts/blocks/alerts/inline', [
-        'condition' => GxHelper::hasFlashes([GxHelper::FLASH_SUCCESS, GxHelper::FLASH_ERROR]),
-        'options' => [
-            'type' => GxHelper::decideByFlashes(GxHelper::FLASH_SUCCESS, Alert::TYPE_SUCCESS, Alert::TYPE_DANGER),
-            'body' => GxHelper::getFlashesForemost([GxHelper::FLASH_SUCCESS, GxHelper::FLASH_ERROR]),
-        ],
+    GxFlashHelper::alert(GxFlashHelper::hasFlashes([GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::FLASH_ERROR]), [
+        'type' => GxFlashHelper::decideByFlashes(GxFlashHelper::FLASH_SUCCESS, Alert::TYPE_SUCCESS, Alert::TYPE_DANGER),
+        'body' => GxFlashHelper::getFlashesForemost([GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::FLASH_ERROR]),
     ])
     ?>
 

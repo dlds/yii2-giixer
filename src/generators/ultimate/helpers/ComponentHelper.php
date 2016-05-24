@@ -52,7 +52,7 @@ class ComponentHelper extends BaseHelper {
         {
 
             $renderParams = [
-                'baseClass' => $this->baseClassImageHelper,
+                'baseClass' => \dlds\giixer\Module::DEFAULT_BASE_IMAGE_HELPER,
             ];
 
             self::$generator->usedClasses[] = self::$generator->helperModel->getModelClass(false);
@@ -101,7 +101,7 @@ class ComponentHelper extends BaseHelper {
      */
     public function getHandlerParentClass($key, $basename = false, $root = true)
     {
-        $class = $this->getParentClass($key, $this->getHandlerClass($key, true), $this->baseClassCrudHandler);
+        $class = $this->getParentClass($key, $this->getHandlerClass($key, true), \dlds\giixer\Module::DEFAULT_BASE_CRUD_HANDLER);
 
         if ($basename)
         {
@@ -203,7 +203,7 @@ class ComponentHelper extends BaseHelper {
     {
         $customBaseClass = $this->getHelperParentCustomClass($key);
 
-        $class = ($customBaseClass) ? $customBaseClass : $this->getParentClass($key, $this->getHelperClass($key, true), $this->baseClassRuleHelper);
+        $class = ($customBaseClass) ? $customBaseClass : $this->getParentClass($key, $this->getHelperClass($key, true), \dlds\giixer\Module::DEFAULT_BASE_COMPONENT);
 
         if ($basename)
         {
@@ -226,10 +226,10 @@ class ComponentHelper extends BaseHelper {
     {
         if (strpos($key, 'Rule'))
         {
-            return \Yii::$app->getModule('gii')->helperRuleBaseClass;
+            return \Yii::$app->getModule('gii')->getBaseClass(false, \dlds\giixer\Module::BASE_URL_RULE_HELPER);
         }
 
-        return \Yii::$app->getModule('gii')->helperRouteBaseClass;
+        return \Yii::$app->getModule('gii')->getBaseClass(false, \dlds\giixer\Module::BASE_URL_ROUTE_HELPER);
     }
 
     /**

@@ -117,7 +117,7 @@ class CrudHelper extends BaseHelper {
      */
     public function getControllerParentClass($basename = false, $root = false, $customBaseClass = false)
     {
-        $class = ($customBaseClass) ? $customBaseClass : $this->baseClassController;
+        $class = ($customBaseClass) ? $customBaseClass : \dlds\giixer\Module::DEFAULT_BASE_CONTROLLER;
 
         if ($basename)
         {

@@ -16,9 +16,13 @@
         }
     ],
     "require": {
-        "yiisoft/yii2-gii": "~2.0.0"
+        "yiisoft/yii2-gii": "~2.0.0",
+        "dlds/yii2-metronic": "~2.0.0",
+        "dlds/yii2-rels": "~0.7.0",
+        "kartik-v/yii2-dynagrid": "~1.4.0"
+
     },
-        "require-dev": {
+    "require-dev": {
         "yiisoft/yii2-codeception": "*",
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-faker": "*",

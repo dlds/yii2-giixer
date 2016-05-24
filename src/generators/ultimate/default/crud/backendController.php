@@ -17,7 +17,7 @@ use <?= $generator->helperComponent->getHandlerClass('backendSearchHandler', fal
 /**
  * <?= $generator->helperCrud->getControllerClass(true) ?> implements the CRUD actions for <?= $generator->helperModel->getModelClass(true) ?> model.
  */
-class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $generator->helperCrud->getControllerParentClass(false, true, \Yii::$app->getModule('gii')->controllerBackendBaseClass) ?> {
+class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $generator->helperCrud->getControllerParentClass(false, true, \Yii::$app->getModule('gii')->getBaseClass($generator->helperCrud->getControllerClass(true), \dlds\giixer\Module::BASE_CONTROLLER_BACKEND)) ?> {
 
     /**
      * @inheritdoc

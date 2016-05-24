@@ -7,8 +7,6 @@
 
 namespace dlds\giixer\components;
 
-use yii\helpers\ArrayHelper;
-use yii\helpers\StringHelper;
 use yii\db\ActiveRecord;
 use dlds\giixer\components\helpers\GxModelHelper;
 
@@ -45,23 +43,6 @@ abstract class GxActiveRecord extends ActiveRecord {
     }
 
     /**
-     * Instantiate multiple models
-     * @param array $data given data
-     * @return array
-     */
-    public static function instantiateMultiple(array $data)
-    {
-        $records = [];
-
-        foreach ($data as $row)
-        {
-            $records[] = new static($row);
-        }
-
-        return $records;
-    }
-
-    /**
      * Removes validation rule from given rules
      * @param array $rules
      */
@@ -94,9 +75,28 @@ abstract class GxActiveRecord extends ActiveRecord {
 
     /**
      * Retrieves model representing column
+     * - this is used when AR is being printed as a string
+     * @return mixed
      */
     protected function representingColumn()
     {
         return $this->primaryKey;
+    }
+
+    /**
+     * Instantiate multiple models
+     * @param array $data given data
+     * @return array
+     */
+    public static function instantiateMultiple(array $data)
+    {
+        $records = [];
+
+        foreach ($data as $row)
+        {
+            $records[] = new static($row);
+        }
+
+        return $records;
     }
 }

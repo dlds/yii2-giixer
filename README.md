@@ -191,13 +191,13 @@ Giixer creates following 2 helpers (HLP) for both `backend` and `frontend` appli
 
 ## Configuration
 
-Enables gii module in your config file by adding it to app bootstrap.
+Enable gii module in your config file by adding it to app bootstrap.
 
 ```
 $config['bootstrap'][] = 'gii';
 ```
 
-Replace default gii module class with giixer one
+Replace default gii module class with giixer one.
 
 ```
 $config['modules']['gii'] = [
@@ -206,7 +206,7 @@ $config['modules']['gii'] = [
 ```
 
 You can also modify giixer module behavior to your requirements by 
-setting additional config options.
+setting additional config options. See bellow.
 
 #### `namespaces` option
 
@@ -288,7 +288,7 @@ Otherwise the **GxUrlRuleHelper** will be used directly as parent class.
 
 #### `translations` option
 
-Defines which translations files should be automatically generated. This options is 
+Defines which translations files should be automatically generated. This option is 
 defined by array containing languages codes.
 
 ```

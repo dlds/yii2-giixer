@@ -298,7 +298,7 @@ class ModelHelper extends BaseHelper {
      */
     public function getQueryParentClass($key, $basename = false, $root = false)
     {
-        $class = $this->getParentClass($key, $this->getQueryClass(true), $this->baseClassQuery);
+        $class = $this->getParentClass($key, $this->getQueryClass(true), \dlds\giixer\Module::DEFAULT_BASE_QUERY);
 
         if ($basename)
         {
@@ -374,7 +374,7 @@ class ModelHelper extends BaseHelper {
      */
     public function getModelParentClass($key, $basename = false, $root = false)
     {
-        $class = $this->getParentClass($key, $this->getModelClass(true), $this->baseClassModel);
+        $class = $this->getParentClass($key, $this->getModelClass(true), \dlds\giixer\Module::DEFAULT_BASE_ACTIVE_RECORD);
 
         if ($basename)
         {

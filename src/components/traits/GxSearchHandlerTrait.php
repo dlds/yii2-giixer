@@ -44,6 +44,6 @@ trait GxSearchHandlerTrait {
      */
     protected function applyDefaultSearchQuery(\yii\data\ActiveDataProvider &$dataProvider)
     {
-        // $dataProvider->isActive();
+        // default query
     }
 }

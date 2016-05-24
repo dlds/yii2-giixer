@@ -29,7 +29,7 @@ use <?= $assignedModelClass ?>;
  * @inheritdoc
  * @see <?= $assignedModelClass."\n" ?>
  */
-abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className, $generator->baseClassImageHelper), '\\') ?> {
+abstract class <?= $className ?> extends <?= '\\' . ltrim($generator->getBaseClass(basename(__FILE__, '.php'), $className, \dlds\giixer\Module::DEFAULT_BASE_IMAGE_HELPER), '\\') ?> {
 
     /**
      * Retrieves assigned model class

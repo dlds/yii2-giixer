@@ -12,6 +12,7 @@ use ReflectionClass;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\View;
+use dlds\giixer\Module;
 use dlds\giixer\components\helpers\GxModelHelper;
 
 /**
@@ -292,7 +293,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         $this->namespaces = Yii::$app->getModule('gii')->namespaces;
 
         $this->generateQuery = true;
-        $this->generateRelations = true;
+        $this->generateRelations = self::RELATIONS_ALL_INVERSE;
         $this->enableI18N = true;
         $this->template = self::ID_CURRENT_TMPL;
         $this->messageCategory = null;
@@ -343,7 +344,7 @@ class Generator extends \yii\gii\generators\model\Generator {
                         return $('#generator-generatemutation').is(':checked');
                     }"],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableNameExtended'],
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
                 [['sluggableMutationAttribute'], 'required', 'when' => function($model) {
                     return $model->generateSluggableMutation;
                 }, 'whenClient' => "function (attribute, value) {
@@ -516,91 +517,16 @@ class Generator extends \yii\gii\generators\model\Generator {
             return [];
         }
 
-        $db = $this->getDbConnection();
+        $relations = parent::generateRelations();
 
-        $schema = $db->getSchema();
-        if ($schema->hasMethod('getSchemaNames'))
-        { // keep BC to Yii versions < 2.0.4
-            try
-            {
-                $schemaNames = $schema->getSchemaNames();
-            }
-            catch (\yii\base\NotSupportedException $e)
-            {
-                // schema names are not supported by schema
-            }
-        }
-        if (!isset($schemaNames))
+        $definitions = ArrayHelper::getValue($relations, $this->tableName, []);
+
+        foreach ($definitions as $key => $rules)
         {
-            if (($pos = strpos($this->tableName, '.')) !== false)
-            {
-                $schemaNames = [substr($this->tableName, 0, $pos)];
-            }
-            else
-            {
-                $schemaNames = [''];
-            }
+            $relations[$this->tableName][$key][0] = str_replace($rules[1], $this->helperModel->getFullyQualifiedName($rules[1], true), $rules[0]);
         }
 
-        $relations = [];
-        foreach ($schemaNames as $schemaName)
-        {
-            foreach ($db->getSchema()->getTableSchemas($schemaName) as $table)
-            {
-                $className = $this->generateClassName($table->fullName);
-                foreach ($table->foreignKeys as $refs)
-                {
-                    $refTable = $refs[0];
-                    $refTableSchema = $db->getTableSchema($refTable);
-                    unset($refs[0]);
-                    $fks = array_keys($refs);
-                    $refClassName = $this->generateClassName($refTable);
-
-                    // Add relation for this table
-                    $link = $this->generateRelationLink(array_flip($refs));
-                    $relationName = $this->generateRelationName($relations, $table, $fks[0], false);
-                    $relations[$table->fullName][$relationName] = [
-                        "return \$this->hasOne(\\".$this->helperModel->getNsByMap($refClassName)."\\$refClassName::className(), $link);",
-                        $refClassName,
-                        false,
-                    ];
-
-                    // Add relation for the referenced table
-                    $uniqueKeys = [$table->primaryKey];
-                    try
-                    {
-                        $uniqueKeys = array_merge($uniqueKeys, $db->getSchema()->findUniqueIndexes($table));
-                    }
-                    catch (NotSupportedException $e)
-                    {
-                        // ignore
-                    }
-                    $hasMany = true;
-                    foreach ($uniqueKeys as $uniqueKey)
-                    {
-                        if (count(array_diff(array_merge($uniqueKey, $fks), array_intersect($uniqueKey, $fks))) === 0)
-                        {
-                            $hasMany = false;
-                            break;
-                        }
-                    }
-                    $link = $this->generateRelationLink($refs);
-                    $relationName = $this->generateRelationName($relations, $refTableSchema, $className, $hasMany);
-                    $relations[$refTableSchema->fullName][$relationName] = [
-                        "return \$this->".($hasMany ? 'hasMany' : 'hasOne')."(\\".$this->helperModel->getNsByMap($className)."\\$className::className(), $link);",
-                        $className,
-                        $hasMany,
-                    ];
-                }
-
-                if (($fks = $this->checkPivotTable($table)) === false)
-                {
-                    continue;
-                }
-
-                $relations = $this->generateManyManyRelations($table, $fks, $relations);
-            }
-        }
+        ksort($relations[$this->tableName]);
 
         return $relations;
     }
@@ -814,8 +740,15 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * Retrieves translation category
      */
-    public function getTranslationCategory()
+    public function getTranslationCategory($key = false)
     {
+        if ($key)
+        {
+            $rules = ArrayHelper::getValue(Yii::$app->getModule('gii')->messages, $key);
+
+            return Module::findMatch($this->getModelClassName(), $rules, $key);
+        }
+
         if ($this->messageCategory)
         {
             return $this->messageCategory;
@@ -865,44 +798,14 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * Validates the [[ns]] attribute.
      */
-    public function validateNamespace()
+    public function validateNamespace($attribute)
     {
-        parent::validateNamespace();
+        parent::validateNamespace($attribute);
 
         $this->nsCommon = ltrim($this->nsCommon, '\\');
         if (false === strpos($this->nsCommon, 'app'))
         {
             $this->addError('ns', '@app namespace must be used.');
-        }
-    }
-
-    /**
-     * Validates given attribute as table name.
-     */
-    public function validateTableNameExtended($attribute, $params)
-    {
-        if (strpos($this->$attribute, '*') !== false && substr_compare($this->$attribute, '*', -1, 1))
-        {
-            $this->addError($attribute, 'Asterisk is only allowed as the last character.');
-
-            return;
-        }
-        $tables = $this->getTableNamesExtended($attribute);
-        if (empty($tables))
-        {
-            $this->addError($attribute, "Table '{$this->$attribute}' does not exist.");
-        }
-        else
-        {
-            foreach ($tables as $table)
-            {
-                $class = $this->generateClassName($table);
-                if ($this->isReservedKeyword($class))
-                {
-                    $this->addError($attribute, "Table '$table' will generate a class which is a reserved PHP keyword.");
-                    break;
-                }
-            }
         }
     }
 
@@ -990,6 +893,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         {
             return $this->tableNames;
         }
+
         $db = $this->getDbConnection();
         if ($db === null)
         {
@@ -1020,51 +924,11 @@ class Generator extends \yii\gii\generators\model\Generator {
         elseif (($table = $db->getTableSchema($this->tableName, true)) !== null)
         {
             $tableNames[] = $this->tableName;
+
             $this->classNames[$this->tableName] = $this->getModelClassName();
         }
 
         return $this->tableNames = $tableNames;
-    }
-
-    /**
-     * @return array the table names that match the pattern specified by [[tableName]].
-     */
-    protected function getTableNamesExtended($attribute)
-    {
-        $db = $this->getDbConnection();
-        if ($db === null)
-        {
-            return [];
-        }
-        $tableNames = [];
-        if (strpos($this->$attribute, '*') !== false)
-        {
-            if (($pos = strrpos($this->$attribute, '.')) !== false)
-            {
-                $schema = substr($this->$attribute, 0, $pos);
-                $pattern = '/^'.str_replace('*', '\w+', substr($this->$attribute, $pos + 1)).'$/';
-            }
-            else
-            {
-                $schema = '';
-                $pattern = '/^'.str_replace('*', '\w+', $this->$attribute).'$/';
-            }
-
-            foreach ($db->schema->getTableNames($schema) as $table)
-            {
-                if (preg_match($pattern, $table))
-                {
-                    $tableNames[] = $schema === '' ? $table : ($schema.'.'.$table);
-                }
-            }
-        }
-        elseif (($table = $db->getTableSchema($this->$attribute, true)) !== null)
-        {
-            $tableNames[] = $this->$attribute;
-            $this->classNames[$this->$attribute] = $this->getModelClassName();
-        }
-
-        return $tableNames;
     }
 
     /**
@@ -1114,7 +978,7 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         if ($this->generateMutation)
         {
-            $modelClassName = $this->generateClassName($this->mutationJoinTableName);
+            $modelClassName = $this->helperModel->getFullyQualifiedName($this->generateClassName($this->mutationJoinTableName), true);
 
             $db = $this->getDbConnection();
             $tableSchema = $db->getTableSchema($this->mutationJoinTableName);
@@ -1125,9 +989,9 @@ class Generator extends \yii\gii\generators\model\Generator {
                 'class' => '\dlds\rels\components\Behavior::className()',
                 'config' => [
                     sprintf('%s::className()', $modelClassName),
-                    sprintf('%s::RN_CATEGORY', $modelClassName),
-                    sprintf('%s::RN_LANGUAGE', $modelClassName),
-                    sprintf('%s::Rn_CURRENT_LANGUAGE', $modelClassName),
+                    sprintf('%s::%s%s', $modelClassName, Module::RELATION_NAME_PREFIX, strtoupper($this->tableName)),
+                    sprintf('%s::%s%s', $modelClassName, Module::RELATION_NAME_PREFIX, strtoupper($this->mutationSourceTableName)),
+                    sprintf('%s::%s%s', $modelClassName, Module::RELATION_NAME_PREFIX, Module::RELATION_NAME_MUTATION_CURRENT),
                 ],
                 'attrs' => $mutationableAttrs,
             ];

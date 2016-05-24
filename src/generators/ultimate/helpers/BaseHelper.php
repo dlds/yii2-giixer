@@ -28,41 +28,6 @@ class BaseHelper {
     protected static $generator;
 
     /**
-     * @var string base controller class
-     */
-    protected $baseClassController = 'dlds\giixer\components\GxController';
-
-    /**
-     * @var string model baseClass
-     */
-    protected $baseClassModel = 'dlds\giixer\components\GxActiveRecord';
-
-    /**
-     * @var string model baseClass
-     */
-    protected $baseClassCrudHandler = 'dlds\giixer\components\handlers\GxCrudHandler';
-
-    /**
-     * @var string query baseClass
-     */
-    protected $baseClassQuery = 'dlds\giixer\components\GxActiveQuery';
-
-    /**
-     * @var string imageHelper baseClass
-     */
-    protected $baseClassImageHelper = 'dlds\giixer\components\helpers\GxImageHelper';
-
-    /**
-     * @var string base route helper class
-     */
-    protected $baseClassRouteHelper = 'dlds\giixer\components\helpers\GxRouteHelper';
-
-    /**
-     * @var string base route helper class
-     */
-    protected $baseClassRuleHelper = 'dlds\giixer\components\helpers\GxUrlRouteHelper';
-
-    /**
      * @var array parent classes
      */
     public $mapParentClasses = [
@@ -148,7 +113,7 @@ class BaseHelper {
             return str_replace('{class}', $classname, $parentClass);
         }
 
-        return (false !== $default) ? $default : $this->baseClassModel;
+        return (false !== $default) ? $default : \dlds\giixer\Module::DEFAULT_BASE_ACTIVE_RECORD;
     }
 
     /**

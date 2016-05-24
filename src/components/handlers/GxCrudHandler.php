@@ -21,7 +21,7 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Initializes CRUD handler
-     * @param int $pk ar model primary key
+     * @throws \yii\base\ErrorException
      */
     public function __construct()
     {
@@ -34,40 +34,60 @@ abstract class GxCrudHandler extends \yii\base\Component {
     }
 
     /**
-     * Creates new AR model instance
+     * Creates new AR model
      * @param array $attrs given attributes
      * @param string $scope given scope for massive assignment
-     * @return mixed model instance
+     * @return instance | null
      */
     public function create(array $attrs, $scope = null)
     {
-        $model = $this->createModel();
+        $event = new GxCrudEvent(['input' => $attrs, 'type' => GxCrudEvent::TYPE_CREATE]);
 
-        return $this->changeModel($model, $attrs, $scope);
+        $this->trigger(self::EVENT_BEFORE_CREATE, $event);
+
+        $this->createModel($attrs, $event, $scope);
+
+        $this->trigger(self::EVENT_AFTER_CREATE, $event);
+
+        return $event->model;
     }
 
     /**
      * Read and retrieves AR model based on given primary key
      * @param mixed $pk given primary key
-     * @return \yii\db\ActiveRecord instance or null if model was not found
+     * @return instance | null if model was not found
      */
     public function read($pk)
     {
-        return $this->findModel($pk);
+        $event = new GxCrudEvent(['input' => $pk, 'type' => GxCrudEvent::TYPE_READ]);
+
+        $this->trigger(self::EVENT_BEFORE_READ, $event);
+
+        $this->findModel($pk, $event);
+
+        $this->trigger(self::EVENT_AFTER_READ, $event);
+
+        return $event->model;
     }
 
     /**
-     * Finds and update AR model based on given primary key
+     * Updates AR model based on given pk and attrs
      * @param mixed $pk given primary key
      * @param array $attrs given attributes to be changed
      * @param string $scope given scope for massive assignment
-     * @return mixed
+     * @return instance | null
      */
     public function update($pk, array $attrs, $scope = null)
     {
-        $model = $this->findModel($pk);
+        $event = new GxCrudEvent(['input' => $pk, 'type' => GxCrudEvent::TYPE_UPDATE]);
 
-        return $this->changeModel($model, $attrs, $scope);
+        $this->trigger(self::EVENT_BEFORE_UPDATE, $event);
+
+        $this->updateModel($this->findModel($pk), $attrs, $event, $scope);
+
+        $this->trigger(self::EVENT_AFTER_UPDATE, $event);
+
+        return $event->model;
     }
 
     /**
@@ -77,32 +97,40 @@ abstract class GxCrudHandler extends \yii\base\Component {
      */
     public function delete($pk)
     {
-        $model = $this->findModel($pk);
+        $event = new GxCrudEvent(['input' => $pk, 'type' => GxCrudEvent::TYPE_DELETE]);
 
-        return $model->delete();
+        $this->trigger(self::EVENT_BEFORE_DELETE, $event);
+
+        $this->deleteModel($this->findModel($pk), $event);
+
+        $this->trigger(self::EVENT_AFTER_DELETE, $event);
+
+        return $event->result;
     }
 
     /**
      * Creates and retrieves new AR model instance
      * @return \yii\db\ActiveRecord instance
      */
-    protected function createModel()
+    protected function createModel(array $attrs, GxCrudEvent &$event, $scope = null)
     {
         $class = $this->modelClass();
 
-        return new $class;
+        $this->updateModel(new $class, $attrs, $event, $scope);
     }
 
     /**
-     * Finds and retrieves AR model instance if found, otherwise null will be retrieved
+     * Finds AR model instance
      * @param mixed $pk primary key in form of integer or array
      * @return mixed
      */
-    protected function findModel($pk)
+    protected function findModel($pk, GxCrudEvent &$event)
     {
         $class = $this->modelClass();
 
-        return $class::findOne($pk);
+        $event->model = $class::findOne($pk);
+
+        $event->result = (boolean) $event->model;
     }
 
     /**
@@ -111,22 +139,33 @@ abstract class GxCrudHandler extends \yii\base\Component {
      * @param array $attrs given attributes
      * @return mixed
      */
-    protected function changeModel(\yii\db\ActiveRecord $model, array $attrs, $scope = null)
+    protected function updateModel(\yii\db\ActiveRecord $model, array $attrs, GxCrudEvent &$event, $scope = null)
     {
-        if ($model->load($attrs, $scope))
-        {
-            $event = new GxCrudEvent([
-                'model' => $model,
-            ]);
+        $event->model = $model;
 
+        if ($event->model && $event->model->load($attrs, $scope))
+        {
             $this->trigger(self::EVENT_BEFORE_CHANGE, $event);
 
-            $event->result = $model->save();
+            $event->result = $event->model->save();
 
             $this->trigger(self::EVENT_AFTER_CHANGE, $event);
         }
+    }
 
-        return $model;
+    /**
+     * Deletes given AR model instance
+     * @param mixed $pk primary key in form of integer or array
+     * @return mixed
+     */
+    protected function deleteModel(\yii\db\ActiveRecord $model, GxCrudEvent &$event)
+    {
+        $event->model = $model;
+
+        if ($event->model)
+        {
+            $event->result = $event->model->delete();
+        }
     }
 
     /**

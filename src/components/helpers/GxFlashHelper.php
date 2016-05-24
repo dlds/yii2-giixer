@@ -2,8 +2,10 @@
 
 namespace dlds\giixer\components\helpers;
 
-class GxHelper {
-	
+use dlds\metronic\widgets\Alert;
+
+class GxFlashHelper {
+
     /**
      * Flashes
      */
@@ -88,5 +90,23 @@ class GxHelper {
     public static function decideByFlashes($keys, $positive, $negative)
     {
         return self::hasFlashes($keys) ? $positive : $negative;
+    }
+
+    /**
+     * Prints alert widget if given condition is true
+     * otherwise it will print default value
+     * @param boolean $condition
+     * @param array $options
+     * @param string $default
+     * @return string
+     */
+    public static function alert($condition, array $options = [], $default = null)
+    {
+        if (!$condition)
+        {
+            return $default;
+        }
+
+        return Alert::widget($options);
     }
 }

@@ -4,7 +4,7 @@ namespace dlds\giixer\components\helpers;
 
 use yii\helpers\ArrayHelper;
 
-class GxRouteHelper {
+class GxUrlRouteHelper {
 
     /**
      * Indicates if given route is current route

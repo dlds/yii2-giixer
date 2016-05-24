@@ -407,9 +407,9 @@ class Generator extends \yii\gii\generators\model\Generator {
     /**
      * Validates the [[ns]] attribute.
      */
-    public function validateNamespace()
+    public function validateNamespace($attribute)
     {
-        parent::validateNamespace();
+        parent::validateNamespace($attribute);
 
         $this->ns = ltrim($this->ns, '\\');
         if (false === strpos($this->ns, 'app\\'))
