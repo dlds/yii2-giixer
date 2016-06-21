@@ -3,6 +3,7 @@
 namespace dlds\giixer\components\traits;
 
 use yii\helpers\ArrayHelper;
+use dlds\giixer\components\events\GxSearchEvent;
 
 /**
  * Makes AR Search handler easier to use
@@ -10,16 +11,16 @@ use yii\helpers\ArrayHelper;
 trait GxSearchHandlerTrait {
 
     /**
-     * @var array global query
+     * @var array global search params
      */
-    private $_query = [];
+    private $_params = [];
 
     /**
      * @inheritdoc
      */
-    public function __construct($query = [])
+    public function __construct($params = [])
     {
-        $this->_query = $query;
+        $this->_params = [\yii\helpers\StringHelper::basename(static::className()) => $params];
 
         return parent::__construct();
     }
@@ -31,11 +32,17 @@ trait GxSearchHandlerTrait {
      */
     public function getDataProvider(array $query = [])
     {
-        $dataProvider = $this->search(ArrayHelper::merge($this->_query, $query));
+        $event = new GxSearchEvent(['params' => ArrayHelper::merge($this->_params, $query)]);
 
-        $this->applyDefaultSearchQuery($dataProvider);
+        $this->trigger(GxSearchEvent::NAME_BEFORE_SEARCH, $event);
 
-        return $dataProvider;
+        $event->dataProvider = $this->search($event->params);
+
+        $this->applyDefaultSearchQuery($event->dataProvider);
+
+        $this->trigger(GxSearchEvent::NAME_AFTER_SEARCH, $event);
+
+        return $event->dataProvider;
     }
 
     /**
@@ -44,6 +51,6 @@ trait GxSearchHandlerTrait {
      */
     protected function applyDefaultSearchQuery(\yii\data\ActiveDataProvider &$dataProvider)
     {
-        // default query
+        // custom default query
     }
 }

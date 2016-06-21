@@ -11,8 +11,16 @@ echo "<?php\n";
 namespace <?= $generator->helperCrud->getNsByPattern(basename(__FILE__, '.php'), $generator->helperCrud->getControllerClass(true)) ?>;
 
 use yii\filters\VerbFilter;
+use dlds\giixer\components\helpers\GxFlashHelper;
+<?php if($generator->generateGalleryBehavior): ?>
+use <?= $generator->helperComponent->getHelperClass('imageHelper', false, true, true) ?>;
+<?php endif; ?>
 use <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', false, true, true) ?>;
 use <?= $generator->helperComponent->getHandlerClass('backendSearchHandler', false, true, true) ?>;
+use <?= $generator->helperComponent->getHelperClass('backendUrlRouteHelper', false, true, true) ?>;
+<?php if($generator->generateSortableBehavior): ?>
+use <?= $generator->helperModel->getModelClass(false) ?>;
+<?php endif; ?>
 
 /**
  * <?= $generator->helperCrud->getControllerClass(true) ?> implements the CRUD actions for <?= $generator->helperModel->getModelClass(true) ?> model.
@@ -33,6 +41,36 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
             ],
         ];
     }
+<?php if($generator->hasControllerExternalActions()): ?>
+
+    /**
+     * Retrieves external actions linked to this controller
+     * @param array $params additional route params
+     * @return array route
+     */
+    public function actions()
+    {
+        $actions = [];
+<?php if($generator->generateSortableBehavior): ?>
+
+        $actions['sort'] = [
+            'class' => \dlds\sortable\components\Action::className(),
+            'modelClass' => <?= $generator->helperModel->getModelClass(true) ?>::className(),
+        ];
+<?php endif; ?>
+<?php if($generator->generateGalleryBehavior): ?>
+
+        $actions['api-gallery'] = [
+            'class' => \dlds\galleryManager\GalleryManagerAction::className(),
+            'types' => [
+                <?= $generator->helperComponent->getHelperClass('imageHelper', true) ?>::getType() => <?= $generator->helperComponent->getHelperClass('imageHelper', true) ?>::modelClass(),
+            ]
+        ];
+<?php endif; ?>
+
+        return $actions;
+    }
+<?php endif; ?>
 
     /**
      * Lists all <?= $generator->helperModel->getModelClass(true) ?> models.
@@ -49,15 +87,22 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
 
     /**
      * Displays a single <?= $generator->helperModel->getModelClass(true) ?> model.
-     * <?= implode("\n     * ", $actionParamComments) . "\n" ?>
+     * @param integer $id primary key
      * @return mixed
      */
-    public function actionView(<?= $actionParams ?>)
+    public function actionView($id)
     {
         $handler = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>();
 
+        $evt = $handler->read($id);
+
+        if (!$evt->isRead())
+        {
+            return $handler->notFoundFallback();
+        }
+
         return $this->render('view', [
-            'model' => $handler->read(<?= $actionParams ?>),
+                'model' => $evt->model,
         ]);
     }
 
@@ -70,39 +115,63 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
     {
         $handler = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>();
 
-        return $this->render('create', [
-            'model' => $handler->create(\Yii::$app->request->post()),
-        ]);
+        $evt = $handler->create(\Yii::$app->request->post());
 
+        if ($evt->isCreated())
+        {
+            GxFlashHelper::setFlash(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_CREATE_SUCCESS));
+
+            return $this->redirect(<?= $generator->helperComponent->getHelperClass('backendUrlRouteHelper', true) ?>::index());
+        }
+
+        return $this->render('create', [
+                'model' => $evt->model,
+        ]);
     }
 
     /**
      * Updates an existing <?= $generator->helperModel->getModelClass(true) ?> model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * <?= implode("\n     * ", $actionParamComments) . "\n" ?>
+     * @param integer $id primary key
      * @return mixed
      */
-    public function actionUpdate(<?= $actionParams ?>)
+    public function actionUpdate($id)
     {
         $handler = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>();
 
+        $evt = $handler->update($id, \Yii::$app->request->post());
+
+        if ($evt->isUpdated())
+        {
+            GxFlashHelper::setFlash(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_UPDATE_SUCCESS));
+        }
+
         return $this->render('update', [
-            'model' => $handler->update(<?= $actionParams ?>, \Yii::$app->request->post()),
+                'model' => $evt->model,
         ]);
     }
 
     /**
      * Deletes an existing <?= $generator->helperModel->getModelClass(true) ?> model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * <?= implode("\n     * ", $actionParamComments) . "\n" ?>
+     * @param integer $id primary key
      * @return mixed
      */
-    public function actionDelete(<?= $actionParams ?>)
+    public function actionDelete($id)
     {
         $handler = new <?= $generator->helperComponent->getHandlerClass('backendCrudHandler', true) ?>();
 
-        return $handler->delete(<?= $actionParams ?>, function($result) {
-                return $this->redirect(['index']);
-            });
+        $evt = $handler->delete($id);
+
+        if ($evt->isDeleted())
+        {
+            GxFlashHelper::setFlash(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_DELETE_SUCCESS));
+
+            return $this->redirect(<?= $generator->helperComponent->getHelperClass('backendUrlRouteHelper', true) ?>::index());
+        }
+
+        GxFlashHelper::setFlash(GxFlashHelper::FLASH_ERROR, GxFlashHelper::message(GxFlashHelper::MESSAGE_DELETE_FAIL));
+
+        return $handler->notProcessableFallback();
     }
 }

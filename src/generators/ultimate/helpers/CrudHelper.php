@@ -26,7 +26,7 @@ class CrudHelper extends BaseHelper {
      */
     public function getRequiredTmplFiles()
     {
-        return [
+        $tmpls = [
             'backendController.php',
             'frontendController.php',
             'views/index.php',
@@ -36,6 +36,13 @@ class CrudHelper extends BaseHelper {
             'views/overview/_grid.php',
             'views/crud/_form.php',
         ];
+
+        if (self::$generator->generateMutation)
+        {
+            $tmpls[] = 'views/crud/relations/mutation.php';
+        }
+
+        return $tmpls;
     }
 
     /**
@@ -277,6 +284,12 @@ class CrudHelper extends BaseHelper {
             'columnNames' => $tableSchema->columnNames,
         ];
 
+        if (self::$generator->generateMutation)
+        {
+            $renderParams['mutationColumns'] = self::$generator->getTableSchema(self::$generator->mutationJoinTableName)->columnNames;
+            $renderParams['mutationSafeAttributes'] = self::$generator->getTableSchema(self::$generator->mutationJoinTableName)->columns;
+        }
+
         $this->processViewsDir($this->getViewsRootDir(), $renderParams, $files);
     }
 
@@ -295,6 +308,16 @@ class CrudHelper extends BaseHelper {
             if (is_file($tmplPath) && pathinfo($filename, PATHINFO_EXTENSION) === 'php')
             {
                 $destFile = trim(str_replace($this->getViewsRootDir(), '', $tmplPath), '/');
+
+                if ($filename == 'mutation.php')
+                {
+                    if (!self::$generator->generateMutation)
+                    {
+                        continue;
+                    }
+
+                    $destFile = str_replace('mutation', Inflector::camel2id(self::$generator->mutationJoinTableName), $destFile);
+                }
 
                 $content = self::$generator->renderFile($tmplPath, $renderParams);
 

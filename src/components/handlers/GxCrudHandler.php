@@ -18,6 +18,7 @@ abstract class GxCrudHandler extends \yii\base\Component {
     const EVENT_BEFORE_UPDATE = 'e_before_update';
     const EVENT_BEFORE_DELETE = 'e_before_delete';
     const EVENT_BEFORE_CHANGE = 'e_before_change';
+    const EVENT_BEFORE_LOAD = 'e_before_load';
 
     /**
      * Initializes CRUD handler
@@ -49,7 +50,7 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
         $this->trigger(self::EVENT_AFTER_CREATE, $event);
 
-        return $event->model;
+        return $event;
     }
 
     /**
@@ -63,11 +64,11 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
         $this->trigger(self::EVENT_BEFORE_READ, $event);
 
-        $this->findModel($pk, $event);
+        $this->findModel($event);
 
         $this->trigger(self::EVENT_AFTER_READ, $event);
 
-        return $event->model;
+        return $event;
     }
 
     /**
@@ -83,11 +84,13 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
         $this->trigger(self::EVENT_BEFORE_UPDATE, $event);
 
-        $this->updateModel($this->findModel($pk), $attrs, $event, $scope);
+        $this->findModel($event);
+
+        $this->updateModel($event, $attrs, $scope);
 
         $this->trigger(self::EVENT_AFTER_UPDATE, $event);
 
-        return $event->model;
+        return $event;
     }
 
     /**
@@ -101,11 +104,31 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
         $this->trigger(self::EVENT_BEFORE_DELETE, $event);
 
-        $this->deleteModel($this->findModel($pk), $event);
+        $this->findModel($event);
+
+        $this->deleteModel($event);
 
         $this->trigger(self::EVENT_AFTER_DELETE, $event);
 
-        return $event->result;
+        return $event;
+    }
+
+    /**
+     * Processed when model is not found
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function notFoundFallback()
+    {
+        throw new \yii\web\NotFoundHttpException;
+    }
+
+    /**
+     * Processed when model is not deleted
+     * @return string model class
+     */
+    public function notProcessableFallback()
+    {
+        throw new \yii\web\UnprocessableEntityHttpException;
     }
 
     /**
@@ -116,7 +139,9 @@ abstract class GxCrudHandler extends \yii\base\Component {
     {
         $class = $this->modelClass();
 
-        $this->updateModel(new $class, $attrs, $event, $scope);
+        $event->model = new $class;
+
+        $this->updateModel($event, $attrs, $scope);
     }
 
     /**
@@ -124,13 +149,16 @@ abstract class GxCrudHandler extends \yii\base\Component {
      * @param mixed $pk primary key in form of integer or array
      * @return mixed
      */
-    protected function findModel($pk, GxCrudEvent &$event)
+    protected function findModel(GxCrudEvent &$event)
     {
         $class = $this->modelClass();
 
-        $event->model = $class::findOne($pk);
+        $event->model = $class::findOne($event->input);
 
-        $event->result = (boolean) $event->model;
+        if (GxCrudEvent::TYPE_READ == $event->type)
+        {
+            $event->result = (boolean) $event->model;
+        }
     }
 
     /**
@@ -139,9 +167,9 @@ abstract class GxCrudHandler extends \yii\base\Component {
      * @param array $attrs given attributes
      * @return mixed
      */
-    protected function updateModel(\yii\db\ActiveRecord $model, array $attrs, GxCrudEvent &$event, $scope = null)
+    protected function updateModel(GxCrudEvent &$event, array $attrs, $scope = null)
     {
-        $event->model = $model;
+        $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
         if ($event->model && $event->model->load($attrs, $scope))
         {
@@ -158,23 +186,12 @@ abstract class GxCrudHandler extends \yii\base\Component {
      * @param mixed $pk primary key in form of integer or array
      * @return mixed
      */
-    protected function deleteModel(\yii\db\ActiveRecord $model, GxCrudEvent &$event)
+    protected function deleteModel(GxCrudEvent &$event)
     {
-        $event->model = $model;
-
         if ($event->model)
         {
             $event->result = $event->model->delete();
         }
-    }
-
-    /**
-     * Processed when model is not found
-     * @return string model class
-     */
-    protected function notFoundFallback()
-    {
-        throw new \yii\web\NotFoundHttpException('AR model was not found');
     }
 
     /**

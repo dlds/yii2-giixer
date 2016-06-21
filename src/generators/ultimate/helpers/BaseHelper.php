@@ -63,8 +63,8 @@ class BaseHelper {
         'frontendCrudHandler' => 'frontend\{ns}',
         'backendSearchHandler' => 'backend\{ns}',
         'frontendSearchHandler' => 'frontend\{ns}',
-        'backendRouteHelper' => 'backend\{ns}',
-        'frontendRouteHelper' => 'frontend\{ns}',
+        'backendUrlRouteHelper' => 'backend\{ns}',
+        'frontendUrlRouteHelper' => 'frontend\{ns}',
         'frontendUrlRuleHelper' => 'frontend\{ns}',
         'imageHelper' => 'common\{ns}\images',
     ];

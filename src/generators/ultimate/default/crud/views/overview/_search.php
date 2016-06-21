@@ -11,7 +11,7 @@ echo "<?php\n";
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true) ?>;
+use <?= $generator->helperComponent->getHelperClass('backendUrlRouteHelper', false, true, true) ?>;
 
 /* @var $this yii\web\View */
 /* @var $model <?= $generator->helperModel->getSearchClass(false, true) ?> */
@@ -21,7 +21,7 @@ use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false,
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->getModelClassName())) ?>-search">
 
     <?= "<?php " ?>$form = ActiveForm::begin([
-        'action' => <?= $generator->helperComponent->getHelperClass('backendRouteHelper', true, false) ?>::index(),
+        'action' => <?= $generator->helperComponent->getHelperClass('backendUrlRouteHelper', true, false) ?>::index(),
         'method' => 'get',
     ]); ?>
 
@@ -36,8 +36,8 @@ foreach ($safeAttributes as $attribute) {
 }
 ?>
     <div class="form-group">
-        <?= "<?= " ?>Html::submitButton(\<?= $generator->generateString('cta_search') ?>, ['class' => 'btn btn-primary']) ?>
-        <?= "<?= " ?>Html::resetButton(\<?= $generator->generateString('cta_reset') ?>, ['class' => 'btn btn-default']) ?>
+        <?= "<?= " ?>Html::submitButton(\Yii::t('<?= $generator->i18nDefaultCategory ?>', 'cta_search'), ['class' => 'btn btn-primary']) ?>
+        <?= "<?= " ?>Html::resetButton(\Yii::t('<?= $generator->i18nDefaultCategory ?>', 'cta_reset'), ['class' => 'btn btn-default']) ?>
     </div>
 
     <?= "<?php " ?>ActiveForm::end(); ?>

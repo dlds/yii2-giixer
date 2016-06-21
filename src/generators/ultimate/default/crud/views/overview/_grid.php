@@ -2,6 +2,7 @@
 
 /* @var $generator dlds\giixer\generators\ultimate\Generator */
 
+use dlds\giixer\Module;
 use dlds\giixer\generators\ultimate\helpers\CrudHelper;
 
 ?>
@@ -11,8 +12,9 @@ use yii\helpers\Html;
 use yii\bootstrap\Modal;
 use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
-use backend\components\helpers\AppHelper;
-use ".$generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true).";
+use ".Module::getClass($generator->helperComponent->getHelperCustomClass('backendElementHelper', true), Module::CLASS_FULLNAME_USEABLE).";
+use ".$generator->helperComponent->getHelperClass('backendUrlRouteHelper', false, true, true).";
+
 
 /* @var \$this yii\web\View */
 /* @var \$searchHandler ".$generator->helperComponent->getHandlerClass('backendSearchHandler', false, true, true)." */
@@ -92,35 +94,35 @@ DynaGrid::widget([
     'gridOptions' => [
         'dataProvider' => \$searchHandler->getDataProvider(),
         'filterModel' => \$searchHandler,
-        'panel' => ['heading' => \Yii::t('app', 'heading_entries_found')],
+        'panel' => ['heading' => \Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'heading_entries_found')],
         'pjax' => true,
         'toolbar' => [
             [
-                'content' => Html::a('<i class=\"glyphicon glyphicon-search\"></i>', sprintf('#%s', AppHelper::".$generator->helperCrud->getIdConstantName(CrudHelper::MODAL_SEARCH)."), ['data' => ['pjax' => 0, 'toggle' => 'modal'], 'class' => 'btn btn-default', 'title' => Yii::t('kvgrid', 'cta_extended_search')])
+                'content' => Html::a('<i class=\"glyphicon glyphicon-search\"></i>', sprintf('#%s', ".Module::getClass($generator->helperComponent->getHelperCustomClass('backendElementHelper', true), Module::CLASS_BASENAME)."::".$generator->helperCrud->getIdConstantName(CrudHelper::MODAL_SEARCH)."), ['data' => ['pjax' => 0, 'toggle' => 'modal'], 'class' => 'btn btn-default', 'title' => Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'cta_extended_search')])
             ],
             //'{dynagridFilter}',
             //'{dynagridSort}',
             '{dynagrid}',
             [
-                'content' => Html::a('<i class=\"glyphicon glyphicon-remove\"></i>', ".$generator->helperComponent->getHelperClass('backendRouteHelper', true)."::index(), ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('kvgrid', 'cta_reset_grid')])
+                'content' => Html::a('<i class=\"glyphicon glyphicon-remove\"></i>', ".$generator->helperComponent->getHelperClass('backendUrlRouteHelper', true)."::index(), ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'cta_reset_grid')])
             ],
             '{export}',
             '{toggleData}',
         ],
         'export' => [
-            'header' => Html::tag('li', Yii::t('kvgrid', 'cta_export_data'), ['role' => 'presentation', 'class' => 'dropdown-header']),
+            'header' => Html::tag('li', Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'cta_export_data'), ['role' => 'presentation', 'class' => 'dropdown-header']),
             'menuOptions' => ['class' => 'dropdown-menu pull-right'],
             'messages' => [
-                'allowPopups' => \Yii::t('kvgrid', 'alert_allow_popups'),
-                'confirmDownload' => \Yii::t('kvgrid', 'alert_confirm_download'),
-                'downloadProgress' => \Yii::t('kvgrid', 'alert_download_progress'),
-                'downloadComplete' => \Yii::t('kvgrid', 'alert_download_complete'),
+                'allowPopups' => \Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'alert_allow_popups'),
+                'confirmDownload' => \Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'alert_confirm_download'),
+                'downloadProgress' => \Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'alert_download_progress'),
+                'downloadComplete' => \Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'alert_download_complete'),
             ],
         ],
         'exportConfig' => \$exportConfig,
     ],
     'options' => [
-        'id' => AppHelper::".$generator->helperCrud->getIdConstantName(CrudHelper::GRID_OVERVIEW)."
+        'id' => ".Module::getClass($generator->helperComponent->getHelperCustomClass('backendElementHelper', true), Module::CLASS_BASENAME)."::".$generator->helperCrud->getIdConstantName(CrudHelper::GRID_OVERVIEW)."
     ],
     'showPersonalize' => true,
     'allowFilterSetting' => false,
@@ -130,8 +132,8 @@ DynaGrid::widget([
 
 <?php
 Modal::begin([
-    'id' => AppHelper::".$generator->helperCrud->getIdConstantName(CrudHelper::MODAL_SEARCH).",
-    'header' => Html::tag('h3', \Yii::t('app', 'heading_extended_search')),
+    'id' => ".Module::getClass($generator->helperComponent->getHelperCustomClass('backendElementHelper', true), Module::CLASS_BASENAME)."::".$generator->helperCrud->getIdConstantName(CrudHelper::MODAL_SEARCH).",
+    'header' => Html::tag('h3', \Yii::t('".$generator->getTranslationCategory('dynagrid')."', 'heading_extended_search')),
 ])
 ?>
 

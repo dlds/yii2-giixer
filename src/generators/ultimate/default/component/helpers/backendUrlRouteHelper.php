@@ -25,6 +25,12 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     const ROUTE_VIEW = '<?= $generator->helperCrud->getRoute('view') ?>';
     const ROUTE_UPDATE = '<?= $generator->helperCrud->getRoute('update') ?>';
     const ROUTE_DELETE = '<?= $generator->helperCrud->getRoute('delete') ?>';
+<?php if($generator->generateSortableBehavior): ?>
+    const ROUTE_SORT = '<?= $generator->helperCrud->getRoute('sort') ?>';
+<?php endif; ?>
+<?php if($generator->generateGalleryBehavior): ?>
+    const ROUTE_API_GALLERY = '<?= $generator->helperCrud->getRoute('api-gallery') ?>';
+<?php endif; ?>
 
     /**
      * Retrieves index route
@@ -49,7 +55,6 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 
         return self::getRoute($route, $params);
     }
-
 
     /**
      * Retrieves view route
@@ -89,4 +94,32 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 
         return self::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
     }
+<?php if($generator->generateSortableBehavior): ?>
+
+    /**
+     * Retrieves sort route
+     * @param array $params additional route params
+     * @return array route
+     */
+    public static function sort(array $params = [])
+    {
+        $route = sprintf('/%s', self::ROUTE_SORT);
+
+        return self::getRoute($route, $params);
+    }
+<?php endif; ?><?php if($generator->generateGalleryBehavior): ?>
+    
+    /**
+     * Retrieves API gallery route
+     * @param array $params additional route params
+     * @return array route
+     */
+    public static function apiGallery(array $params = [])
+    {
+        $route = sprintf('/%s', self::ROUTE_API_GALLERY);
+
+        return self::getRoute($route, $params);
+    }
+<?php endif; ?>
+
 }

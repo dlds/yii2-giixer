@@ -13,16 +13,6 @@ class GxCrudEvent extends \yii\base\Event {
     const TYPE_DELETE = 40;
 
     /**
-     * @var boolean result of CRUD action
-     */
-    public $result;
-
-    /**
-     * @var \dlds\giixer\components\GxActiveRecord AR model used in CRUD action
-     */
-    public $model;
-
-    /**
      * @var mixed input data
      */
     public $input;
@@ -32,4 +22,49 @@ class GxCrudEvent extends \yii\base\Event {
      */
     public $type;
 
+    /**
+     * @var boolean result state of CRUD action
+     */
+    public $result;
+
+    /**
+     * @var \dlds\giixer\components\GxActiveRecord AR model used in CRUD action
+     */
+    public $model;
+
+    /**
+     * Indicates if create action was successful
+     * @return boolean
+     */
+    public function isCreated()
+    {
+        return $this->result && self::TYPE_CREATE == $this->type;
+    }
+
+    /**
+     * Indicates if read action was successful
+     * @return boolean
+     */
+    public function isRead()
+    {
+        return $this->result && self::TYPE_READ == $this->type;
+    }
+
+    /**
+     * Indicates if update action was successful
+     * @return boolean
+     */
+    public function isUpdated()
+    {
+        return $this->result && self::TYPE_UPDATE == $this->type;
+    }
+
+    /**
+     * Indicates if delete action was successful
+     * @return boolean
+     */
+    public function isDeleted()
+    {
+        return $this->result && self::TYPE_DELETE == $this->type;
+    }
 }

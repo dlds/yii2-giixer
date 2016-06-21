@@ -38,12 +38,20 @@ yii.giixer = (function ($) {
             var generateMutationTogglerTargets = [
                 'form .field-generator-mutationjointablename',
                 'form .field-generator-mutationsourcetablename',
-                'form .field-generator-generatesluggablemutation',
-                'form .field-generator-sluggablemutationattribute',
-                'form .field-generator-sluggablemutationensureunique',
-                'form .field-generator-sluggablemutationimutable',
+                'form .field-generator-mutationignoredformattributes',
             ];
             initOnChangeVisibilityToggle(generateMutationToggler, generateMutationTogglerTargets, ':checked');
+
+            // register on check visibility toggler callback
+            var generateSluggableToggler = $('form #generator-generatesluggablebehavior');
+            var generateSluggableTogglerTargets = [
+                'form .field-generator-sluggablebehaviorsourceattribute',
+                'form .field-generator-sluggablebehaviortargetattribute',
+                'form .field-generator-sluggablebehaviorensureunique',
+                'form .field-generator-sluggablebehaviorimutable',
+            ];
+            initOnChangeVisibilityToggle(generateSluggableToggler, generateSluggableTogglerTargets, ':checked');
+
 
             // register on check visibility toggler callback
             var generateTimestampBehaviorToggler = $('form #generator-generatetimestampbehavior');
@@ -62,11 +70,20 @@ yii.giixer = (function ($) {
                 'form .field-generator-sortablerestrictionsattribute',
             ];
             initOnChangeVisibilityToggle(generateSortableBehaviorToggler, generateSortableBehaviorTogglerTargets, ':checked');
+            
+            // register on check visibility toggler callback
+            var generateGalleryBehaviorToggler = $('form #generator-generategallerybehavior');
+            var generateGalleryBehaviorTogglerTargets = [
+                'form .field-generator-gallerytablename',
+            ];
+            initOnChangeVisibilityToggle(generateGalleryBehaviorToggler, generateGalleryBehaviorTogglerTargets, ':checked');
 
             // toggle visibility once at begin to ensure elements are in proper state
             toggleVisibility(generateMutationToggler, generateMutationTogglerTargets, ':checked');
+            toggleVisibility(generateSluggableToggler, generateSluggableTogglerTargets, ':checked');
             toggleVisibility(generateTimestampBehaviorToggler, generateTimestampBehaviorTogglerTargets, ':checked');
             toggleVisibility(generateSortableBehaviorToggler, generateSortableBehaviorTogglerTargets, ':checked');
+            toggleVisibility(generateGalleryBehaviorToggler, generateGalleryBehaviorTogglerTargets, ':checked');
         }
     };
 })(jQuery);

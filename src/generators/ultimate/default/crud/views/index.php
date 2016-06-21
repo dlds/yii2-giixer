@@ -13,13 +13,13 @@ use dlds\metronic\widgets\Alert;
 use dlds\metronic\widgets\Link;
 use dlds\metronic\widgets\Portlet;
 use dlds\giixer\components\helpers\GxFlashHelper;
-use <?= $generator->helperComponent->getHelperClass('backendRouteHelper', false, true, true) ?>;
+use <?= $generator->helperComponent->getHelperClass('backendUrlRouteHelper', false, true, true) ?>;
 
 /* @var $this yii\web\View */
 /* @var $searchHandler <?= $generator->helperComponent->getHandlerClass('backendSearchHandler', false, true, true) ?> */
 
-$this->title = \Yii::t('<?= $generator->getTranslationCategory() ?>', 'title_overview_{models}', [
-    'models' => <?= $generator->helperCrud->getHeading(true) ?>,
+$this->title = \Yii::t('<?= $generator->i18nDefaultCategory ?>', 'title_overview_{models}', [
+'models' => <?= $generator->helperCrud->getHeading(true) ?>,
 ]);
 
 $this->params['breadcrumbs'][] = <?= $generator->helperCrud->getHeading(true) ?>;
@@ -35,8 +35,8 @@ $this->params['breadcrumbs'][] = <?= $generator->helperCrud->getHeading(true) ?>
             Link::widget([
                 'icon' => 'fa fa-plus',
                 'iconPosition' => Link::ICON_POSITION_LEFT,
-                'label' => \Yii::t('app', 'cta_create_new'),
-                'url' => ".$generator->helperComponent->getHelperClass('backendRouteHelper', true, false)."::create(),
+                'label' => \Yii::t('".$generator->i18nDefaultCategory."', 'cta_create_new'),
+                'url' => ".$generator->helperComponent->getHelperClass('backendUrlRouteHelper', true, false)."::create(),
                 'options' => [
                     'class' => 'btn blue-steel btn-circle action-create'
                 ],

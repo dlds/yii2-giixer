@@ -15,4 +15,25 @@ namespace dlds\giixer\components;
  */
 abstract class GxActiveQuery extends \yii\db\ActiveQuery {
 
+    /**
+     * Attaches required queries to be able to show recordPrint
+     * without another db call
+     * @see GxActiveRecord::getRecordPrint() 
+     * @return \dlds\giixer\components\GxActiveQuery
+     */
+    public function queryRecordPrint()
+    {
+        return $this;
+    }
+
+    /**
+     * Retrieves active data provider based on given activequery
+     * @param \yii\db\ActiveQuery $query
+     * @param array $config
+     * @return \dlds\giixer\components\traits\ActiveDataProvider
+     */
+    public function activeDataProvider($config = [])
+    {
+        return new \yii\data\ActiveDataProvider(\yii\helpers\ArrayHelper::merge(['query' => $this], $config));
+    }
 }

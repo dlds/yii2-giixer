@@ -43,14 +43,6 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
 <?php endforeach; ?>
     <?= '// </editor-fold>'."\n" ?>
 
-<?php if ($generator->canGenerateBehaviors()): ?>
-    <?= '// <editor-fold defaultstate="collapsed" desc="CONSTANTS: Behaviors names">'."\n" ?>
-<?php foreach ($generator->getBehaviorsToGenerate() as $key => $configs): ?>
-    const <?= $generator->getBehaviorConstantName($key) ?> = '<?= $generator->getBehaviorName($key) ?>';
-<?php endforeach; ?>
-    <?= '// </editor-fold>'."\n" ?>
-<?php endif; ?>
-
     /**
      * @inheritdoc
      */
@@ -137,10 +129,10 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
 <?php if ($generator->generateGalleryBehavior): ?>
 
     /**
-     * Gallelry image relation
+     * Image cover relation
      * @return ActiveQuery relation
      */
-    public function getAppGalleryCover()
+    public function getAssignedImageCover()
     {
         return $this->hasOne(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
                 ->where(['type' => <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_HELPER, true) ?>::getType()])
@@ -148,16 +140,28 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
     }
 
     /**
-     * Gallelry image relation
+     * Image relation
      * @return ActiveQuery relation
      */
-    public function getAppGalleryImages()
+    public function getAssignedImages()
     {
         return $this->hasMany(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
                 ->where(['type' => <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_HELPER, true) ?>::getType()]);
     }
 <?php endif; ?>
-    
+
+    /**
+     * @inheritdoc
+     */
+    public function getRecordPrint()
+    {
+<?php if($generator->recordPrintAttr): ?>
+        return $this-><?= $generator->recordPrintAttr ?>;
+<?php else: ?>
+        return $this->primaryKey;
+<?php endif; ?>
+    }
+
     /**
      * @inheritdoc
      * @return <?= $generator->helperModel->getQueryClass(false, true) ?> the active query used by this AR class.

@@ -21,7 +21,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
      */
     public static function index()
     {
-        $route = <?= $generator->helperComponent->getHelperClass('frontendRouteHelper') ?>::ROUTE_INDEX;
+        $route = <?= $generator->helperComponent->getHelperClass('frontendUrlRouteHelper') ?>::ROUTE_INDEX;
 
         $pattern = $route;
 
@@ -34,7 +34,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
      */
     public static function view($route = false)
     {
-        $route = <?= $generator->helperComponent->getHelperClass('frontendRouteHelper') ?>::ROUTE_VIEW;
+        $route = <?= $generator->helperComponent->getHelperClass('frontendUrlRouteHelper') ?>::ROUTE_VIEW;
 
         $pattern = $route;
 

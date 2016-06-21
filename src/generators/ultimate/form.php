@@ -13,6 +13,8 @@ GiixerAsset::register($this);
 echo $form->errorSummary($generator);
 
 echo $form->field($generator, 'tableName');
+
+echo $form->field($generator, 'recordPrintAttr');
 ?>
 <div class="row">
     <div class="col-md-12" style="background-color: #FFFFE0;margin-bottom:15px">
@@ -28,23 +30,34 @@ echo $form->field($generator, 'tableName');
             <div class="col-md-6">
                 <?= $form->field($generator, 'mutationSourceTableName') ?>
             </div>
-        </div>
-        <div class="row">
             <div class="col-md-12">
-                <?= $form->field($generator, 'generateSluggableMutation')->sticky()->checkbox() ?>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-7">
-                <?= $form->field($generator, 'sluggableMutationAttribute') ?>
-            </div>
-            <div class="col-md-5">
-                <?= $form->field($generator, 'sluggableMutationEnsureUnique')->sticky()->checkbox() ?>
-                <?= $form->field($generator, 'sluggableMutationImutable')->sticky()->checkbox() ?>
+                <?= $form->field($generator, 'mutationIgnoredFormAttributes') ?>
             </div>
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-md-12" style="background-color: #FFFFE0;margin-bottom:15px">
+        <div class="row" style="margin-top:15px">
+
+            <div class="col-md-12">
+                <?= $form->field($generator, 'generateSluggableBehavior')->sticky()->checkbox() ?>
+            </div>
+            <div class="col-md-7">
+                <?= $form->field($generator, 'sluggableBehaviorSourceAttribute') ?>
+                <?= $form->field($generator, 'sluggableBehaviorTargetAttribute') ?>
+            </div>
+            <div class="col-md-5">
+                <?= $form->field($generator, 'sluggableBehaviorEnsureUnique')->sticky()->checkbox() ?>
+                <?= $form->field($generator, 'sluggableBehaviorImutable')->sticky()->checkbox() ?>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
 <div class="row">
     <div class="col-md-12" style="background-color: #FFFFE0;margin-bottom:15px">
         <div class="row" style="margin-top:15px">
@@ -92,6 +105,11 @@ echo $form->field($generator, 'tableName');
         <div class="row" style="margin-top:15px">
             <div class="col-md-12">
                 <?= $form->field($generator, 'generateGalleryBehavior')->sticky()->checkbox() ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $form->field($generator, 'galleryTableName') ?>
             </div>
         </div>
     </div>

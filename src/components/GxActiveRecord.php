@@ -8,6 +8,7 @@
 namespace dlds\giixer\components;
 
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use dlds\giixer\components\helpers\GxModelHelper;
 
 /**
@@ -18,17 +19,25 @@ use dlds\giixer\components\helpers\GxModelHelper;
  */
 abstract class GxActiveRecord extends ActiveRecord {
 
+    // <editor-fold defaultstate="collapsed" desc="CONSTANTS: Behaviors names">
+    const BN_GALLERY_MANAGER = 'b_gallery_manager';
+    const BN_MUTATION = 'b_mutation';
+    const BN_SLUGGABLE = 'b_sluggable';
+    const BN_SORTABLE = 'b_sortable';
+    const BN_TIMESTAMP = 'b_timestamp';
+
+    // </editor-fold>
+
     /**
      * Retrieves models representing column
      */
     public function __toString()
     {
-        return (string) $this->representingColumn();
+        return (string) $this->getRecordPrint();
     }
 
     /**
-     * Loads given parameters
-     * @param array $params
+     * @inheritdoc
      */
     public function load($data, $formName = null)
     {
@@ -40,6 +49,36 @@ abstract class GxActiveRecord extends ActiveRecord {
         }
 
         return parent::load($data, $formName);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAttributeLabel($attribute)
+    {
+        $behavior = $this->getBehavior(self::BN_MUTATION);
+
+        if ($behavior && in_array($attribute, $behavior->attrs))
+        {
+            $relation = ArrayHelper::getValue($behavior->config, 3, false);
+
+            if ($relation)
+            {
+                $attribute = sprintf('%s.%s', $relation, $attribute);
+            }
+        }
+
+        return parent::getAttributeLabel($attribute);
+    }
+
+    /**
+     * Retrieves model default string representation
+     * This is used when AR is being printed as a string
+     * @return mixed
+     */
+    public function getRecordPrint()
+    {
+        return $this->primaryKey;
     }
 
     /**
@@ -71,16 +110,6 @@ abstract class GxActiveRecord extends ActiveRecord {
     protected function setAttributesUnsafe(&$scenarios, $name, array $attrs = [])
     {
         GxModelHelper::setAttributesUnsafe($scenarios, $name, $attrs);
-    }
-
-    /**
-     * Retrieves model representing column
-     * - this is used when AR is being printed as a string
-     * @return mixed
-     */
-    protected function representingColumn()
-    {
-        return $this->primaryKey;
     }
 
     /**

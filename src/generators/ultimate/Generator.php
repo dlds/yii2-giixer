@@ -85,25 +85,36 @@ class Generator extends \yii\gii\generators\model\Generator {
     public $mutationSourceTableName;
 
     /**
+     * @var string mutation ignored attributes
+     */
+    public $mutationIgnoredFormAttributes;
+
+    /**
      * @var boolean indicates if sluggable behavior should be generated
      */
-    public $generateSluggableMutation = false;
+    public $generateSluggableBehavior = false;
 
     /**
      * @var string defines sluggable source attributes
      * for multiple use comma separation like "firstname,lastname"
      */
-    public $sluggableMutationAttribute;
+    public $sluggableBehaviorSourceAttribute;
+
+    /**
+     * @var string defines sluggable target attributes
+     * for multiple use comma separation like "firstname,lastname"
+     */
+    public $sluggableBehaviorTargetAttribute = 'slug';
 
     /**
      * @var boolean indicates if sluggable behavior should ensure uniqueness
      */
-    public $sluggableMutationEnsureUnique = true;
+    public $sluggableBehaviorEnsureUnique = true;
 
     /**
      * @var boolean indicates if sluggable behavior should be imutable
      */
-    public $sluggableMutationImutable = true;
+    public $sluggableBehaviorImutable = false;
 
     /**
      * @var boolean indicates timestamp behavior should be generated
@@ -126,6 +137,16 @@ class Generator extends \yii\gii\generators\model\Generator {
     public $generateGalleryBehavior = false;
 
     /**
+     * @var string gallery table name
+     */
+    public $galleryTableName = 'core_image';
+
+    /**
+     * @var boolean indicates if sortable behavior should be generated
+     */
+    public $generateSortableBehavior = false;
+
+    /**
      * @var string defines sortable column attribute
      */
     public $sortableColumnAttribute = 'position';
@@ -146,9 +167,9 @@ class Generator extends \yii\gii\generators\model\Generator {
     public $sortableKeyAttribute = false;
 
     /**
-     * @var boolean indicates if sortable behavior should be generated
+     * @var string attribute which will be used as record print
      */
-    public $generateSortableBehavior = false;
+    public $recordPrintAttr;
 
     /**
      * @var string controller class name
@@ -235,8 +256,8 @@ class Generator extends \yii\gii\generators\model\Generator {
      * @var array containing helpers files to be generated
      */
     public $helperFilesMap = [
-        'backendRouteHelper' => 'backend/{ns}',
-        'frontendRouteHelper' => 'frontend/{ns}',
+        'backendUrlRouteHelper' => 'backend/{ns}',
+        'frontendUrlRouteHelper' => 'frontend/{ns}',
         'frontendUrlRuleHelper' => 'frontend/{ns}',
     ];
 
@@ -255,6 +276,11 @@ class Generator extends \yii\gii\generators\model\Generator {
     public $componentsFilesMap = [
         self::COMPONENT_IMAGE_HELPER => 'common\{ns}\images',
     ];
+
+    /**
+     * @var string i18n default category
+     */
+    public $i18nDefaultCategory = 'global';
 
     /**
      * @var array static namespaces
@@ -335,22 +361,30 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         return ArrayHelper::merge([
                 [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
+                [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
                 [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
-                [['generateMutation', 'generateSluggableMutation', 'sluggableMutationEnsureUnique', 'sluggableMutationImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
+                [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
                     return $model->generateMutation;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatemutation').is(':checked');
                     }"],
+                [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
+                    return trim($model->mutationIgnoredFormAttributes);
+                }],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
-                [['sluggableMutationAttribute'], 'required', 'when' => function($model) {
-                    return $model->generateSluggableMutation;
+                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
+                    return $model->generateSluggableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                [['sluggableMutationAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName']],
+                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                    return $model->generateSluggableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generatesluggablemutation').is(':checked');
+                    }"],
                 [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
                     return $model->generateTimestampBehavior;
                 }, 'whenClient' => "function (attribute, value) {
@@ -361,7 +395,7 @@ class Generator extends \yii\gii\generators\model\Generator {
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                [['sortableIndexAttribute'], 'string'],
+                [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
                 [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
                     return $model->generateSortableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
@@ -371,6 +405,13 @@ class Generator extends \yii\gii\generators\model\Generator {
                     return $model->generateSortableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
+                    }"],
+                [['galleryTableName'], 'filter', 'filter' => 'trim'],
+                [['galleryTableName'], 'validateTableName'],
+                [['galleryTableName'], 'required', 'when' => function($model) {
+                    return $model->generateGalleryBehavior;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generategallerybehavior').is(':checked');
                     }"],
                 ], $rules);
     }
@@ -432,7 +473,10 @@ class Generator extends \yii\gii\generators\model\Generator {
             'generateMutation' => 'This indicates whether the generator should generate relation model between application language table (model) and generating model.',
             'mutationJoinTableName' => 'This is the of "Mapping" table representing the many-to-many relationship between application languages and generating model.',
             'mutationSourceTableName' => 'This is the name of the source table holds application languages used in many-to-many relationship.',
-            'generateSluggable' => 'This indicates whether the generator should generate Yii2 Sluggable behavior in main model class.',
+            'mutationIgnoredFormAttributes' => 'One or more mutation join table attributes which will be ignored in create/update form. Divided by comma (attr1, attr2, ...)',
+            'generateSluggableBehavior' => 'This indicates whether the generator should generate Yii2 Sluggable behavior in main model class.',
+            'sluggableBehaviorTargetAttribute' => 'This is the name of the table attribute which should be used as target where generated slug will be stored.',
+            'sluggableBehaviorSourceAttribute' => 'This is the name of the table attribute which should be used as source for generating slug.',
             'generateTimestampBehavior' => 'This indicates whether the generator should generate Yii2 Timestamp behavior in main model class.',
             'timestampCreatedAtAttribute' => 'This is the name of the table attribute which should be used as created at timestamp value.',
             'timestampUpdatedAtAttribute' => 'This is the name of the table attribute which should be used as updated at timestamp value.',
@@ -462,6 +506,9 @@ class Generator extends \yii\gii\generators\model\Generator {
                     return $db->getSchema()->getTableNames();
                 },
                 'mutationSourceTableName' => function () use ($db) {
+                    return $db->getSchema()->getTableNames();
+                },
+                'galleryTableName' => function () use ($db) {
                     return $db->getSchema()->getTableNames();
                 },
             ];
@@ -532,6 +579,68 @@ class Generator extends \yii\gii\generators\model\Generator {
     }
 
     /**
+     * Generates validation rules for the specified table.
+     * @param \yii\db\TableSchema $table the table schema
+     * @return array the generated validation rules
+     */
+    public function generateRules($table)
+    {
+        $rules = parent::generateRules($table);
+
+        foreach ($rules as $key => $rule)
+        {
+            $rules[$key] = preg_replace_callback("/[A-Za-z]+::className\(\)/", function($matches) {
+
+                $match = ArrayHelper::getValue($matches, 0);
+
+                $class = explode('::', $match);
+
+                $className = $this->helperModel->getFullyQualifiedName(ArrayHelper::getValue($class, 0), true);
+
+                if ($className)
+                {
+                    return sprintf('%s::className()', $className);
+                }
+
+                return $match;
+            }, $rule);
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Retrieves relation keys
+     * @param type $table
+     * @param type $asDefinition
+     */
+    public function getRelationKey($table, $asDefinition = false)
+    {
+        $schema = $this->getTableSchema($table);
+
+        $keys = false;
+
+        foreach ($schema->foreignKeys as $definition)
+        {
+            if ($this->tableName == $definition[0])
+            {
+                $keys = $definition;
+            }
+        }
+
+        if ($keys && $asDefinition)
+        {
+            ArrayHelper::remove($keys, 0);
+
+            $def = trim(str_replace(['array', '(', ')', ','], '', var_export($keys, true)));
+
+            return "[".$def."]";
+        }
+
+        return $keys;
+    }
+
+    /**
      * Generates relations using a junction table by adding an extra viaTable().
      * @param \yii\db\TableSchema the table being checked
      * @param array $fks obtained from the checkPivotTable() method
@@ -573,9 +682,14 @@ class Generator extends \yii\gii\generators\model\Generator {
      * Retrieves table schema
      * @return \yii\db\TableSchema
      */
-    public function getTableSchema()
+    public function getTableSchema($table = false)
     {
         $db = $this->getDbConnection();
+
+        if ($table)
+        {
+            return $db->getTableSchema($table);
+        }
 
         return $db->getTableSchema($this->tableName);
     }
@@ -624,6 +738,7 @@ class Generator extends \yii\gii\generators\model\Generator {
             }
         }
         $column = $tableSchema->columns[$attribute];
+
         if ($column->phpType === 'boolean')
         {
             return "\$form->field(\$model, '$attribute')->checkbox()";
@@ -631,6 +746,39 @@ class Generator extends \yii\gii\generators\model\Generator {
         elseif ($column->type === 'text')
         {
             return "\$form->field(\$model, '$attribute')->textarea(['rows' => 6])";
+        }
+        elseif ($column->type === 'smallint' && preg_match('/^is_.*/', $column->name))
+        {
+            return "\$form->field(\$model, '$attribute')->dropDownList(\\dlds\\giixer\\components\\fakers\\GxOptionsDataFaker::getBooleanOptions())";
+        }
+        elseif ($column->type === 'integer')
+        {
+            foreach ($tableSchema->foreignKeys as $fk)
+            {
+                $refTable = ArrayHelper::getValue($fk, 0);
+
+                $refTableSchema = $this->getTableSchema($refTable);
+
+                $keys = array_keys($fk);
+
+                if (in_array($column->name, $keys) && $refTableSchema)
+                {
+                    $refClassName = $this->getClassForTable($refTable, true, true);
+
+                    if (is_array($refTableSchema->primaryKey))
+                    {
+                        $pk = ArrayHelper::getValue($refTableSchema->primaryKey, 0);
+                    }
+                    else
+                    {
+                        $pk = $refTableSchema->primaryKey;
+                    }
+
+                    return "\$form->field(\$model, '$attribute')->dropDownList(ArrayHelper::map($refClassName::find()->queryRecordPrint()->all(), '$pk', 'recordPrint'))";
+                }
+            }
+
+            return "\$form->field(\$model, '$attribute')->textInput()";
         }
         else
         {
@@ -885,6 +1033,30 @@ class Generator extends \yii\gii\generators\model\Generator {
     }
 
     /**
+     * Validates record print attribute if exists in model table or associated tables
+     */
+    public function validateRecordPrintAttr($attribute, $params)
+    {
+        $db = $this->getDbConnection();
+        $schema = $db->getTableSchema($this->tableName, true);
+
+        if ($schema)
+        {
+            if (!in_array($this->$attribute, $schema->columnNames))
+            {
+                $mutationSchema = $db->getTableSchema($this->mutationJoinTableName, true);
+
+                if ($this->generateMutation && in_array($this->$attribute, $mutationSchema->columnNames))
+                {
+                    return true;
+                }
+
+                $this->addError($attribute, sprintf("Table '%s' does not contain attribute '%s'.", $schema->name, $this->$attribute));
+            }
+        }
+    }
+
+    /**
      * @return array the table names that match the pattern specified by [[tableName]].
      */
     protected function getTableNames()
@@ -985,13 +1157,13 @@ class Generator extends \yii\gii\generators\model\Generator {
 
             $mutationableAttrs = array_diff($tableSchema->columnNames, $tableSchema->primaryKey);
 
-            $behaviors['languages'] = [
+            $behaviors[Module::BEHAVIOR_NAME_MUTATION] = [
                 'class' => '\dlds\rels\components\Behavior::className()',
                 'config' => [
                     sprintf('%s::className()', $modelClassName),
                     sprintf('%s::%s%s', $modelClassName, Module::RELATION_NAME_PREFIX, strtoupper($this->tableName)),
                     sprintf('%s::%s%s', $modelClassName, Module::RELATION_NAME_PREFIX, strtoupper($this->mutationSourceTableName)),
-                    sprintf('%s::%s%s', $modelClassName, Module::RELATION_NAME_PREFIX, Module::RELATION_NAME_MUTATION_CURRENT),
+                    sprintf('static::%s%s', Module::RELATION_NAME_PREFIX, Module::RELATION_NAME_MUTATION_CURRENT),
                 ],
                 'attrs' => $mutationableAttrs,
             ];
@@ -1003,7 +1175,7 @@ class Generator extends \yii\gii\generators\model\Generator {
 
             $helperClassName = sprintf('%s%s', $modelClassName, self::SUFFIX_CLASS_IMAGE_HELPER);
 
-            $behaviors['gallery_manager'] = [
+            $behaviors[Module::BEHAVIOR_NAME_GALLERY_MANAGER] = [
                 'class' => '\dlds\galleryManager\GalleryBehavior::className()',
                 'type' => sprintf('%s::getType()', $helperClassName),
                 'directory' => sprintf('%s::getDirectory()', $helperClassName),
@@ -1012,62 +1184,64 @@ class Generator extends \yii\gii\generators\model\Generator {
                 'extension' => sprintf('%s::getExtension()', $helperClassName),
                 'hasName' => 'false',
                 'hasDescription' => 'false',
-                //'host' => UrlRuleHelper::getHostDefinition(UrlRuleHelper::HOST_WWW),
+                'tableName' => $this->galleryTableName,
             ];
-
-            /*
-              $relation['AppGalleryCover'] = '$this->hasOne(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
-              ->where(['type' => EduPostImageHelper::getType()])
-              ->orderBy(['rank' => SORT_ASC]);';
-
-              $relation['AppGalleryImages'] = '$this->hasMany(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
-              ->where(['type' => EduPostImageHelper::getType()]);'
-             *
-             */
         }
 
         if ($this->generateTimestampBehavior)
         {
-            $behaviors['timestamp'] = [
+            $behaviors[Module::BEHAVIOR_NAME_TIMESTAMP] = [
                 'class' => '\yii\behaviors\TimestampBehavior::className()',
             ];
 
             if ($this->timestampCreatedAtAttribute && self::DEFAULT_TIMESTAMP_CREATED_AT_ATTR != $this->timestampCreatedAtAttribute)
             {
-                $behaviors['timestamp']['createdAtAttribute'] = $this->timestampCreatedAtAttribute;
+                $behaviors[Module::BEHAVIOR_NAME_TIMESTAMP]['createdAtAttribute'] = $this->timestampCreatedAtAttribute;
             }
 
             if ($this->timestampUpdatedAtAttribute && self::DEFAULT_TIMESTAMP_UPDATED_AT_ATTR != $this->timestampUpdatedAtAttribute)
             {
-                $behaviors['timestamp']['updatedAtAttribute'] = $this->timestampUpdatedAtAttribute;
+                $behaviors[Module::BEHAVIOR_NAME_TIMESTAMP]['updatedAtAttribute'] = $this->timestampUpdatedAtAttribute;
             }
         }
 
         if ($this->generateSortableBehavior)
         {
-            $behaviors['sortable'] = [
+            $behaviors[Module::BEHAVIOR_NAME_SORTABLE] = [
                 'class' => '\dlds\sortable\components\Behavior::className()',
             ];
 
             if ($this->sortableKeyAttribute)
             {
-                $behaviors['sortable']['key'] = $this->sortableKeyAttribute;
+                $behaviors[Module::BEHAVIOR_NAME_SORTABLE]['key'] = $this->sortableKeyAttribute;
             }
 
             if ($this->sortableColumnAttribute)
             {
-                $behaviors['sortable']['column'] = $this->sortableColumnAttribute;
+                $behaviors[Module::BEHAVIOR_NAME_SORTABLE]['column'] = $this->sortableColumnAttribute;
             }
 
             if ($this->sortableIndexAttribute)
             {
-                $behaviors['sortable']['index'] = $this->sortableIndexAttribute;
+                $behaviors[Module::BEHAVIOR_NAME_SORTABLE]['index'] = $this->sortableIndexAttribute;
             }
 
             if ($this->sortableRestrictionsAttribute)
             {
-                $behaviors['sortable']['restrictions'] = $this->sortableRestrictionsAttribute;
+                $behaviors[Module::BEHAVIOR_NAME_SORTABLE]['restrictions'] = explode(',', $this->sortableRestrictionsAttribute);
             }
+        }
+
+        if ($this->generateSluggableBehavior)
+        {
+            $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE] = [
+                'class' => '\yii\behaviors\SluggableBehavior::className()',
+            ];
+
+            $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['attribute'] = $this->sluggableBehaviorSourceAttribute;
+            $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['slugAttribute'] = $this->sluggableBehaviorTargetAttribute;
+            $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['ensureUnique'] = $this->getBooleanQuoted($this->sluggableBehaviorEnsureUnique);
+            $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['immutable'] = $this->getBooleanQuoted($this->sluggableBehaviorImutable);
         }
 
         return $behaviors;
@@ -1080,7 +1254,7 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getBehaviorConstantName($key)
     {
-        return 'BN_'.strtoupper($key);
+        return Module::BEHAVIOR_CONSTANT_NAME_PREFIX.strtoupper($key);
     }
 
     /**
@@ -1090,7 +1264,23 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getBehaviorName($key)
     {
-        return 'b_'.$key;
+        return Module::BEHAVIOR_NAME_PREFIX.$key;
+    }
+
+    /**
+     * Retrieves classnamefor given table
+     * @param type $table
+     */
+    public function getClassForTable($table, $namespace = false, $root = false)
+    {
+        $class = $this->generateClassName($table);
+
+        if ($namespace)
+        {
+            return $this->helperModel->getFullyQualifiedName($class, $root);
+        }
+
+        return $class;
     }
 
     /**
@@ -1165,5 +1355,51 @@ class Generator extends \yii\gii\generators\model\Generator {
         }
 
         return false;
+    }
+
+    /**
+     * Retrieves quoted boolean value
+     * @param boolean $boolean
+     * @return string
+     */
+    public function getBooleanQuoted($boolean)
+    {
+        return $boolean ? 'true' : 'false';
+    }
+
+    /**
+     * Indicates if given mutation attribute is ignored or not
+     * @param type $attr
+     */
+    public function isMutationAttributeIgnored($attr)
+    {
+        $ignored = explode(',', $this->mutationIgnoredFormAttributes);
+
+        return in_array($attr, $ignored);
+    }
+
+    /**
+     * Indicate if controller external actions should be generated
+     */
+    public function hasControllerExternalActions()
+    {
+        return $this->generateSortableBehavior || $this->generateGalleryBehavior;
+    }
+
+    /**
+     * Filters sort attributes and removes SortableBehavior column if exists
+     * sortable behavior column is automatically added to sort attributes
+     * in search model
+     * @param array $attrs
+     * @return array
+     */
+    public function filterSortAttrs($attrs)
+    {
+        if (($key = array_search($this->sortableColumnAttribute, $attrs)) !== false)
+        {
+            unset($attrs[$key]);
+        }
+
+        return $attrs;
     }
 }

@@ -7,12 +7,23 @@ use dlds\metronic\widgets\Alert;
 class GxFlashHelper {
 
     /**
-     * Flashes
+     * Flashes IDs
      */
     const FLASH_INFO = 'flash_info';
     const FLASH_SUCCESS = 'flash_success';
     const FLASH_WARNING = 'flash_warning';
     const FLASH_ERROR = 'flash_error';
+
+    /**
+     * Messages Keys
+     */
+    const MESSAGE_CREATE_SUCCESS = 'flash_create_success';
+    const MESSAGE_UPDATE_SUCCESS = 'flash_update_success';
+    const MESSAGE_DELETE_SUCCESS = 'flash_delete_success';
+    // fails
+    const MESSAGE_CREATE_FAIL = 'flash_create_fail';
+    const MESSAGE_UPDATE_FAIL = 'flash_update_fail';
+    const MESSAGE_DELETE_FAIL = 'flash_delete_fail';
 
     /**
      * Retrieves flash by given flash key
@@ -108,5 +119,50 @@ class GxFlashHelper {
         }
 
         return Alert::widget($options);
+    }
+
+    /**
+     * Retrieves flash message
+     * @param string $key
+     */
+    public static function message($key)
+    {
+        return \Yii::t('dlds/giixer', $key);
+    }
+
+    /**
+     * Retrieves success type
+     * @return int
+     */
+    public static function success()
+    {
+        return Alert::TYPE_SUCCESS;
+    }
+
+    /**
+     * Retrieves warning type
+     * @return int
+     */
+    public static function warning()
+    {
+        return Alert::TYPE_WARNING;
+    }
+
+    /**
+     * Retrieves error type
+     * @return int
+     */
+    public static function error()
+    {
+        return Alert::TYPE_DANGER;
+    }
+
+    /**
+     * Retrieves info type
+     * @return int
+     */
+    public static function info()
+    {
+        return Alert::TYPE_INFO;
     }
 }

@@ -33,15 +33,22 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
 
     /**
      * Displays a single <?= $generator->helperModel->getModelClass(true) ?> model.
-     * <?= implode("\n     * ", $actionParamComments) . "\n" ?>
+     * @param integer $id primary key
      * @return mixed
      */
-    public function actionView(<?= $actionParams ?>)
+    public function actionView($id)
     {
-        $handler = new <?= $generator->helperComponent->getHandlerClass('frontendCrudHandler', true) ?>(<?= $actionParams ?>);
+        $handler = new <?= $generator->helperComponent->getHandlerClass('frontendCrudHandler', true) ?>();
+
+        $evt = $handler->read($id);
+
+        if (!$evt->isRead())
+        {
+            return $handler->notFoundFallback();
+        }
 
         return $this->render('view', [
-            'model' => $handler->read(),
+                'model' => $evt->model,
         ]);
     }
 

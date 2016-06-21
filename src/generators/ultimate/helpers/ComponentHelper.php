@@ -34,11 +34,16 @@ class ComponentHelper extends BaseHelper {
             'handlers/frontendCrudHandler.php',
             'handlers/backendSearchHandler.php',
             'handlers/frontendSearchHandler.php',
-            'helpers/backendRouteHelper.php',
-            'helpers/frontendRouteHelper.php',
+            'helpers/backendUrlRouteHelper.php',
+            'helpers/frontendUrlRouteHelper.php',
         ];
     }
 
+    /**
+     * Generates all required comonents
+     * @param \yii\db\TableSchema $tableSchema
+     * @param array $files
+     */
     public function generateComponents(\yii\db\TableSchema $tableSchema, array &$files)
     {
         $this->generateHandlers($tableSchema, $files);
@@ -196,12 +201,12 @@ class ComponentHelper extends BaseHelper {
     }
 
     /**
-     * Retrieves HELPER class
+     * Retrieves HELPER base/parent class
      * @return type
      */
     public function getHelperParentClass($key, $basename = false, $root = true)
     {
-        $customBaseClass = $this->getHelperParentCustomClass($key);
+        $customBaseClass = $this->getHelperCustomClass($key);
 
         $class = ($customBaseClass) ? $customBaseClass : $this->getParentClass($key, $this->getHelperClass($key, true), \dlds\giixer\Module::DEFAULT_BASE_COMPONENT);
 
@@ -222,14 +227,25 @@ class ComponentHelper extends BaseHelper {
      * Retrieves helper custom parent class
      * @param type $key
      */
-    protected function getHelperParentCustomClass($key)
+    public function getHelperCustomClass($key, $childClass = false)
     {
-        if (strpos($key, 'Rule'))
+        if (true == $childClass)
         {
-            return \Yii::$app->getModule('gii')->getBaseClass(false, \dlds\giixer\Module::BASE_URL_RULE_HELPER);
+            $childClass = $this->getHelperClass($key, true);
         }
+        
+        $map = [
+            'backendElementHelper' => \dlds\giixer\Module::BASE_ELEMENT_HELPER_BACKEND,
+            'frontendElementHelper' => \dlds\giixer\Module::BASE_ELEMENT_HELPER_FRONTEND,
+            'backendUrlRouteHelper' => \dlds\giixer\Module::BASE_URL_ROUTE_HELPER,
+            'frontendUrlRouteHelper' => \dlds\giixer\Module::BASE_URL_ROUTE_HELPER,
+            'backendUrlRuleHelper' => \dlds\giixer\Module::BASE_URL_RULE_HELPER,
+            'frontendUrlRuleHelper' => \dlds\giixer\Module::BASE_URL_RULE_HELPER,
+        ];
 
-        return \Yii::$app->getModule('gii')->getBaseClass(false, \dlds\giixer\Module::BASE_URL_ROUTE_HELPER);
+        $id = \yii\helpers\ArrayHelper::getValue($map, $key, false);
+
+        return \Yii::$app->getModule('gii')->getBaseClass($childClass, $id);
     }
 
     /**

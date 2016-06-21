@@ -22,6 +22,8 @@ class Module extends \yii\gii\Module {
     const BASE_CONTROLLER_FRONTEND = 'base_controller_frontend';
     const BASE_URL_ROUTE_HELPER = 'base_url_route_helper';
     const BASE_URL_RULE_HELPER = 'base_url_rule_helper';
+    const BASE_ELEMENT_HELPER_BACKEND = 'base_element_helper_backend';
+    const BASE_ELEMENT_HELPER_FRONTEND = 'base_element_helper_frontend';
 
     /**
      * Defaults
@@ -33,6 +35,7 @@ class Module extends \yii\gii\Module {
     const DEFAULT_BASE_CRUD_HANDLER = 'dlds\giixer\components\handlers\GxCrudHandler';
     const DEFAULT_BASE_URL_ROUTE_HELPER = 'dlds\\giixer\\components\\helpers\\GxUrlRouteHelper';
     const DEFAULT_BASE_URL_RULE_HELPER = 'dlds\\giixer\\components\\helpers\\GxUrlRuleHelper';
+    const DEFAULT_BASE_ELEMENT_HELPER = 'dlds\\giixer\\components\\helpers\\GxElementHelper';
     const DEFAULT_BASE_IMAGE_HELPER = 'dlds\\giixer\\components\\helpers\\GxImageHelper';
 
     /**
@@ -40,6 +43,24 @@ class Module extends \yii\gii\Module {
      */
     const RELATION_NAME_PREFIX = 'RN_';
     const RELATION_NAME_MUTATION_CURRENT = 'CURRENT_LANGUAGE';
+
+    /**
+     * Behaviors names
+     */
+    const BEHAVIOR_CONSTANT_NAME_PREFIX = 'BN_';
+    const BEHAVIOR_NAME_PREFIX = 'b_';
+    const BEHAVIOR_NAME_SORTABLE = 'sortable';
+    const BEHAVIOR_NAME_SLUGGABLE = 'sluggable';
+    const BEHAVIOR_NAME_TIMESTAMP = 'timestamp';
+    const BEHAVIOR_NAME_GALLERY_MANAGER = 'gallery_manager';
+    const BEHAVIOR_NAME_MUTATION = 'mutation';
+
+    /**
+     * Class definition
+     */
+    const CLASS_BASENAME = 1;
+    const CLASS_FULLNAME = 2;
+    const CLASS_FULLNAME_USEABLE = 3;
 
     /**
      * @var array preddefined namespaces map
@@ -90,6 +111,11 @@ class Module extends \yii\gii\Module {
      */
     public function getBaseClass($child, $key)
     {
+        if (!$key)
+        {
+            return self::DEFAULT_BASE_COMPONENT;
+        }
+
         $map = \yii\helpers\ArrayHelper::getValue($this->bases, $key, []);
 
         if (!$child)
@@ -118,6 +144,27 @@ class Module extends \yii\gii\Module {
         }
 
         return $default;
+    }
+
+    /**
+     * Retrieves classname in specified format
+     * @param string $class
+     * @param int $definition
+     * @return string
+     */
+    public static function getClass($class, $definition = self::CLASS_BASENAME)
+    {
+        if (self::CLASS_BASENAME == $definition)
+        {
+            return \yii\helpers\StringHelper::basename($class);
+        }
+
+        if (self::CLASS_FULLNAME_USEABLE == $definition)
+        {
+            return trim($class, '\\');
+        }
+
+        return sprintf('\\%s', $class);
     }
 
     /**

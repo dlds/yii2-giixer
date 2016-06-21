@@ -21,6 +21,13 @@ use <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php')
 class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php'), true) ?> {
 
     /**
+     * @var array allowd sorting attrs
+     */
+    public $sortAttrs = [
+        '<?= implode("',\n         '", $generator->filterSortAttrs($attributes)) ?>'
+    ];
+
+    /**
      * @inheritdoc
      */
     public function rules()
@@ -77,12 +84,8 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
     protected function sortData(ActiveDataProvider &$dataProvider)
     {
         $dataProvider->setSort([
-            'attributes' => [
-                '<?= implode("',\n                '", $attributes) ?>'
-            ],
-            'defaultOrder' => [
-                '<?= $primaryKey ?>' => SORT_DESC,
-            ],
+            'attributes' => $this->getSortAttrs(),
+            'defaultOrder' => self::getDefaultOrder(),
         ]);
     }
 
@@ -102,5 +105,25 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
     protected function additionalQuery(\yii\db\ActiveQuery &$query)
     {
         <?= implode("\n        ", $conditions) ?>
+    }
+
+     /**
+     * Retrieves sorting attrs
+     * @return array
+     */
+    protected function getSortAttrs()
+    {
+        $default = self::getDefaultOrder();
+
+        return \yii\helpers\ArrayHelper::merge($this->sortAttrs, array_keys($default));
+    }
+
+    /**
+     * Retrieves default sort order
+     * @return array
+     */
+    public static function getDefaultOrder()
+    {
+        return [self::tableName().'.<?= ($generator->generateSortableBehavior) ? $generator->sortableColumnAttribute : $primaryKey ?>' => SORT_DESC];
     }
 }

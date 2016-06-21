@@ -11,11 +11,12 @@ echo "<?php\n";
 
 use dlds\metronic\Metronic;
 use dlds\metronic\widgets\Portlet;
+use dlds\giixer\components\helpers\GxFlashHelper;
 
 /* @var $this yii\web\View */
 /* @var $model <?= $generator->helperModel->getModelClass(false, true) ?> */
 
-$this->title = \Yii::t('<?= $generator->getTranslationCategory() ?>', 'title_create_new_{model}', [
+$this->title = \Yii::t('<?= $generator->i18nDefaultCategory ?>', 'title_create_new_{model}', [
         'model' => \<?= $generator->helperCrud->getHeading() ?>,
     ]);
 
@@ -31,6 +32,13 @@ $this->params['breadcrumbs'][] = \<?= $generator->generateString('heading_new_en
         'title' => \$this->title,
         'color' => Metronic::UI_COLOR_GREEN_HAZE,
     ]);
+    ?>
+
+    <?=
+    GxFlashHelper::alert(GxFlashHelper::hasFlashes(GxFlashHelper::FLASH_SUCCESS), [
+        'type' => GxFlashHelper::success(),
+        'body' => GxFlashHelper::getFlash(GxFlashHelper::FLASH_SUCCESS),
+    ])
     ?>
 
     <?=
