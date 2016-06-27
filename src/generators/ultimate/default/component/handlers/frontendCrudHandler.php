@@ -18,7 +18,7 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
     /**
      * @inheritdoc
      */
-    public function create(array $attrs, \Closure $callback = null, $scope = null)
+    public function create(array $attrs, $scope = null)
     {
         throw new \yii\web\ForbiddenHttpException;
     }
@@ -26,15 +26,15 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
     /**
      * @inheritdoc
      */
-    public function read($pk, \Closure $callback = null)
+    public function read($pk)
     {
-        return parent::read($pk, $callback);
+        return parent::read($pk);
     }
     
     /**
      * @inheritdoc
      */
-    public function update($pk, array $attrs, \Closure $callback = null, $scope = null)
+    public function update($pk, array $attrs, $scope = null)
     {
         throw new \yii\web\ForbiddenHttpException;
     }
@@ -42,7 +42,7 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
     /**
      * @inheritdoc
      */
-    public function delete($pk, \Closure $callback = null)
+    public function delete($pk)
     {
         throw new \yii\web\ForbiddenHttpException;
     }

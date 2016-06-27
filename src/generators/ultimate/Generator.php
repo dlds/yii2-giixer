@@ -573,7 +573,10 @@ class Generator extends \yii\gii\generators\model\Generator {
             $relations[$this->tableName][$key][0] = str_replace($rules[1], $this->helperModel->getFullyQualifiedName($rules[1], true), $rules[0]);
         }
 
-        ksort($relations[$this->tableName]);
+        if ($relations && isset($relations[$this->tableName]))
+        {
+            ksort($relations[$this->tableName]);
+        }
 
         return $relations;
     }

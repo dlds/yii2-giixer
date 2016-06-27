@@ -13,6 +13,11 @@ class GxCrudEvent extends \yii\base\Event {
     const TYPE_DELETE = 40;
 
     /**
+     * @var int primary key
+     */
+    public $id;
+
+    /**
      * @var mixed input data
      */
     public $input;

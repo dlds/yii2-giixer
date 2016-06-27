@@ -46,7 +46,7 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
         $this->trigger(self::EVENT_BEFORE_CREATE, $event);
 
-        $this->createModel($attrs, $event, $scope);
+        $this->createModel($event, $scope);
 
         $this->trigger(self::EVENT_AFTER_CREATE, $event);
 
@@ -55,12 +55,12 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Read and retrieves AR model based on given primary key
-     * @param mixed $pk given primary key
+     * @param int|array $pk given primary key
      * @return instance | null if model was not found
      */
     public function read($pk)
     {
-        $event = new GxCrudEvent(['input' => $pk, 'type' => GxCrudEvent::TYPE_READ]);
+        $event = new GxCrudEvent(['id' => $pk, 'type' => GxCrudEvent::TYPE_READ]);
 
         $this->trigger(self::EVENT_BEFORE_READ, $event);
 
@@ -72,21 +72,21 @@ abstract class GxCrudHandler extends \yii\base\Component {
     }
 
     /**
-     * Updates AR model based on given pk and attrs
-     * @param mixed $pk given primary key
-     * @param array $attrs given attributes to be changed
+     * Updates AR model based on given pk
+     * @param intYarray $pk given primary key
+     * @param array $attrs given attributes
      * @param string $scope given scope for massive assignment
      * @return instance | null
      */
     public function update($pk, array $attrs, $scope = null)
     {
-        $event = new GxCrudEvent(['input' => $pk, 'type' => GxCrudEvent::TYPE_UPDATE]);
+        $event = new GxCrudEvent(['id' => $pk, 'input' => $attrs, 'type' => GxCrudEvent::TYPE_UPDATE]);
 
         $this->trigger(self::EVENT_BEFORE_UPDATE, $event);
 
         $this->findModel($event);
 
-        $this->updateModel($event, $attrs, $scope);
+        $this->updateModel($event, $scope);
 
         $this->trigger(self::EVENT_AFTER_UPDATE, $event);
 
@@ -95,12 +95,12 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Deletes ar model based on given primary key
-     * @param mixed $pk given primary key
+     * @param int|array $pk given primary key
      * @return boolean
      */
     public function delete($pk)
     {
-        $event = new GxCrudEvent(['input' => $pk, 'type' => GxCrudEvent::TYPE_DELETE]);
+        $event = new GxCrudEvent(['id' => $pk, 'type' => GxCrudEvent::TYPE_DELETE]);
 
         $this->trigger(self::EVENT_BEFORE_DELETE, $event);
 
@@ -133,27 +133,29 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Creates and retrieves new AR model instance
+     * @param GxCrudEvent $event
+     * @param string $scope alternative model scope
      * @return \yii\db\ActiveRecord instance
      */
-    protected function createModel(array $attrs, GxCrudEvent &$event, $scope = null)
+    protected function createModel(GxCrudEvent &$event, $scope = null)
     {
         $class = $this->modelClass();
 
         $event->model = new $class;
 
-        $this->updateModel($event, $attrs, $scope);
+        $this->updateModel($event, $scope);
     }
 
     /**
      * Finds AR model instance
-     * @param mixed $pk primary key in form of integer or array
+     * @param GxCrudEvent $event
      * @return mixed
      */
     protected function findModel(GxCrudEvent &$event)
     {
         $class = $this->modelClass();
 
-        $event->model = $class::findOne($event->input);
+        $event->model = $class::findOne($event->id);
 
         if (GxCrudEvent::TYPE_READ == $event->type)
         {
@@ -163,15 +165,15 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Changes model based on given attributes
-     * @param \yii\db\ActiveRecord $model given model to be changed
-     * @param array $attrs given attributes
+     * @param GxCrudEvent $event
+     * @param string $scope alternative model scope
      * @return mixed
      */
-    protected function updateModel(GxCrudEvent &$event, array $attrs, $scope = null)
+    protected function updateModel(GxCrudEvent &$event, $scope = null)
     {
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
-        if ($event->model && $event->model->load($attrs, $scope))
+        if ($event->model && $event->model->load($event->input, $scope))
         {
             $this->trigger(self::EVENT_BEFORE_CHANGE, $event);
 
@@ -183,7 +185,7 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Deletes given AR model instance
-     * @param mixed $pk primary key in form of integer or array
+     * @param GxCrudEvent $event
      * @return mixed
      */
     protected function deleteModel(GxCrudEvent &$event)

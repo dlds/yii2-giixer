@@ -140,7 +140,7 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
     }
 
     /**
-     * Image relation
+     * Images relation
      * @return ActiveQuery relation
      */
     public function getAssignedImages()

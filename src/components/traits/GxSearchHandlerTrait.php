@@ -20,7 +20,14 @@ trait GxSearchHandlerTrait {
      */
     public function __construct($params = [])
     {
-        $this->_params = [\yii\helpers\StringHelper::basename(static::className()) => $params];
+        $classname = \yii\helpers\StringHelper::basename(static::className());
+
+        if (!isset($params[$classname]))
+        {
+            $params = [$classname => $params];
+        }
+
+        $this->_params = $params;
 
         return parent::__construct();
     }
