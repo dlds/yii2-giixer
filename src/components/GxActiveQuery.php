@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @link http://www.digitaldeals.cz/
  * @copyright Copyright (c) 2016 Digital Deals s.r.o.
  * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
 
 namespace dlds\giixer\components;
@@ -13,7 +15,8 @@ namespace dlds\giixer\components;
 
  * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
-abstract class GxActiveQuery extends \yii\db\ActiveQuery {
+abstract class GxActiveQuery extends \yii\db\ActiveQuery
+{
 
     /**
      * Attaches required queries to be able to show recordPrint

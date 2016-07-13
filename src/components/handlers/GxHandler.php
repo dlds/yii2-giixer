@@ -1,10 +1,28 @@
 <?php
 
+/**
+ * @link http://www.digitaldeals.cz/
+ * @copyright Copyright (c) 2016 Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
+ */
+
 namespace dlds\giixer\components\handlers;
 
 use dlds\giixer\components\events\GxEvent;
 
-abstract class GxHandler extends \yii\base\Component {
+/**
+ * This is basic handler class used 
+ * for invoking validation on appropriate model class and
+ * based on validation result call appropriate callback
+ * ---
+ * This is useful for application controllers to keep its methods lean
+ * and well-arranged.
+ * ---
+ * @see http://www.yiiframework.com/doc-2.0/guide-concept-events.html
+ */
+abstract class GxHandler extends \yii\base\Component
+{
 
     // AFTER events
     const EVENT_AFTER_PROCESS = 'e_after_process';
@@ -20,17 +38,18 @@ abstract class GxHandler extends \yii\base\Component {
     {
         $class = $this->modelClass();
 
-        if (!is_subclass_of($class, \yii\base\Model::className()))
-        {
+        if (!is_subclass_of($class, \yii\base\Model::className())) {
             throw new \yii\base\ErrorException('Invalid model class. Method "getModelClass" has to retrieve Model descendant class.');
         }
     }
 
     /**
-     * Process new AR model
+     * Process handler
+     * ---
+     * Processes through GxEvent which holds all data about action
      * @param array $attrs given attributes
      * @param string $scope given scope for massive assignment
-     * @return instance | null
+     * @return instance|null
      */
     public function process(array $attrs, $scope = null)
     {
@@ -46,7 +65,7 @@ abstract class GxHandler extends \yii\base\Component {
     }
 
     /**
-     * Changes model based on given attributes
+     * Process model validation and run callback based on validation result
      * @param \yii\db\ActiveRecord $model given model to be changed
      * @param array $attrs given attributes
      * @return mixed
@@ -55,18 +74,17 @@ abstract class GxHandler extends \yii\base\Component {
     {
         $class = $this->modelClass();
 
+        // instantiate new class
         $event->model = new $class;
 
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
-        if ($event->model && $event->model->load($event->input, $scope))
-        {
-            if ($event->model->validate())
-            {
+        // load data into model
+        if ($event->model && $event->model->load($event->input, $scope)) {
+            // if model is valid run validCallback otherwise notValidCallback
+            if ($event->model->validate()) {
                 $this->validCallback($event);
-            }
-            else
-            {
+            } else {
                 $this->notValidCallback($event);
             }
         }

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @link http://www.digitaldeals.cz/
  * @copyright Copyright (c) 2016 Digital Deals s.r.o.
  * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
 
 namespace dlds\giixer\generators\ultimate;
@@ -20,7 +22,8 @@ use dlds\giixer\components\helpers\GxModelHelper;
  *
  * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
-class Generator extends \yii\gii\generators\model\Generator {
+class Generator extends \yii\gii\generators\model\Generator
+{
 
     /**
      * IDs
@@ -297,22 +300,19 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function init()
     {
-        if (!isset($this->templates[self::ID_CURRENT_TMPL]))
-        {
+        if (!isset($this->templates[self::ID_CURRENT_TMPL])) {
             $this->templates[self::ID_CURRENT_TMPL] = $this->tmplsRootDir();
         }
 
         $this->namespaces = Yii::$app->getModule('gii')->namespaces;
 
-        if (!empty($this->namespaces) && !is_array($this->namespaces))
-        {
+        if (!empty($this->namespaces) && !is_array($this->namespaces)) {
             throw new \yii\base\ErrorException('Giier namespaces should be array');
         }
 
         $translations = Yii::$app->getModule('gii')->translations;
 
-        if ($translations)
-        {
+        if ($translations) {
             $this->translations = $translations;
         }
 
@@ -360,60 +360,60 @@ class Generator extends \yii\gii\generators\model\Generator {
         GxModelHelper::removeValidationRules($rules, 'validateModelClass', ['modelClass']);
 
         return ArrayHelper::merge([
-                [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
-                [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
-                [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
-                [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
+                    [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
+                    [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
+                    [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
+                    [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
+                    [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
+                    [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
                     return $model->generateMutation;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatemutation').is(':checked');
                     }"],
-                [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
+                    [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
                     return trim($model->mutationIgnoredFormAttributes);
                 }],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
-                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
+                    [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
+                    [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
+                    [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
                     return $model->generateSluggableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                    [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
                     return $model->generateSluggableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                    [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
                     return $model->generateTimestampBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'required', 'when' => function($model) {
+                    [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'required', 'when' => function($model) {
                     return $model->generateTimestampBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
-                [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                    [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
+                    [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
                     return $model->generateSortableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
-                [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function($model) {
+                    [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function($model) {
                     return $model->generateSortableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
-                [['galleryTableName'], 'filter', 'filter' => 'trim'],
-                [['galleryTableName'], 'validateTableName'],
-                [['galleryTableName'], 'required', 'when' => function($model) {
+                    [['galleryTableName'], 'filter', 'filter' => 'trim'],
+                    [['galleryTableName'], 'validateTableName'],
+                    [['galleryTableName'], 'required', 'when' => function($model) {
                     return $model->generateGalleryBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generategallerybehavior').is(':checked');
                     }"],
-                ], $rules);
+                        ], $rules);
     }
 
     /**
@@ -496,8 +496,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     public function autoCompleteData()
     {
         $db = $this->getDbConnection();
-        if ($db !== null)
-        {
+        if ($db !== null) {
             return [
                 'tableName' => function () use ($db) {
                     return $db->getSchema()->getTableNames();
@@ -512,9 +511,7 @@ class Generator extends \yii\gii\generators\model\Generator {
                     return $db->getSchema()->getTableNames();
                 },
             ];
-        }
-        else
-        {
+        } else {
             return [];
         }
     }
@@ -524,8 +521,7 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function generate()
     {
-        if (self::ID_CURRENT_TMPL !== $this->template)
-        {
+        if (self::ID_CURRENT_TMPL !== $this->template) {
             return parent::generate();
         }
 
@@ -559,8 +555,7 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function generateRelations()
     {
-        if (!$this->generateRelations)
-        {
+        if (!$this->generateRelations) {
             return [];
         }
 
@@ -568,13 +563,11 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         $definitions = ArrayHelper::getValue($relations, $this->tableName, []);
 
-        foreach ($definitions as $key => $rules)
-        {
+        foreach ($definitions as $key => $rules) {
             $relations[$this->tableName][$key][0] = str_replace($rules[1], $this->helperModel->getFullyQualifiedName($rules[1], true), $rules[0]);
         }
 
-        if ($relations && isset($relations[$this->tableName]))
-        {
+        if ($relations && isset($relations[$this->tableName])) {
             ksort($relations[$this->tableName]);
         }
 
@@ -590,8 +583,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         $rules = parent::generateRules($table);
 
-        foreach ($rules as $key => $rule)
-        {
+        foreach ($rules as $key => $rule) {
             $rules[$key] = preg_replace_callback("/[A-Za-z]+::className\(\)/", function($matches) {
 
                 $match = ArrayHelper::getValue($matches, 0);
@@ -600,8 +592,7 @@ class Generator extends \yii\gii\generators\model\Generator {
 
                 $className = $this->helperModel->getFullyQualifiedName(ArrayHelper::getValue($class, 0), true);
 
-                if ($className)
-                {
+                if ($className) {
                     return sprintf('%s::className()', $className);
                 }
 
@@ -623,21 +614,18 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         $keys = false;
 
-        foreach ($schema->foreignKeys as $definition)
-        {
-            if ($this->tableName == $definition[0])
-            {
+        foreach ($schema->foreignKeys as $definition) {
+            if ($this->tableName == $definition[0]) {
                 $keys = $definition;
             }
         }
 
-        if ($keys && $asDefinition)
-        {
+        if ($keys && $asDefinition) {
             ArrayHelper::remove($keys, 0);
 
             $def = trim(str_replace(['array', '(', ')', ','], '', var_export($keys, true)));
 
-            return "[".$def."]";
+            return "[" . $def . "]";
         }
 
         return $keys;
@@ -664,7 +652,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         $viaLink = $this->generateRelationLink([$table->primaryKey[0] => $fks[$table->primaryKey[0]][1]]);
         $relationName = $this->generateRelationName($relations, $table0Schema, $table->primaryKey[1], true);
         $relations[$table0Schema->fullName][$relationName] = [
-            "return \$this->hasMany(\\".$this->helperModel->getNsByMap($className1)."\\$className1::className(), $link)->viaTable('".$this->generateTableName($table->name)."', $viaLink);",
+            "return \$this->hasMany(\\" . $this->helperModel->getNsByMap($className1) . "\\$className1::className(), $link)->viaTable('" . $this->generateTableName($table->name) . "', $viaLink);",
             $className1,
             true,
         ];
@@ -673,7 +661,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         $viaLink = $this->generateRelationLink([$table->primaryKey[1] => $fks[$table->primaryKey[1]][1]]);
         $relationName = $this->generateRelationName($relations, $table1Schema, $table->primaryKey[0], true);
         $relations[$table1Schema->fullName][$relationName] = [
-            "return \$this->hasMany(\\".$this->helperModel->getNsByMap($className0)."\\$className0::className(), $link)->viaTable('".$this->generateTableName($table->name)."', $viaLink);",
+            "return \$this->hasMany(\\" . $this->helperModel->getNsByMap($className0) . "\\$className0::className(), $link)->viaTable('" . $this->generateTableName($table->name) . "', $viaLink);",
             $className0,
             true,
         ];
@@ -689,8 +677,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         $db = $this->getDbConnection();
 
-        if ($table)
-        {
+        if ($table) {
             return $db->getTableSchema($table);
         }
 
@@ -705,16 +692,13 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getNameAttribute(\yii\db\TableSchema $table)
     {
-        foreach ($this->getColumnNames($table) as $name)
-        {
-            if (!strcasecmp($name, 'name') || !strcasecmp($name, 'title'))
-            {
+        foreach ($this->getColumnNames($table) as $name) {
+            if (!strcasecmp($name, 'name') || !strcasecmp($name, 'title')) {
                 return $name;
             }
         }
 
-        if (is_array($table->primaryKey))
-        {
+        if (is_array($table->primaryKey)) {
             return ArrayHelper::getValue($table->primaryKey, 0);
         }
 
@@ -729,51 +713,35 @@ class Generator extends \yii\gii\generators\model\Generator {
     public function generateActiveField($attribute)
     {
         $tableSchema = $this->getTableSchema();
-        if ($tableSchema === false || !isset($tableSchema->columns[$attribute]))
-        {
-            if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute))
-            {
+        if ($tableSchema === false || !isset($tableSchema->columns[$attribute])) {
+            if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute)) {
                 return "\$form->field(\$model, '$attribute')->passwordInput()";
-            }
-            else
-            {
+            } else {
                 return "\$form->field(\$model, '$attribute')";
             }
         }
         $column = $tableSchema->columns[$attribute];
 
-        if ($column->phpType === 'boolean')
-        {
+        if ($column->phpType === 'boolean') {
             return "\$form->field(\$model, '$attribute')->checkbox()";
-        }
-        elseif ($column->type === 'text')
-        {
+        } elseif ($column->type === 'text') {
             return "\$form->field(\$model, '$attribute')->textarea(['rows' => 6])";
-        }
-        elseif ($column->type === 'smallint' && preg_match('/^is_.*/', $column->name))
-        {
+        } elseif ($column->type === 'smallint' && preg_match('/^is_.*/', $column->name)) {
             return "\$form->field(\$model, '$attribute')->dropDownList(\\dlds\\giixer\\components\\fakers\\GxOptionsDataFaker::getBooleanOptions())";
-        }
-        elseif ($column->type === 'integer')
-        {
-            foreach ($tableSchema->foreignKeys as $fk)
-            {
+        } elseif ($column->type === 'integer') {
+            foreach ($tableSchema->foreignKeys as $fk) {
                 $refTable = ArrayHelper::getValue($fk, 0);
 
                 $refTableSchema = $this->getTableSchema($refTable);
 
                 $keys = array_keys($fk);
 
-                if (in_array($column->name, $keys) && $refTableSchema)
-                {
+                if (in_array($column->name, $keys) && $refTableSchema) {
                     $refClassName = $this->getClassForTable($refTable, true, true);
 
-                    if (is_array($refTableSchema->primaryKey))
-                    {
+                    if (is_array($refTableSchema->primaryKey)) {
                         $pk = ArrayHelper::getValue($refTableSchema->primaryKey, 0);
-                    }
-                    else
-                    {
+                    } else {
                         $pk = $refTableSchema->primaryKey;
                     }
 
@@ -782,33 +750,22 @@ class Generator extends \yii\gii\generators\model\Generator {
             }
 
             return "\$form->field(\$model, '$attribute')->textInput()";
-        }
-        else
-        {
-            if (preg_match('/^(password|pass|passwd|passcode)$/i', $column->name))
-            {
+        } else {
+            if (preg_match('/^(password|pass|passwd|passcode)$/i', $column->name)) {
                 $input = 'passwordInput';
-            }
-            else
-            {
+            } else {
                 $input = 'textInput';
             }
-            if (is_array($column->enumValues) && count($column->enumValues) > 0)
-            {
+            if (is_array($column->enumValues) && count($column->enumValues) > 0) {
                 $dropDownOptions = [];
-                foreach ($column->enumValues as $enumValue)
-                {
+                foreach ($column->enumValues as $enumValue) {
                     $dropDownOptions[$enumValue] = Inflector::humanize($enumValue);
                 }
                 return "\$form->field(\$model, '$attribute')->dropDownList("
-                    .preg_replace("/\n\s*/", ' ', VarDumper::export($dropDownOptions)).", ['prompt' => ''])";
-            }
-            elseif ($column->phpType !== 'string' || $column->size === null)
-            {
+                        . preg_replace("/\n\s*/", ' ', VarDumper::export($dropDownOptions)) . ", ['prompt' => ''])";
+            } elseif ($column->phpType !== 'string' || $column->size === null) {
                 return "\$form->field(\$model, '$attribute')->$input()";
-            }
-            else
-            {
+            } else {
                 return "\$form->field(\$model, '$attribute')->$input(['maxlength' => $column->size])";
             }
         }
@@ -822,17 +779,13 @@ class Generator extends \yii\gii\generators\model\Generator {
     public function generateActiveSearchField($attribute)
     {
         $tableSchema = $this->getTableSchema();
-        if ($tableSchema === false)
-        {
+        if ($tableSchema === false) {
             return "\$form->field(\$model, '$attribute')";
         }
         $column = $tableSchema->columns[$attribute];
-        if ($column->phpType === 'boolean')
-        {
+        if ($column->phpType === 'boolean') {
             return "\$form->field(\$model, '$attribute')->checkbox()";
-        }
-        else
-        {
+        } else {
             return "\$form->field(\$model, '$attribute')";
         }
     }
@@ -844,28 +797,17 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function generateColumnFormat($column)
     {
-        if ($column->phpType === 'boolean')
-        {
+        if ($column->phpType === 'boolean') {
             return 'boolean';
-        }
-        elseif ($column->type === 'text')
-        {
+        } elseif ($column->type === 'text') {
             return 'ntext';
-        }
-        elseif (stripos($column->name, 'time') !== false && $column->phpType === 'integer')
-        {
+        } elseif (stripos($column->name, 'time') !== false && $column->phpType === 'integer') {
             return 'datetime';
-        }
-        elseif (stripos($column->name, 'email') !== false)
-        {
+        } elseif (stripos($column->name, 'email') !== false) {
             return 'email';
-        }
-        elseif (stripos($column->name, 'url') !== false)
-        {
+        } elseif (stripos($column->name, 'url') !== false) {
             return 'url';
-        }
-        else
-        {
+        } else {
             return 'text';
         }
     }
@@ -893,15 +835,13 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getTranslationCategory($key = false)
     {
-        if ($key)
-        {
+        if ($key) {
             $rules = ArrayHelper::getValue(Yii::$app->getModule('gii')->messages, $key);
 
             return Module::findMatch($this->getModelClassName(), $rules, $key);
         }
 
-        if ($this->messageCategory)
-        {
+        if ($this->messageCategory) {
             return $this->messageCategory;
         }
 
@@ -913,8 +853,7 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getModelClassName()
     {
-        if ($this->modelClass)
-        {
+        if ($this->modelClass) {
             return $this->modelClass;
         }
 
@@ -926,8 +865,7 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getComponentNs($file, $className)
     {
-        if (isset($this->componentsFilesMap[$file]))
-        {
+        if (isset($this->componentsFilesMap[$file])) {
             return str_replace('{ns}', $this->getNsByMap($className, true), $this->componentsFilesMap[$file]);
         }
 
@@ -954,8 +892,7 @@ class Generator extends \yii\gii\generators\model\Generator {
         parent::validateNamespace($attribute);
 
         $this->nsCommon = ltrim($this->nsCommon, '\\');
-        if (false === strpos($this->nsCommon, 'app'))
-        {
+        if (false === strpos($this->nsCommon, 'app')) {
             $this->addError('ns', '@app namespace must be used.');
         }
     }
@@ -968,21 +905,15 @@ class Generator extends \yii\gii\generators\model\Generator {
     public function validateTemplate()
     {
         $templates = $this->templates;
-        if (!isset($templates[$this->template]))
-        {
+        if (!isset($templates[$this->template])) {
             $this->addError('template', 'Invalid template selection.');
-        }
-        else
-        {
+        } else {
             $templateRoot = $this->templates[$this->template];
-            foreach ($this->requiredTmplFiles() as $subDir => $tmpls)
-            {
-                foreach ($tmpls as $tmpl)
-                {
+            foreach ($this->requiredTmplFiles() as $subDir => $tmpls) {
+                foreach ($tmpls as $tmpl) {
                     $filePath = sprintf('%s/%s/%s', $templateRoot, $subDir, $tmpl);
 
-                    if (!is_file($filePath))
-                    {
+                    if (!is_file($filePath)) {
                         $this->addError('template', "Unable to find the required code template file '$filePath'.");
                     }
                 }
@@ -998,39 +929,30 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function validateAttributeExistence($attribute, $params)
     {
-        if (is_array($params))
-        {
+        if (is_array($params)) {
             $tblAttr = ArrayHelper::getValue($params, 'tblAttr');
-        }
-        else
-        {
+        } else {
             $tblAttr = false;
         }
 
-        if (!$tblAttr || !isset($this->$tblAttr))
-        {
+        if (!$tblAttr || !isset($this->$tblAttr)) {
             throw new \yii\base\InvalidConfigException('Invalid validator rule: a rule "validateAttributeExistence" requires additional parameter "tblAttr" to be specified which represents one of the generator\'s attribute holding appropriate table name.');
         }
 
         $db = $this->getDbConnection();
         $schema = $db->getTableSchema($this->$tblAttr, true);
 
-        if ($schema)
-        {
+        if ($schema) {
             $attributes = explode(',', $this->$attribute);
 
-            foreach ($attributes as $attr)
-            {
+            foreach ($attributes as $attr) {
                 $attr = trim($attr);
 
-                if (!in_array($attr, $schema->columnNames))
-                {
+                if (!in_array($attr, $schema->columnNames)) {
                     $this->addError($attribute, sprintf("Table '%s' does not contain attribute '%s'.", $this->$tblAttr, $attr));
                 }
             }
-        }
-        else
-        {
+        } else {
             $this->addError($attribute, sprintf("Schema for join table '%s' does not available.", $this->$tblAttr));
         }
     }
@@ -1043,14 +965,11 @@ class Generator extends \yii\gii\generators\model\Generator {
         $db = $this->getDbConnection();
         $schema = $db->getTableSchema($this->tableName, true);
 
-        if ($schema)
-        {
-            if (!in_array($this->$attribute, $schema->columnNames))
-            {
+        if ($schema) {
+            if (!in_array($this->$attribute, $schema->columnNames)) {
                 $mutationSchema = $db->getTableSchema($this->mutationJoinTableName, true);
 
-                if ($this->generateMutation && in_array($this->$attribute, $mutationSchema->columnNames))
-                {
+                if ($this->generateMutation && in_array($this->$attribute, $mutationSchema->columnNames)) {
                     return true;
                 }
 
@@ -1064,40 +983,30 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     protected function getTableNames()
     {
-        if ($this->tableNames !== null)
-        {
+        if ($this->tableNames !== null) {
             return $this->tableNames;
         }
 
         $db = $this->getDbConnection();
-        if ($db === null)
-        {
+        if ($db === null) {
             return [];
         }
         $tableNames = [];
-        if (strpos($this->tableName, '*') !== false)
-        {
-            if (($pos = strrpos($this->tableName, '.')) !== false)
-            {
+        if (strpos($this->tableName, '*') !== false) {
+            if (($pos = strrpos($this->tableName, '.')) !== false) {
                 $schema = substr($this->tableName, 0, $pos);
-                $pattern = '/^'.str_replace('*', '\w+', substr($this->tableName, $pos + 1)).'$/';
-            }
-            else
-            {
+                $pattern = '/^' . str_replace('*', '\w+', substr($this->tableName, $pos + 1)) . '$/';
+            } else {
                 $schema = '';
-                $pattern = '/^'.str_replace('*', '\w+', $this->tableName).'$/';
+                $pattern = '/^' . str_replace('*', '\w+', $this->tableName) . '$/';
             }
 
-            foreach ($db->schema->getTableNames($schema) as $table)
-            {
-                if (preg_match($pattern, $table))
-                {
-                    $tableNames[] = $schema === '' ? $table : ($schema.'.'.$table);
+            foreach ($db->schema->getTableNames($schema) as $table) {
+                if (preg_match($pattern, $table)) {
+                    $tableNames[] = $schema === '' ? $table : ($schema . '.' . $table);
                 }
             }
-        }
-        elseif (($table = $db->getTableSchema($this->tableName, true)) !== null)
-        {
+        } elseif (($table = $db->getTableSchema($this->tableName, true)) !== null) {
             $tableNames[] = $this->tableName;
 
             $this->classNames[$this->tableName] = $this->getModelClassName();
@@ -1118,7 +1027,7 @@ class Generator extends \yii\gii\generators\model\Generator {
 
         $classFileName = str_replace(Yii::getAlias('@dlds/giixer'), Yii::getAlias('@yii/gii'), $class->getFileName());
 
-        return dirname($classFileName).'/default';
+        return dirname($classFileName) . '/default';
     }
 
     /**
@@ -1151,8 +1060,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         $behaviors = [];
 
-        if ($this->generateMutation)
-        {
+        if ($this->generateMutation) {
             $modelClassName = $this->helperModel->getFullyQualifiedName($this->generateClassName($this->mutationJoinTableName), true);
 
             $db = $this->getDbConnection();
@@ -1172,8 +1080,7 @@ class Generator extends \yii\gii\generators\model\Generator {
             ];
         }
 
-        if ($this->generateGalleryBehavior)
-        {
+        if ($this->generateGalleryBehavior) {
             $modelClassName = $this->generateClassName($this->tableName);
 
             $helperClassName = sprintf('%s%s', $modelClassName, self::SUFFIX_CLASS_IMAGE_HELPER);
@@ -1191,52 +1098,43 @@ class Generator extends \yii\gii\generators\model\Generator {
             ];
         }
 
-        if ($this->generateTimestampBehavior)
-        {
+        if ($this->generateTimestampBehavior) {
             $behaviors[Module::BEHAVIOR_NAME_TIMESTAMP] = [
                 'class' => '\yii\behaviors\TimestampBehavior::className()',
             ];
 
-            if ($this->timestampCreatedAtAttribute && self::DEFAULT_TIMESTAMP_CREATED_AT_ATTR != $this->timestampCreatedAtAttribute)
-            {
+            if ($this->timestampCreatedAtAttribute && self::DEFAULT_TIMESTAMP_CREATED_AT_ATTR != $this->timestampCreatedAtAttribute) {
                 $behaviors[Module::BEHAVIOR_NAME_TIMESTAMP]['createdAtAttribute'] = $this->timestampCreatedAtAttribute;
             }
 
-            if ($this->timestampUpdatedAtAttribute && self::DEFAULT_TIMESTAMP_UPDATED_AT_ATTR != $this->timestampUpdatedAtAttribute)
-            {
+            if ($this->timestampUpdatedAtAttribute && self::DEFAULT_TIMESTAMP_UPDATED_AT_ATTR != $this->timestampUpdatedAtAttribute) {
                 $behaviors[Module::BEHAVIOR_NAME_TIMESTAMP]['updatedAtAttribute'] = $this->timestampUpdatedAtAttribute;
             }
         }
 
-        if ($this->generateSortableBehavior)
-        {
+        if ($this->generateSortableBehavior) {
             $behaviors[Module::BEHAVIOR_NAME_SORTABLE] = [
                 'class' => '\dlds\sortable\components\Behavior::className()',
             ];
 
-            if ($this->sortableKeyAttribute)
-            {
+            if ($this->sortableKeyAttribute) {
                 $behaviors[Module::BEHAVIOR_NAME_SORTABLE]['key'] = $this->sortableKeyAttribute;
             }
 
-            if ($this->sortableColumnAttribute)
-            {
+            if ($this->sortableColumnAttribute) {
                 $behaviors[Module::BEHAVIOR_NAME_SORTABLE]['column'] = $this->sortableColumnAttribute;
             }
 
-            if ($this->sortableIndexAttribute)
-            {
+            if ($this->sortableIndexAttribute) {
                 $behaviors[Module::BEHAVIOR_NAME_SORTABLE]['index'] = $this->sortableIndexAttribute;
             }
 
-            if ($this->sortableRestrictionsAttribute)
-            {
+            if ($this->sortableRestrictionsAttribute) {
                 $behaviors[Module::BEHAVIOR_NAME_SORTABLE]['restrictions'] = explode(',', $this->sortableRestrictionsAttribute);
             }
         }
 
-        if ($this->generateSluggableBehavior)
-        {
+        if ($this->generateSluggableBehavior) {
             $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE] = [
                 'class' => '\yii\behaviors\SluggableBehavior::className()',
             ];
@@ -1257,7 +1155,7 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getBehaviorConstantName($key)
     {
-        return Module::BEHAVIOR_CONSTANT_NAME_PREFIX.strtoupper($key);
+        return Module::BEHAVIOR_CONSTANT_NAME_PREFIX . strtoupper($key);
     }
 
     /**
@@ -1267,7 +1165,7 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function getBehaviorName($key)
     {
-        return Module::BEHAVIOR_NAME_PREFIX.$key;
+        return Module::BEHAVIOR_NAME_PREFIX . $key;
     }
 
     /**
@@ -1278,8 +1176,7 @@ class Generator extends \yii\gii\generators\model\Generator {
     {
         $class = $this->generateClassName($table);
 
-        if ($namespace)
-        {
+        if ($namespace) {
             return $this->helperModel->getFullyQualifiedName($class, $root);
         }
 
@@ -1312,34 +1209,25 @@ class Generator extends \yii\gii\generators\model\Generator {
     public function generateString($string = '', $placeholders = [])
     {
         $string = addslashes($string);
-        if ($this->enableI18N)
-        {
+        if ($this->enableI18N) {
             // If there are placeholders, use them
-            if (!empty($placeholders))
-            {
-                $ph = ', '.VarDumper::export($placeholders);
-            }
-            else
-            {
+            if (!empty($placeholders)) {
+                $ph = ', ' . VarDumper::export($placeholders);
+            } else {
                 $ph = '';
             }
-            $str = "Yii::t('".$this->getTranslationCategory()."', '".$string."'".$ph.")";
-        }
-        else
-        {
+            $str = "Yii::t('" . $this->getTranslationCategory() . "', '" . $string . "'" . $ph . ")";
+        } else {
             // No I18N, replace placeholders by real words, if any
-            if (!empty($placeholders))
-            {
+            if (!empty($placeholders)) {
                 $phKeys = array_map(function($word) {
-                    return '{'.$word.'}';
+                    return '{' . $word . '}';
                 }, array_keys($placeholders));
                 $phValues = array_values($placeholders);
-                $str = "'".str_replace($phKeys, $phValues, $string)."'";
-            }
-            else
-            {
+                $str = "'" . str_replace($phKeys, $phValues, $string) . "'";
+            } else {
                 // No placeholders, just the given string
-                $str = "'".$string."'";
+                $str = "'" . $string . "'";
             }
         }
         return $str;
@@ -1352,8 +1240,7 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function shouldBeQuoted($value)
     {
-        if (is_callable($value, true) && 'false' !== $value && 'true' !== $value && 'null' !== $value && false === strpos($value, '::') && !is_numeric($value))
-        {
+        if (is_callable($value, true) && 'false' !== $value && 'true' !== $value && 'null' !== $value && false === strpos($value, '::') && !is_numeric($value)) {
             return true;
         }
 
@@ -1398,11 +1285,11 @@ class Generator extends \yii\gii\generators\model\Generator {
      */
     public function filterSortAttrs($attrs)
     {
-        if (($key = array_search($this->sortableColumnAttribute, $attrs)) !== false)
-        {
+        if (($key = array_search($this->sortableColumnAttribute, $attrs)) !== false) {
             unset($attrs[$key]);
         }
 
         return $attrs;
     }
+
 }

@@ -230,12 +230,13 @@ is divided into modules and you need to generate classes for these modules.
 
 ```
 [
-    '^ModA[a-zA-Z]+Form$' => 'app\\modules\\moda\models\\forms'
-    '^ModB[a-zA-Z]+Form$' => 'app\\modules\\modb\\models\\forms'
-    '^ModA[a-zA-Z]+Search$' => 'app\\modules\\moda\\models\\db\\search',
-    '^ModB[a-zA-Z]+Search$' => 'app\\modules\\modb\\models\\db\\search',
+    '^Edu[a-zA-Z]+Form$' => 'app\\modules\\edu\models\\forms'
+    '^Shop[a-zA-Z]+Form$' => 'app\\modules\\shop\\models\\forms'
+    '^Edu[a-zA-Z]+Search$' => 'app\\modules\\edu\\models\\db\\search',
+    '^Shop[a-zA-Z]+Search$' => 'app\\modules\\shop\\models\\db\\search',
 ]
 ```
+In example above application has two modules Edu and Shop.
 
 Regex is used as array keys and required namespace is used for array values. 
 Giixer than use appropriate namespaces for matched class names and generates
@@ -250,7 +251,7 @@ Defines base classes for specific components, controllers and other application 
 ```
 [
 	dlds\giixer\Module::BASE_CONTROLLER_BACKEND => [
-    	'^ModA[a-zA-Z]+Controller$' => 'backend\\modules\\edu\\controllers\\base\\EduBaseController',
+    	'^Edu[a-zA-Z]+Controller$' => 'backend\\modules\\edu\\controllers\\base\\EduBaseController',
 		'^Shop[a-zA-Z]+Controller$' => 'backend\\modules\\shop\\controllers\\base\\ShopBaseController',
 	],
 	dlds\giixer\Module::BASE_CONTROLLER_FRONTEND => [

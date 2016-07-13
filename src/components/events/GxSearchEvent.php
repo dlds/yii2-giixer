@@ -1,8 +1,22 @@
 <?php
 
+/**
+ * @link http://www.digitaldeals.cz/
+ * @copyright Copyright (c) 2016 Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
+ */
+
 namespace dlds\giixer\components\events;
 
-class GxSearchEvent extends \yii\base\Event {
+/**
+ * This is search event class which is used by GxSearchHandler descendants
+ * to hold dataProvider for current search and input query params
+ * @see http://www.yiiframework.com/doc-2.0/guide-concept-events.html
+ * @see http://www.yiiframework.com/doc-2.0/guide-output-data-providers.html
+ */
+class GxSearchEvent extends \yii\base\Event
+{
 
     /**
      * Event names
@@ -28,4 +42,5 @@ class GxSearchEvent extends \yii\base\Event {
     {
         return $this->dataProvider instanceof \yii\data\ActiveDataProvider;
     }
+
 }

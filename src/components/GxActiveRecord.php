@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @link http://www.digitaldeals.cz/
  * @copyright Copyright (c) 2016 Digital Deals s.r.o.
  * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
 
 namespace dlds\giixer\components;
@@ -17,7 +19,8 @@ use dlds\giixer\components\helpers\GxModelHelper;
 
  * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
-abstract class GxActiveRecord extends ActiveRecord {
+abstract class GxActiveRecord extends ActiveRecord
+{
 
     // <editor-fold defaultstate="collapsed" desc="CONSTANTS: Behaviors names">
     const BN_GALLERY_MANAGER = 'b_gallery_manager';
@@ -43,8 +46,7 @@ abstract class GxActiveRecord extends ActiveRecord {
     {
         $data = GxModelHelper::adaptToMassiveAssignment($data, static::className());
 
-        if (false === $formName)
-        {
+        if (false === $formName) {
             $formName = '';
         }
 
@@ -58,12 +60,10 @@ abstract class GxActiveRecord extends ActiveRecord {
     {
         $behavior = $this->getBehavior(self::BN_MUTATION);
 
-        if ($behavior && in_array($attribute, $behavior->attrs))
-        {
+        if ($behavior && in_array($attribute, $behavior->attrs)) {
             $relation = ArrayHelper::getValue($behavior->config, 3, false);
 
-            if ($relation)
-            {
+            if ($relation) {
                 $attribute = sprintf('%s.%s', $relation, $attribute);
             }
         }
@@ -121,11 +121,11 @@ abstract class GxActiveRecord extends ActiveRecord {
     {
         $records = [];
 
-        foreach ($data as $row)
-        {
+        foreach ($data as $row) {
             $records[] = new static($row);
         }
 
         return $records;
     }
+
 }

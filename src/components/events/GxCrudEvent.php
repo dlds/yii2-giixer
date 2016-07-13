@@ -1,7 +1,20 @@
 <?php
 
+/**
+ * @link http://www.digitaldeals.cz/
+ * @copyright Copyright (c) 2016 Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
+ */
+
 namespace dlds\giixer\components\events;
 
+/**
+ * This is simple CRUD event class used by GxCrudHandler descendants.
+ * Class holds type of CRUD action, input data, primary key and instance 
+ * of assigned AR and result of CRUD action.
+ * @see http://www.yiiframework.com/doc-2.0/guide-concept-events.html
+ */
 class GxCrudEvent extends \yii\base\Event
 {
 
@@ -82,4 +95,5 @@ class GxCrudEvent extends \yii\base\Event
     {
         return null !== $this->result;
     }
+
 }

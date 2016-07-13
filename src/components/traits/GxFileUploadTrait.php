@@ -1,8 +1,22 @@
 <?php
 
+/**
+ * @link http://www.digitaldeals.cz/
+ * @copyright Copyright (c) 2016 Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
+ */
+
 namespace dlds\giixer\components\traits;
 
-trait GxFileUploadTrait {
+/**
+ * This is simple FileUpload trait handling single or multiple file uploads.
+ * ---
+ * It comes with ready to use validation, file holder and file storing.
+ * @see http://www.yiiframework.com/doc-2.0/yii-web-uploadedfile.html
+ */
+trait GxFileUploadTrait
+{
 
     /**
      * Runs saving of uploaded files
@@ -12,17 +26,14 @@ trait GxFileUploadTrait {
     {
         $files = $this->getFileHolder();
 
-        if (!is_array($files))
-        {
+        if (!is_array($files)) {
             $files = [$files];
         }
 
-        if ($this->validate())
-        {
+        if ($this->validate()) {
             $paths = [];
 
-            foreach ($files as $key => $file)
-            {
+            foreach ($files as $key => $file) {
                 $paths[$key] = $this->getFilePath($file);
 
                 $file->saveAs($paths[$key], true);
@@ -52,8 +63,7 @@ trait GxFileUploadTrait {
     {
         $dir = $this->getUploadDir();
 
-        if (!file_exists($dir))
-        {
+        if (!file_exists($dir)) {
             @mkdir($dir, 0755, true);
         }
 

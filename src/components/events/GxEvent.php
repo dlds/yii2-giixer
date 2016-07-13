@@ -1,8 +1,21 @@
 <?php
 
+/**
+ * @link http://www.digitaldeals.cz/
+ * @copyright Copyright (c) 2016 Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
+ */
+
 namespace dlds\giixer\components\events;
 
-class GxEvent extends \yii\base\Event {
+/**
+ * This is basic event class used by GxHandler. Holds input data, assigned model,
+ * and result of handler action.
+ * @see http://www.yiiframework.com/doc-2.0/guide-concept-events.html
+ */
+class GxEvent extends \yii\base\Event
+{
 
     /**
      * @var mixed input data
@@ -43,4 +56,5 @@ class GxEvent extends \yii\base\Event {
     {
         $this->result = false;
     }
+
 }

@@ -2,8 +2,9 @@
 
 /**
  * @link http://www.digitaldeals.cz/
- * @copyright Copyright (c) Digital Deals s.r.o. 
+ * @copyright Copyright (c) 2016 Digital Deals s.r.o.
  * @license http://www.digitaldeals.cz/license/
+ * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
 
 namespace dlds\giixer;
