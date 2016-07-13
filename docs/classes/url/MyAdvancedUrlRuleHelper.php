@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2016  &copy; Digital Deals s.r.o.
  * @license http://www.digitaldeals.cz/license/
@@ -37,8 +38,7 @@ class MyAdvancedUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleH
      * --------------------
      * @return string rule
      */
-    public static function view($canonicals = false)
-    {
+    public static function view() {
         // gets appropriate route
         $route = \frontend\components\helpers\url\routes\MyBasicRouteHelper::ROUTE_VIEW;
 
@@ -55,10 +55,8 @@ class MyAdvancedUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleH
      * @see http://www.yiiframework.com/doc-2.0/yii-web-urlmanager.html#createUrl()-detail
      * @return final url
      */
-    public function createUrl($manager, $route, $params)
-    {
-        if ($route === \frontend\components\helpers\url\routes\MyBasicRouteHelper::ROUTE_VIEW)
-        {
+    public function createUrl($manager, $route, $params) {
+        if ($route === \frontend\components\helpers\url\routes\MyBasicRouteHelper::ROUTE_VIEW) {
             return $this->createViewUrl($manager, $route, $params);
         }
 
@@ -71,10 +69,8 @@ class MyAdvancedUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleH
      * @see http://www.yiiframework.com/doc-2.0/yii-web-urlmanager.html#parseRequest()-detail
      * @return matched route
      */
-    public function parseRequest($manager, $request)
-    {
-        if ($this->route === \frontend\components\helpers\url\routes\MyBasicRouteHelper::ROUTE_VIEW)
-        {
+    public function parseRequest($manager, $request) {
+        if ($this->route === \frontend\components\helpers\url\routes\MyBasicRouteHelper::ROUTE_VIEW) {
             return $this->parseViewRequest($manager, $request);
         }
 
@@ -85,24 +81,21 @@ class MyAdvancedUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleH
      * Creates custom view url with ability to pull custom slug of
      * appropriate AR model from DB and use it in final url
      */
-    protected function createViewUrl($manager, $route, $params)
-    {
+    protected function createViewUrl($manager, $route, $params) {
         // routes are always based on AR models primary keys so to avoid showing
         // this primary key in url we have to remove it from route params
         $id = \yii\helpers\ArrayHelper::remove($params, 'id');
 
         // if there is no 'id' in route this rule will not match
-        if ($id)
-        {
+        if ($id) {
             // finds appropriate AR model based on its primary key in current route
             $model = \frontend\models\db\MyBasic::findOne($id);
 
             // if there is no AR with given primary key this rule will not match
-            if ($model)
-            {
+            if ($model) {
                 // we have to push custom AR model slug to current route
                 return parent::createUrl($manager, $route, \yii\helpers\ArrayHelper::merge($params, [
-                            'slug' => $model->slug,
+                                    'slug' => $model->slug,
                 ]));
             }
         }
@@ -114,22 +107,19 @@ class MyAdvancedUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleH
      * Parses current view request with ability to match custom slugs
      * appropriate AR model
      */
-    protected function parseViewRequest($manager, $request)
-    {
+    protected function parseViewRequest($manager, $request) {
         // gets all request params
         $params = ArrayHelper::getValue(parent::parseRequest($manager, $request), 1);
 
         // if there is no params in current request this rule will not match
-        if ($params)
-        {
+        if ($params) {
             // finds model by current slug
             $model = \frontend\models\db\MyBasic::find()->andWhere([
-                    \frontend\models\db\MyBasic::tablename().'.slug' => ArrayHelper::getValue($params, 'post')
-                ])->one();
+                        \frontend\models\db\MyBasic::tablename() . '.slug' => ArrayHelper::getValue($params, 'post')
+                    ])->one();
 
             // if model is not found this rule will not match
-            if (!$model)
-            {
+            if (!$model) {
                 return false;
             }
 
@@ -146,4 +136,5 @@ class MyAdvancedUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleH
 
         return false;
     }
+
 }

@@ -17,8 +17,9 @@ abstract class <?= $generator->helperComponent->getHandlerClass(basename(__FILE_
 
     /**
      * @inheritdoc
+     * @return <?= $generator->helperModel->getModelClass(false, true)."\n" ?>
      */
-    public function modelClass()
+    protected function modelClass()
     {
         return <?= $generator->helperModel->getModelClass(false, true) ?>::classname();
     }

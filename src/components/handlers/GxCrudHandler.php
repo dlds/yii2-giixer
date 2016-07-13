@@ -1,10 +1,31 @@
 <?php
 
+/**
+ * @link http://www.digitaldeals.cz/
+ * @copyright Copyright (c) 2014 Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ */
+
 namespace dlds\giixer\components\handlers;
 
 use dlds\giixer\components\events\GxCrudEvent;
 
-abstract class GxCrudHandler extends \yii\base\Component {
+/**
+ * This is base CRUD handler class used 
+ * for invoking Create, Read, Update, Delete event on AR models classes.
+ * ---
+ * CRUD handler defines scenarion for these events/actions and handles
+ * proccesing of appropriate methods on AR models together with
+ * invoking Event filled with appropriate data
+ * ---
+ * This is useful for application controllers to keep its methods lean
+ * and well-arranged.
+ * ---
+ * @see http://www.yiiframework.com/doc-2.0/guide-db-active-record.html
+ * @see http://www.yiiframework.com/doc-2.0/guide-concept-events.html
+ */
+abstract class GxCrudHandler extends \yii\base\Component
+{
 
     // AFTER events
     const EVENT_AFTER_CREATE = 'e_after_create';
@@ -28,17 +49,20 @@ abstract class GxCrudHandler extends \yii\base\Component {
     {
         $class = $this->modelClass();
 
-        if (!is_subclass_of($class, \yii\db\ActiveRecord::className()))
-        {
+        if (!is_subclass_of($class, \yii\db\ActiveRecord::className())) {
             throw new \yii\base\ErrorException('Invalid model class. Method "getModelClass" has to retrieve ActiveRecord descendant class.');
         }
     }
 
     /**
      * Creates new AR model
+     * ---
+     * Processes whole Create action through GxCrudEvent
+     * where all information about action result is stored
+     * ---
      * @param array $attrs given attributes
      * @param string $scope given scope for massive assignment
-     * @return instance | null
+     * @return instance|null
      */
     public function create(array $attrs, $scope = null)
     {
@@ -55,6 +79,10 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Read and retrieves AR model based on given primary key
+     * ---
+     * Processes whole Read action through GxCrudEvent
+     * where all information about action result is stored
+     * ---
      * @param int|array $pk given primary key
      * @return instance | null if model was not found
      */
@@ -73,7 +101,11 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Updates AR model based on given pk
-     * @param intYarray $pk given primary key
+     * ---
+     * Processes whole Update action through GxCrudEvent
+     * where all information about action result is stored
+     * ---
+     * @param int|array $pk given primary key
      * @param array $attrs given attributes
      * @param string $scope given scope for massive assignment
      * @return instance | null
@@ -95,6 +127,10 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
     /**
      * Deletes ar model based on given primary key
+     * ---
+     * Processes whole Delete action through GxCrudEvent
+     * where all information about action result is stored
+     * ---
      * @param int|array $pk given primary key
      * @return boolean
      */
@@ -157,8 +193,7 @@ abstract class GxCrudHandler extends \yii\base\Component {
 
         $event->model = $class::findOne($event->id);
 
-        if (GxCrudEvent::TYPE_READ == $event->type)
-        {
+        if (GxCrudEvent::TYPE_READ == $event->type) {
             $event->result = (boolean) $event->model;
         }
     }
@@ -173,8 +208,7 @@ abstract class GxCrudHandler extends \yii\base\Component {
     {
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
-        if ($event->model && $event->model->load($event->input, $scope))
-        {
+        if ($event->model && $event->model->load($event->input, $scope)) {
             $this->trigger(self::EVENT_BEFORE_CHANGE, $event);
 
             $event->result = $event->model->save();
@@ -190,8 +224,7 @@ abstract class GxCrudHandler extends \yii\base\Component {
      */
     protected function deleteModel(GxCrudEvent &$event)
     {
-        if ($event->model)
-        {
+        if ($event->model) {
             $event->result = $event->model->delete();
         }
     }

@@ -41,7 +41,7 @@ abstract class GxActiveRecord extends ActiveRecord {
      */
     public function load($data, $formName = null)
     {
-        GxModelHelper::adaptData($data, static::className());
+        $data = GxModelHelper::adaptToMassiveAssignment($data, static::className());
 
         if (false === $formName)
         {

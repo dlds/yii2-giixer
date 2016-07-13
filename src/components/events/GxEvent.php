@@ -14,4 +14,33 @@ class GxEvent extends \yii\base\Event {
      */
     public $model;
 
+    /**
+     * @var boolean status holder
+     */
+    protected $result;
+
+    /**
+     * Indicates if status holder holds true
+     * @return boolean
+     */
+    public function isSuccess()
+    {
+        return true === $this->result;
+    }
+
+    /**
+     * Sets current status holder to true
+     */
+    public function setSuccess()
+    {
+        $this->result = true;
+    }
+
+    /**
+     * Sets current status holder to false
+     */
+    public function setFail()
+    {
+        $this->result = false;
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2016  &copy; Digital Deals s.r.o.
  * @license http://www.digitaldeals.cz/license/
@@ -39,8 +40,7 @@ class MyBasicUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleHelp
      * so it is easy to have multilangual routing system
      * @return string rule
      */
-    public static function index()
-    {
+    public static function index() {
         // gets appropriate route for this rule
         $route = \frontend\components\helpers\url\routes\MyBasicRouteHelper::ROUTE_INDEX;
 
@@ -59,8 +59,7 @@ class MyBasicUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleHelp
      * so it is easy to have multilangual routing system
      * @return string rule
      */
-    public static function view()
-    {
+    public static function view() {
         // gets appropriate route for this rule
         $route = \frontend\modules\tools\components\helpers\url\routes\ToolsCompassValueRouteHelper::ROUTE_VIEW;
 
@@ -72,4 +71,5 @@ class MyBasicUrlRuleHelper extends \dlds\giixer\components\helpers\GxUrlRuleHelp
         // retrieves final rule - it is possible to define host, verb and mode as additional parameters
         return self::getRule($pattern, $route);
     }
+
 }

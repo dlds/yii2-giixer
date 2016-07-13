@@ -3,8 +3,8 @@ Yii2 Giixer
 
 Extended gii module for Yii2 including a bunch of useful handler, helpers, traits
 and other components. This module generates required models, controllers and other
-classes with dependency on own components. Default yii-gii generator is not available
-and is replaced by when your are usint this module.
+classes with dependency on own components. Default yii-gii generator is not available 
+when your are usint yii2-giiixer module.
 
 ## Installation
 
@@ -30,42 +30,44 @@ There is not any migration required to run. Module itself does not store any dat
 
 ## Structure
 
-Giixer defines its own easy to maintain and extend application structure which
-is sligtly different than default gii generated structure. Below you can find 
+Giixer defines its own easy to maintain and extendable application structure which
+is sligtly different from default (gii generated) structure. Below you can find 
 what all and how giixer generates.
 
 ### ActiveRecords
 
-Giixer uses its own ActiveRecords (AR) nested strucutre. Below are all 4 ARs 
+Giixer uses its own ActiveRecords (AR) strucutre. Below are all 4 ARs 
 with descriptions about what they stand for. Each is placed on notional level as in application.
 
 1. **Base AR**
-    * Top level and not editable AR 
+    * Top level and not editable AR
     * Maintained only by giixer itself.
     * Always extends **GxActiveRecord**
-    * Manual changes may be lost after next giixer generation
+    * Manual changes are lost after next giixer generation
     * File is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
 2. **Common AR**
     * Extends **Base AR**
     * Editable and maintained by developer
-    * Changes **will not** be lost after any giixer generation
+    * Manual changes **are not** lost after any giixer generation
     * File is placed in `common\models\db` or `common\modules\modulename\models\db`
 3. **Frontend/Backend AR**
     * Extends **Common AR**
     * Low level AR 
     * Editable and maintained by developer
     * Lie in separate application scopes `frontend` or `backend`
-    * Only these can be directly used by application
+    * Only these models can be directly used by application
     * Namespaces are usually `app\models\db` or `app\modules\modulename\models\db` 
     * Files are placed in corresponding location to their namespaces with `app` replaced by `frontend` or `backend`
 
-This AR model structure gives you opportunity to easily change your DB strucutre
-and still be able to regenerate your AR models without loosing your current code changes
+> Structure schema is shown in [this diagram](https://github.com/dlds/yii2-giixer/blob/master/docs/schemas/ar_structure.png)
+
+This AR model structure gives you opportunity to easily update your DB schema
+and still be able to regenerate your AR models without loosing your current code changes.
 
 Because of same namespace for backend and frontend AR you can easily move some application logic to common scope
 and avoid code duplication while AR models will be still found.
 
-> Structure schema is shown in [this diagram](https://github.com/dlds/yii2-giixer/blob/master/docs/schemas/ar_structure.png)
+> Some additional features stored in **Base AR** is shown in [MyModel](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/models/MyModel.php)
 
 ### ActiveQueries
 
@@ -90,8 +92,15 @@ does not have access to backend application scope and vice versa.
 
 > Structure schema is shown in [this diagram](https://github.com/dlds/yii2-giixer/blob/master/docs/schemas/aq_structure.png)
 
+Giixer generated default AQ logic stored in **Common AQ** to be able to easily use appropriate AR model class in custom queries.
+
+> Default AQ logic is show in [MyModelQuery](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/models/MyModelQuery.php)
 
 ### Helpers
+
+Giixer defines bunch of useful helpers. Below you can see which helpers giixer offers.
+
+#### URL Helpers
 
 Own url route and rule helpers are generated for each AR model.
 
@@ -112,9 +121,9 @@ Giixer creates following 2 helpers (HLP) for both `backend` and `frontend` appli
 
 Main idea of both helpers is to encapsulate rules/routes in single class and provide developer with easy interface for using it.
 
-> Basic route and rule helpers examples: [MyBasicRouteHelper](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/MyBasicRouteHelper.php), [MyBasicUrlRuleHelper](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/MyBasicUrlRuleHelper.php)
+> Basic route and rule helpers examples: [MyBasicRouteHelper](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/url/MyBasicRouteHelper.php), [MyBasicUrlRuleHelper](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/url/MyBasicUrlRuleHelper.php)
 
-To be able to have url slug defined in translation files and work properly you have to load your rules in application bootstrap like bellow.
+To be able to have translatable url slug defined in translation files (i18n) you have to load your rules in application bootstrap like bellow.
 Otherwise translation will not work. See [Yii2 Adding Rules Dynamically](http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html#adding-rules)
 
 ```
@@ -166,28 +175,33 @@ Than in application config you just set your AppBootstrapHandler to be processed
 
 **TIP:** Usually you want to have better looking urls without model primary key shown in it. For instance you have own CMS system
 where each of your `Post` model has its own slug looks like `my-custom-post-title` and you want to have final url be
-like `http://www.mydomain.com/my-custom-post-title/`. For this case you have to update your **UrlRuleHelper** class according to [MyAdvancedRuleHelper](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/MyAdvancedUrlRuleHelper.php)
+like `http://www.mydomain.com/my-custom-post-title/`. For this case you have to update your **UrlRuleHelper** class according to [MyAdvancedRuleHelper](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/url/MyAdvancedUrlRuleHelper.php)
 
+#### Model Helper
+
+This helper defines methods used in **GxActiveRecord** class. There are methods for adapting query params to pass mass assignemnt, methods to easily change validation rules or scenario definitions.
+
+> For more information see [GxModelHelper](https://github.com/dlds/yii2-giixer/blob/master/src/components/helpers/GxModelHelper.php)
+
+#### Other Helpers
+
+Giixer defines a few another helper class which is more or less complex and useful in basic manipulation with application. Each helper has it own well-documented class.
+
+> For more information see [Giixer Helpers](https://github.com/dlds/yii2-giixer/blob/master/src/components/helpers)
 
 ### Handlers
 
-Own url route and rule helpers are generated for each AR model.
+Giixer defines two main handler class useful for controllers to keep its methods lean and well-arranged.
 
-Giixer creates following 2 helpers (HLP) for both `backend` and `frontend` application.
+1. **GxCrudHandler**
+    * Defines its own approach of Create, Read, Update, Delete methods
+    * Invokes **GxCrudEvent** during each action which holds all data about action result
+    * Usually used for manipulationg standart AR model classes and their appropriate DB entries
+2. **GxHandler**
+    * Defines its own approach to validate model and based on validation result processes appropriate callback
+    * Usually used for non AR models manipulation when save() means creating multiple ARs etc...
 
-1. **Route HLP**
-    * Extends `\dlds\giixer\components\helpers\GxRouteHelper` or your custom class set in `helperRouteBaseClass` (see **Configuration** section)
-    * Contains all default routes generated by giixer
-    * Directly used by application
-    * Frontend file is placed in `frontend\components\helpers\url\routes` or `frontend\modules\modulename\components\helpers\url\routes`
-    * Backend file is placed in `backend\components\helpers\url\routes` or `backend\modules\modulename\components\helpers\url\routes`
-2. **Rule HLP**
-    * Extends `\dlds\giixer\components\helpers\GxUrlRuleHelper` or your custom class set in `helperRuleBaseClass` (see **Configuration** section)
-    * Contains rules for all giixer generated routes
-    * Usually used in url rules configuration
-    * Frontend file is placed in `frontend\components\helpers\url\rules` or `frontend\modules\modulename\components\helpers\url\rules`
-    * Backend file is placed in `backend\components\helpers\url\rules` or `backend\modules\modulename\components\helpers\url\rules`
-
+> For more information see [Giixer Handlers](https://github.com/dlds/yii2-giixer/blob/master/src/components/handlers)
 
 ## Configuration
 

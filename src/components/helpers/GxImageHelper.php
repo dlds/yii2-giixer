@@ -1,10 +1,28 @@
 <?php
 
+/**
+ * @link http://www.digitaldeals.cz/
+ * @copyright Copyright (c) 2014 Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ */
+
 namespace dlds\giixer\components\helpers;
 
 use yii\helpers\StringHelper;
 
-abstract class GxImageHelper {
+/**
+ * This is image helper class defining basic methods for image manipulation
+ * ---
+ * Application has to define path aliases @res for resource directory 
+ * and @web for web accesible content dir
+ * ---
+ * Class defines basic image versions (thumbnails), allowed types, ...
+ * ---
+ * Works with Imagine library
+ * @see https://imagine.readthedocs.io/en/latest/
+ */
+abstract class GxImageHelper
+{
 
     /**
      * Global versions
@@ -14,6 +32,12 @@ abstract class GxImageHelper {
     const VERSION_MD = 920;
     const VERSION_LG = 930;
     const VERSION_XL = 940;
+
+    /**
+     * Path aliases names
+     */
+    const AN_RESOURCES = '@res';
+    const AN_WEB = '@web';
 
     /**
      * Paths tmlps
@@ -76,7 +100,7 @@ abstract class GxImageHelper {
      */
     public static function getDirectory()
     {
-        return \Yii::getAlias('@res', false).DIRECTORY_SEPARATOR.sprintf(self::TMPL_IMG_PATH, static::getType());
+        return \Yii::getAlias(self::AN_RESOURCES, false) . DIRECTORY_SEPARATOR . sprintf(self::TMPL_IMG_PATH, static::getType());
     }
 
     /**
@@ -86,7 +110,7 @@ abstract class GxImageHelper {
      */
     public static function getUrl()
     {
-        return \Yii::getAlias('@web', false).DIRECTORY_SEPARATOR.sprintf(self::TMPL_IMG_PATH, static::getType());
+        return \Yii::getAlias(self::AN_WEB, false) . DIRECTORY_SEPARATOR . sprintf(self::TMPL_IMG_PATH, static::getType());
     }
 
     /**
@@ -96,4 +120,5 @@ abstract class GxImageHelper {
     {
         return __CLASS__;
     }
+
 }

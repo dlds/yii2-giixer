@@ -36,4 +36,16 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery {
     {
         return new \yii\data\ActiveDataProvider(\yii\helpers\ArrayHelper::merge(['query' => $this], $config));
     }
+
+    /**
+     * Retrieves assigned model class
+     * @return \yii\db\ActiveRecord
+     */
+    abstract protected function modelClass();
+
+    /**
+     * Retrieves assigned model table
+     * @return string
+     */
+    abstract protected function modelTable();
 }

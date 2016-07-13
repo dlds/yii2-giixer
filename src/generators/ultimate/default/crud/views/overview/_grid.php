@@ -21,13 +21,7 @@ use ".$generator->helperComponent->getHelperClass('backendUrlRouteHelper', false
 ?>
 
 <?php
-\$columns = [
-    [
-        'attribute' => 'id',
-        'contentOptions' => [
-            'class' => 'w60 text-center',
-        ],
-    ],"
+\$columns = ["
 ?>
 
 <?php

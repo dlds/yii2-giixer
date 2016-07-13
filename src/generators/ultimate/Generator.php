@@ -1241,7 +1241,7 @@ class Generator extends \yii\gii\generators\model\Generator {
                 'class' => '\yii\behaviors\SluggableBehavior::className()',
             ];
 
-            $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['attribute'] = $this->sluggableBehaviorSourceAttribute;
+            $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['attribute'] = explode(',', $this->sluggableBehaviorSourceAttribute);
             $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['slugAttribute'] = $this->sluggableBehaviorTargetAttribute;
             $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['ensureUnique'] = $this->getBooleanQuoted($this->sluggableBehaviorEnsureUnique);
             $behaviors[Module::BEHAVIOR_NAME_SLUGGABLE]['immutable'] = $this->getBooleanQuoted($this->sluggableBehaviorImutable);

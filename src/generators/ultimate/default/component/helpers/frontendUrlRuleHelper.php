@@ -13,7 +13,8 @@ namespace <?= $generator->helperComponent->getNsByPattern(basename(__FILE__, '.p
  * @inheritdoc
  * @see <?= $generator->helperComponent->getHelperParentClass(basename(__FILE__, '.php'), false, true)."\n" ?>
  */
-class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true) ?> extends <?= $generator->helperComponent->getHelperParentClass(basename(__FILE__, '.php'), false, true) ?> {
+class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true) ?> extends <?= $generator->helperComponent->getHelperParentClass(basename(__FILE__, '.php'), false, true) ?> 
+{
 
     /**
      * Retrieves index rule
@@ -32,12 +33,28 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
      * Retrieves view rule
      * @return string rule
      */
-    public static function view($route = false)
+    public static function view()
     {
         $route = <?= $generator->helperComponent->getHelperClass('frontendUrlRouteHelper') ?>::ROUTE_VIEW;
 
         $pattern = $route;
 
         return self::getRule($pattern, $route);
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public static function getHostDefinition($host = false)
+    {
+        return false;
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public static function getHostDefault()
+    {
+        return false;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link http://www.digitaldeals.cz/
  * @copyright Copyright (c) Digital Deals s.r.o. 
@@ -13,7 +14,8 @@ namespace dlds\giixer;
  *
  * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
-class Module extends \yii\gii\Module {
+class Module extends \yii\gii\Module
+{
 
     /**
      * Bases identifications
@@ -61,6 +63,11 @@ class Module extends \yii\gii\Module {
     const CLASS_BASENAME = 1;
     const CLASS_FULLNAME = 2;
     const CLASS_FULLNAME_USEABLE = 3;
+
+    /**
+     * Module translation category
+     */
+    const I18N_CATEGORY = 'dlds/giixer';
 
     /**
      * @var array preddefined namespaces map
@@ -111,15 +118,13 @@ class Module extends \yii\gii\Module {
      */
     public function getBaseClass($child, $key)
     {
-        if (!$key)
-        {
+        if (!$key) {
             return self::DEFAULT_BASE_COMPONENT;
         }
 
         $map = \yii\helpers\ArrayHelper::getValue($this->bases, $key, []);
 
-        if (!$child)
-        {
+        if (!$child) {
             return $map;
         }
 
@@ -135,10 +140,8 @@ class Module extends \yii\gii\Module {
      */
     public static function findMatch($subject, array $map, $default = false)
     {
-        foreach ($map as $regex => $value)
-        {
-            if (preg_match('%'.$regex.'%', $subject))
-            {
+        foreach ($map as $regex => $value) {
+            if (preg_match('%' . $regex . '%', $subject)) {
                 return $value;
             }
         }
@@ -154,13 +157,11 @@ class Module extends \yii\gii\Module {
      */
     public static function getClass($class, $definition = self::CLASS_BASENAME)
     {
-        if (self::CLASS_BASENAME == $definition)
-        {
+        if (self::CLASS_BASENAME == $definition) {
             return \yii\helpers\StringHelper::basename($class);
         }
 
-        if (self::CLASS_FULLNAME_USEABLE == $definition)
-        {
+        if (self::CLASS_FULLNAME_USEABLE == $definition) {
             return trim($class, '\\');
         }
 
@@ -181,4 +182,5 @@ class Module extends \yii\gii\Module {
             'extension' => ['class' => 'yii\gii\generators\extension\Generator'],
         ];
     }
+
 }

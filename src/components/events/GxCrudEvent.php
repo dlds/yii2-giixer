@@ -2,7 +2,8 @@
 
 namespace dlds\giixer\components\events;
 
-class GxCrudEvent extends \yii\base\Event {
+class GxCrudEvent extends \yii\base\Event
+{
 
     /**
      * Event type
@@ -71,5 +72,14 @@ class GxCrudEvent extends \yii\base\Event {
     public function isDeleted()
     {
         return $this->result && self::TYPE_DELETE == $this->type;
+    }
+
+    /**
+     * Indicates if action was processed
+     * @return boolean
+     */
+    public function isProcessed()
+    {
+        return null !== $this->result;
     }
 }

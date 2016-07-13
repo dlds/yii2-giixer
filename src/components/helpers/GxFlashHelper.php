@@ -1,10 +1,24 @@
 <?php
 
+/**
+ * @link http://www.digitaldeals.cz/
+ * @copyright Copyright (c) 2014 Digital Deals s.r.o.
+ * @license http://www.digitaldeals.cz/license/
+ */
+
 namespace dlds\giixer\components\helpers;
 
 use dlds\metronic\widgets\Alert;
 
-class GxFlashHelper {
+/**
+ * This is basic flash message helper class
+ * ---
+ * Defines method to easily manipulate with application 
+ * session flash messages
+ * @see http://www.yiiframework.com/doc-2.0/guide-runtime-sessions-cookies.html#flash-data
+ */
+class GxFlashHelper
+{
 
     /**
      * Flashes IDs
@@ -26,27 +40,24 @@ class GxFlashHelper {
     const MESSAGE_DELETE_FAIL = 'flash_delete_fail';
 
     /**
-     * Retrieves flash by given flash key
-     * @param array $key given flash key
-     * @return mixed flash value
+     * Sets new flash message
+     * @param array $key flash message identification
      */
-    public static function setFlash($key, $value)
+    public static function set($key, $value)
     {
-        if (\Yii::$app && isset(\Yii::$app->session))
-        {
+        if (\Yii::$app && isset(\Yii::$app->session)) {
             \Yii::$app->session->setFlash($key, $value);
         }
     }
 
     /**
-     * Retrieves flash by given flash key
-     * @param array $key given flash key
-     * @return mixed flash value
+     * Retrieves flash by given message identification
+     * @param array $key given flash message identification
+     * @return string|null flash message content
      */
-    public static function getFlash($key)
+    public static function get($key)
     {
-        if (\Yii::$app && isset(\Yii::$app->session) && \Yii::$app->session->hasFlash($key))
-        {
+        if (\Yii::$app && isset(\Yii::$app->session) && \Yii::$app->session->hasFlash($key)) {
             return \Yii::$app->session->getFlash($key);
         }
 
@@ -54,23 +65,31 @@ class GxFlashHelper {
     }
 
     /**
-     * Retrieves first occures flash
-     * @param array $keys given flashed to be checked
-     * @param mixed $default given default value if no flash occures
+     * Retrieves flash which is occured as first
+     * ---
+     * Used when you do not know which flash message exists and
+     * which not and you want to check multiple flash identification.
+     * ---
+     * Below example tries to find and retrieve 'fail_flash' message, 
+     * if it does not exist method tries to find 'fail_success' and even 
+     * that not exists it retrieves 'Nothing found' content.
+     * ---
+     * GxFlashHelper::getForemost(['fail_flash', 'success_flash], 'Nothing found.');
+     * ===
+     * @param array $keys given identification to be chekech
+     * @param mixed $default default value to retrieve
+     * @return string message content
      */
-    public static function getFlashesForemost($keys, $default = false)
+    public static function getForemost(array $keys, $default = false)
     {
-        if (!is_array($keys))
-        {
+        if (!is_array($keys)) {
             $keys = [$keys];
         }
 
-        foreach ($keys as $key)
-        {
-            $value = self::getFlash($key);
+        foreach ($keys as $key) {
+            $value = self::get($key);
 
-            if (null !== $value)
-            {
+            if (null !== $value) {
                 return $value;
             }
         }
@@ -79,26 +98,28 @@ class GxFlashHelper {
     }
 
     /**
-     * Indicates if on of given flash is set in sessions
-     * @param array $keys given flashes key
-     * @return boolean TRUE if has otherwise FALSE
+     * Indicates if at least one of given flash identificators is set in current session
+     * @param array $keys given flashes identification
+     * @return boolean
      */
-    public static function hasFlashes($keys)
+    public static function hasFlashes(array $keys)
     {
-        return (boolean) self::getFlashesForemost($keys);
+        return (boolean) self::getForemost($keys);
     }
 
     /**
      * Retrieve positive or negative value based on given flashes
-     * if al least one of given flashes is occured in current sessions
+     * ---
+     * If at least one of given flashes is occured in current session
      * than possitive value will be retrieved
      * otherwise negative value will be retrieved
-     * @param string $keys given flashes key
+     * ---
+     * @param array $keys given identificators
      * @param mixed $positive value to be retrieved when flash exists
      * @param mixed $negative value to be retrieved when flash doesn't exist
      * @return mixed
      */
-    public static function decideByFlashes($keys, $positive, $negative)
+    public static function decideByFlashes(array $keys, $positive, $negative)
     {
         return self::hasFlashes($keys) ? $positive : $negative;
     }
@@ -107,14 +128,13 @@ class GxFlashHelper {
      * Prints alert widget if given condition is true
      * otherwise it will print default value
      * @param boolean $condition
-     * @param array $options
+     * @param array $options widget html options
      * @param string $default
      * @return string
      */
     public static function alert($condition, array $options = [], $default = null)
     {
-        if (!$condition)
-        {
+        if (!$condition) {
             return $default;
         }
 
@@ -122,12 +142,14 @@ class GxFlashHelper {
     }
 
     /**
-     * Retrieves flash message
+     * Retrieves translated flash message 
+     * using default giixer translation category
      * @param string $key
+     * @return string translated message
      */
     public static function message($key)
     {
-        return \Yii::t('dlds/giixer', $key);
+        return \Yii::t(\dlds\giixer\Module::I18N_CATEGORY, $key);
     }
 
     /**
@@ -165,4 +187,5 @@ class GxFlashHelper {
     {
         return Alert::TYPE_INFO;
     }
+
 }

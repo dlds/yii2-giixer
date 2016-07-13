@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2016  &copy; Digital Deals s.r.o.
  * @license http://www.digitaldeals.cz/license/
@@ -40,8 +41,7 @@ class MyBasicRouteHelper extends \dlds\giixer\components\helpers\GxRouteHelper {
      * @param array $params additional route params
      * @return array route
      */
-    public static function index(array $params = [])
-    {
+    public static function index(array $params = []) {
         // adds foremost slash to route name for correct parsing
         $route = sprintf('/%s', self::ROUTE_INDEX);
 
@@ -58,13 +58,13 @@ class MyBasicRouteHelper extends \dlds\giixer\components\helpers\GxRouteHelper {
      * @param array $params additional route params
      * @return array route
      */
-    public static function view(\frontend\models\db\MyBasic $model, array $params = [])
-    {
+    public static function view(\frontend\models\db\MyBasic $model, array $params = []) {
         // adds foremost slash to route name for correct parsing
         $route = sprintf('/%s', self::ROUTE_VIEW);
 
         // primary key of given AR is pushed as param named 'id' to current route automatically
         return self::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
     }
+
     // ...
 }

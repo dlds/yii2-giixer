@@ -14,4 +14,21 @@ namespace <?= $generator->helperModel->getNsByPattern(basename(__FILE__, '.php')
  */
 class <?= $generator->helperModel->getQueryClass(true) ?> extends <?= $generator->helperModel->getQueryParentClass(basename(__FILE__, '.php'), false, true) ?> {
 
+    /**
+     * @inheritdoc
+     * @return <?= $generator->helperModel->getModelClass(false, true)."\n" ?>
+     */
+    protected function modelClass()
+    {
+        return <?= $generator->helperModel->getModelClass(false, true) ?>::className();
+    }
+
+    /**
+     * @inheritdoc
+     * @return <?= $generator->helperModel->getModelClass(false, true)."\n" ?>
+     */
+    protected function modelTable()
+    {
+        return <?= $generator->helperModel->getModelClass(false, true) ?>::tableName();
+    }
 }

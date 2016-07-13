@@ -16,6 +16,7 @@
         }
     ],
     "require": {
+        "yiisoft/yii2-imagine": "~2.0.0",
         "yiisoft/yii2-gii": "~2.0.0",
         "dlds/yii2-metronic": "~2.0.0",
         "dlds/yii2-rels": "~0.7.0",
