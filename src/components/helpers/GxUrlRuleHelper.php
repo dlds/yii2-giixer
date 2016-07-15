@@ -79,7 +79,10 @@ abstract class GxUrlRuleHelper extends UrlRule
      * @param int|string $host host ID
      * @return string|array|boolean host/hosts definition(s)
      */
-    abstract public static function getHostDefinition($host = false);
+    public static function getHostDefinition($host = false)
+    {
+        return null;
+    }
 
     /**
      * Retrieves default host definition
@@ -91,5 +94,9 @@ abstract class GxUrlRuleHelper extends UrlRule
      * or definition of single domain
      * @return string|boolean default host definition
      */
-    abstract public static function getHostDefault();
+    public static function getHostDefault()
+    {
+        return null;
+    }
+
 }
