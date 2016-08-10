@@ -40,13 +40,15 @@ class GxModelHelper
             foreach ($params as $key => $value) {
 
                 $attr = $key;
+                $pattern = sprintf('/^%s_.*$/', $basename);
 
-                if (preg_match(sprintf('/^%s_.*$/', $className), $attr)) {
-                    $attr = ltrim(strstr($key, '_'), '_');
+                if (!preg_match($pattern, $attr)) {
+                    continue;
                 }
 
-                unset($params[$key]);
+                $attr = ltrim(strstr($key, '_'), '_');
 
+                unset($params[$key]);
                 $params[$basename][$attr] = $value;
             }
         }

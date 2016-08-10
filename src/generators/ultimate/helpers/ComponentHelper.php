@@ -6,7 +6,8 @@ use Yii;
 use yii\gii\CodeFile;
 use yii\helpers\StringHelper;
 
-class ComponentHelper extends BaseHelper {
+class ComponentHelper extends BaseHelper
+{
 
     /**
      * Suffixes
@@ -14,7 +15,7 @@ class ComponentHelper extends BaseHelper {
     const SUFFIX_HANDLER = 'Handler';
     const SUFFIX_HELPER = 'Helper';
     const SUFFIX_TRANSLATION = 'Translation';
-    const SUFFIX_IMAGE_HELPER = 'Image'.self::SUFFIX_HELPER;
+    const SUFFIX_IMAGE_HELPER = 'Image' . self::SUFFIX_HELPER;
 
     /**
      * Static Tmpls
@@ -53,8 +54,7 @@ class ComponentHelper extends BaseHelper {
         $this->generateTranslations($tableSchema, $files);
 
         // generate gallery behavior
-        if (self::$generator->generateGalleryBehavior)
-        {
+        if (self::$generator->generateGalleryBehavior) {
 
             $renderParams = [
                 'baseClass' => \dlds\giixer\Module::DEFAULT_BASE_IMAGE_HELPER,
@@ -86,8 +86,7 @@ class ComponentHelper extends BaseHelper {
     {
         $renderParams = [];
 
-        foreach (self::$generator->handlerFilesMap as $tmpl => $ns)
-        {
+        foreach (self::$generator->handlerFilesMap as $tmpl => $ns) {
             $filePath = sprintf('%s/%s.php', \Yii::getAlias($this->getHandlerFilePathAlias($tmpl, $ns)), $this->getHandlerClass($tmpl, true));
 
             $tmplPath = sprintf('%s/%s.php', self::DIR_COMPONENT_HANDLERS_PATH, $tmpl);
@@ -108,13 +107,11 @@ class ComponentHelper extends BaseHelper {
     {
         $class = $this->getParentClass($key, $this->getHandlerClass($key, true), \dlds\giixer\Module::DEFAULT_BASE_CRUD_HANDLER);
 
-        if ($basename)
-        {
+        if ($basename) {
             return StringHelper::basename($class);
         }
 
-        if ($root)
-        {
+        if ($root) {
             return sprintf('\\%s', $class);
         }
 
@@ -131,13 +128,11 @@ class ComponentHelper extends BaseHelper {
 
         $class = $this->getFullyQualifiedName($classname, $root, $key);
 
-        if ($basename)
-        {
+        if ($basename) {
             return StringHelper::basename($class);
         }
 
-        if ($asUse)
-        {
+        if ($asUse) {
             return trim($class, '\\');
         }
 
@@ -153,13 +148,11 @@ class ComponentHelper extends BaseHelper {
     {
         $type = str_replace(self::SUFFIX_HANDLER, '', $key);
 
-        if (strpos($key, 'backend') !== false)
-        {
+        if (strpos($key, 'backend') !== false) {
             return str_replace('backend', '', $type);
         }
 
-        if (strpos($key, 'frontend') !== false)
-        {
+        if (strpos($key, 'frontend') !== false) {
             return str_replace('frontend', '', $type);
         }
 
@@ -186,8 +179,7 @@ class ComponentHelper extends BaseHelper {
     {
         $renderParams = [];
 
-        foreach (self::$generator->helperFilesMap as $tmpl => $ns)
-        {
+        foreach (self::$generator->helperFilesMap as $tmpl => $ns) {
             $filePath = sprintf('%s/%s.php', \Yii::getAlias($this->getHelperFilePathAlias($tmpl, $ns)), $this->getHelperClass($tmpl, true));
 
             $tmplPath = sprintf('%s/%s.php', self::DIR_COMPONENT_HELPERS_PATH, $tmpl);
@@ -210,13 +202,11 @@ class ComponentHelper extends BaseHelper {
 
         $class = ($customBaseClass) ? $customBaseClass : $this->getParentClass($key, $this->getHelperClass($key, true), \dlds\giixer\Module::DEFAULT_BASE_COMPONENT);
 
-        if ($basename)
-        {
+        if ($basename) {
             return StringHelper::basename($class);
         }
 
-        if ($root)
-        {
+        if ($root) {
             return sprintf('\\%s', $class);
         }
 
@@ -229,11 +219,10 @@ class ComponentHelper extends BaseHelper {
      */
     public function getHelperCustomClass($key, $childClass = false)
     {
-        if (true == $childClass)
-        {
+        if (true == $childClass) {
             $childClass = $this->getHelperClass($key, true);
         }
-        
+
         $map = [
             'backendElementHelper' => \dlds\giixer\Module::BASE_ELEMENT_HELPER_BACKEND,
             'frontendElementHelper' => \dlds\giixer\Module::BASE_ELEMENT_HELPER_FRONTEND,
@@ -258,13 +247,11 @@ class ComponentHelper extends BaseHelper {
 
         $class = $this->getFullyQualifiedName($classname, $root, $key);
 
-        if ($basename)
-        {
+        if ($basename) {
             return StringHelper::basename($class);
         }
 
-        if ($asUse)
-        {
+        if ($asUse) {
             return trim($class, '\\');
         }
 
@@ -280,13 +267,11 @@ class ComponentHelper extends BaseHelper {
     {
         $type = str_replace(self::SUFFIX_HELPER, '', $key);
 
-        if (strpos($key, 'backend') !== false)
-        {
+        if (strpos($key, 'backend') !== false) {
             return ucfirst(str_replace('backend', '', $type));
         }
 
-        if (strpos($key, 'frontend') !== false)
-        {
+        if (strpos($key, 'frontend') !== false) {
             return ucfirst(str_replace('frontend', '', $type));
         }
 
@@ -315,10 +300,8 @@ class ComponentHelper extends BaseHelper {
             'labels' => self::$generator->generateLabels($tableSchema),
         ];
 
-        foreach (self::$generator->translationsFilesMap as $tmpl => $ns)
-        {
-            foreach (self::$generator->translations as $lang)
-            {
+        foreach (self::$generator->translationsFilesMap as $tmpl => $ns) {
+            foreach (self::$generator->translations as $lang) {
                 $filePath = sprintf('%s.php', \Yii::getAlias($this->getTranslationFilePathAlias($lang, $ns, $tmpl)));
 
                 $tmplPath = sprintf('%s/%s.php', self::DIR_TRANSLATIONS_PATH, $tmpl);
@@ -342,13 +325,11 @@ class ComponentHelper extends BaseHelper {
 
         $class = $this->getFullyQualifiedName($classname, $root);
 
-        if ($basename)
-        {
+        if ($basename) {
             return StringHelper::basename($class);
         }
 
-        if ($asUse)
-        {
+        if ($asUse) {
             return trim($class, '\\');
         }
 
@@ -363,15 +344,56 @@ class ComponentHelper extends BaseHelper {
     {
         $namespace = str_replace('{ns}', $this->getNsByMap($this->getTranslationClass(true, false), true), $ns);
 
-        $parts = explode('/', $this->getBaseClassKey('/'));
+        $pathParts = $this->removeModuleNameFromPathAlias(explode('/', $this->getBaseClassKey('/')), $namespace);
 
+        return sprintf('@%s/%s/%s', str_replace('\\', '/', $namespace), $lang, implode('/', $pathParts));
+    }
+
+    /**
+     * Removes module name or its aliases from file path alias
+     * ---
+     * Ensures that module name wont be duplicated in transaltion file path
+     * ---
+     * @param array $parts path parts
+     * @param stirng $namespace
+     * @return array
+     */
+    protected function removeModuleNameFromPathAlias(array $parts, $namespace)
+    {
         $module = \yii\helpers\ArrayHelper::getValue($parts, 0, false);
 
-        if (false !== $module && false !== strpos($namespace, $module))
-        {
+        // check the first entry in PARTS if matches module name - than remove
+        if (false !== $module && false !== strpos($namespace, $module)) {
+
             \yii\helpers\ArrayHelper::remove($parts, 0);
+            return $parts;
         }
 
-        return sprintf('@%s/%s/%s', str_replace('\\', '/', $namespace), $lang, implode('/', $parts));
+        // if no module aliases are set - return current PARTS
+        if (empty(self::$generator->aliases)) {
+            return $parts;
+        }
+
+        // remove all module aliases from path 
+        foreach (self::$generator->aliases as $key => $aliases) {
+
+            if (false === strpos($namespace, $key)) {
+                continue;
+            }
+
+            // go throught all aliases
+            foreach ($aliases as $alias) {
+
+                $module = \yii\helpers\ArrayHelper::getValue($parts, 0, false);
+                
+                // if alias matches the first part of path - remove it
+                if ($module === $alias) {
+                    \yii\helpers\ArrayHelper::remove($parts, 0);
+                }
+            }
+        }
+
+        return $parts;
     }
+
 }

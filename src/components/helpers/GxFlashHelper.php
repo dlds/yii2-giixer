@@ -66,6 +66,20 @@ class GxFlashHelper
     }
 
     /**
+     * Indicates if appropriate flash is set
+     * ---
+     * Indicates if at least one of given flash identificators 
+     * is set in current session.
+     * ---
+     * @param array $keys given flashes identification
+     * @return boolean
+     */
+    public static function has(array $keys)
+    {
+        return (boolean) self::search($keys);
+    }
+
+    /**
      * Retrieves flash which is occured as first
      * ---
      * Used when you do not know which flash message exists and
@@ -75,13 +89,13 @@ class GxFlashHelper
      * if it does not exist method tries to find 'fail_success' and even 
      * that not exists it retrieves 'Nothing found' content.
      * ---
-     * GxFlashHelper::getForemost(['fail_flash', 'success_flash], 'Nothing found.');
+     * GxFlashHelper::search(['fail_flash', 'success_flash], 'Nothing found.');
      * ===
      * @param array $keys given identification to be chekech
      * @param mixed $default default value to retrieve
      * @return string message content
      */
-    public static function getForemost(array $keys, $default = false)
+    public static function search(array $keys, $default = false)
     {
         if (!is_array($keys)) {
             $keys = [$keys];
@@ -99,16 +113,6 @@ class GxFlashHelper
     }
 
     /**
-     * Indicates if at least one of given flash identificators is set in current session
-     * @param array $keys given flashes identification
-     * @return boolean
-     */
-    public static function hasFlashes(array $keys)
-    {
-        return (boolean) self::getForemost($keys);
-    }
-
-    /**
      * Retrieve positive or negative value based on given flashes
      * ---
      * If at least one of given flashes is occured in current session
@@ -120,9 +124,9 @@ class GxFlashHelper
      * @param mixed $negative value to be retrieved when flash doesn't exist
      * @return mixed
      */
-    public static function decideByFlashes(array $keys, $positive, $negative)
+    public static function decideBy(array $keys, $positive, $negative)
     {
-        return self::hasFlashes($keys) ? $positive : $negative;
+        return self::has($keys) ? $positive : $negative;
     }
 
     /**

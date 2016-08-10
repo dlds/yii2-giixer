@@ -88,6 +88,11 @@ class Module extends \yii\gii\Module
     public $translations = ['en'];
 
     /**
+     * @var array modules names aliases
+     */
+    public $aliases = [];
+
+    /**
      * @var array messages categories rules
      */
     public $messages = [];

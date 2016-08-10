@@ -49,7 +49,7 @@ abstract class GxActiveRecord extends ActiveRecord
         if (false === $formName) {
             $formName = '';
         }
-
+        
         return parent::load($data, $formName);
     }
 

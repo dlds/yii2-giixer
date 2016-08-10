@@ -33,7 +33,7 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
     {
     return $this->hasOne(<?= $generator->helperModel->getFullyQualifiedName($generator->getClassForTable($generator->mutationJoinTableName), true) ?>::className(), <?= $generator->getRelationKey($generator->mutationJoinTableName, true) ?>)
             ->innerJoinWith([<?= $generator->helperModel->getFullyQualifiedName($generator->getClassForTable($generator->mutationJoinTableName), true) ?>::<?= sprintf('%s%s', \dlds\giixer\Module::RELATION_NAME_PREFIX, strtoupper($generator->mutationSourceTableName)) ?> => function($query) {
-                    $query->current(self::AN_CURRENT_LANGUAGE);
+                    $query->isCurrent(self::AN_CURRENT_LANGUAGE);
                 }]);
 }
     // </editor-fold>

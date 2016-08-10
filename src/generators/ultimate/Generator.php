@@ -294,6 +294,11 @@ class Generator extends \yii\gii\generators\model\Generator
      * @var array used classes
      */
     public $usedClasses = [];
+    
+    /**
+     * @var array module aliases
+     */
+    public $aliases = [];
 
     /**
      * Inits generator
@@ -314,6 +319,12 @@ class Generator extends \yii\gii\generators\model\Generator
 
         if ($translations) {
             $this->translations = $translations;
+        }
+        
+        $aliases = Yii::$app->getModule('gii')->aliases;
+
+        if ($aliases) {
+            $this->aliases = $aliases;
         }
 
         $this->namespaces = Yii::$app->getModule('gii')->namespaces;
