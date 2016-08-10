@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = ['label' => $model->__toString()];
     ?>
 
     <?=
-    GxFlashHelper::alert(GxFlashHelper::hasFlashes(GxFlashHelper::FLASH_SUCCESS), [
+    GxFlashHelper::alert(GxFlashHelper::has(GxFlashHelper::FLASH_SUCCESS), [
         'type' => GxFlashHelper::success(),
         'body' => GxFlashHelper::getFlash(GxFlashHelper::FLASH_SUCCESS),
     ])

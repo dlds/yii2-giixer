@@ -49,9 +49,9 @@ $this->params['breadcrumbs'][] = <?= $generator->helperCrud->getHeading(true) ?>
     ?>
 
     <?=
-    GxFlashHelper::alert(GxFlashHelper::hasFlashes([GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::FLASH_ERROR]), [
-        'type' => GxFlashHelper::decideByFlashes(GxFlashHelper::FLASH_SUCCESS, Alert::TYPE_SUCCESS, Alert::TYPE_DANGER),
-        'body' => GxFlashHelper::getFlashesForemost([GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::FLASH_ERROR]),
+    GxFlashHelper::alert(GxFlashHelper::has([GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::FLASH_ERROR]), [
+        'type' => GxFlashHelper::decideBy([GxFlashHelper::FLASH_SUCCESS], Alert::TYPE_SUCCESS, Alert::TYPE_DANGER),
+        'body' => GxFlashHelper::search([GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::FLASH_ERROR]),
     ])
     ?>
 
