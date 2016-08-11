@@ -18,13 +18,13 @@ class GxElementHelper
     /**
      * Retrieves formatted element id
      * @param string $id given id
-     * @param string $key appended key
-     * @param boolen $withHash
+     * @param boolean $withHash
+     * @param string $suffix appended key
      */
-    public static function getId($id, $key = null, $withHash = false)
+    public static function getId($id, $withHash = true, $suffix = null)
     {
-        if ($key) {
-            $id = sprintf('%s-%s', $id, $key);
+        if ($suffix) {
+            $id = sprintf('%s-%s', $id, $suffix);
         }
 
         if ($withHash) {
