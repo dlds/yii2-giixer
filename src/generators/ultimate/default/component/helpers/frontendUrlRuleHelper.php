@@ -26,7 +26,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 
         $pattern = $route;
 
-        return self::getRule($pattern, $route);
+        return static::getRule($pattern, $route);
     }
 
     /**
@@ -39,7 +39,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 
         $pattern = $route;
 
-        return self::getRule($pattern, $route);
+        return static::getRule($pattern, $route);
     }
     
     /**

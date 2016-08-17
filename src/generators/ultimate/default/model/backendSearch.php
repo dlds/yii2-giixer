@@ -85,7 +85,7 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
     {
         $dataProvider->setSort([
             'attributes' => $this->getSortAttrs(),
-            'defaultOrder' => self::getDefaultOrder(),
+            'defaultOrder' => static::getDefaultOrder(),
         ]);
     }
 
@@ -113,7 +113,7 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
      */
     protected function getSortAttrs()
     {
-        $default = self::getDefaultOrder();
+        $default = static::getDefaultOrder();
 
         return \yii\helpers\ArrayHelper::merge($this->sortAttrs, array_keys($default));
     }
@@ -124,6 +124,6 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
      */
     public static function getDefaultOrder()
     {
-        return [self::tableName().'.<?= ($generator->generateSortableBehavior) ? $generator->sortableColumnAttribute : $primaryKey ?>' => SORT_DESC];
+        return [static::tableName().'.<?= ($generator->generateSortableBehavior) ? $generator->sortableColumnAttribute : $primaryKey ?>' => SORT_DESC];
     }
 }

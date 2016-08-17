@@ -244,10 +244,10 @@ class ModelHelper extends BaseHelper {
                 case Schema::TYPE_TIME:
                 case Schema::TYPE_DATETIME:
                 case Schema::TYPE_TIMESTAMP:
-                    $hashConditions[] = "self::tableName().'.{$column}' => \$this->{$column},";
+                    $hashConditions[] = "static::tableName().'.{$column}' => \$this->{$column},";
                     break;
                 default:
-                    $likeConditions[] = "->andFilterWhere(['like', self::tableName().'.{$column}', \$this->{$column}])";
+                    $likeConditions[] = "->andFilterWhere(['like', static::tableName().'.{$column}', \$this->{$column}])";
                     break;
             }
         }

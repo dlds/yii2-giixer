@@ -41,7 +41,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_INDEX);
 
-        return self::getRoute($route, $params);
+        return static::getRoute($route, $params);
     }
 
     /**
@@ -53,7 +53,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_CREATE);
 
-        return self::getRoute($route, $params);
+        return static::getRoute($route, $params);
     }
 
     /**
@@ -66,7 +66,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_VIEW);
 
-        return self::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
+        return static::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
     }
 
     /**
@@ -79,7 +79,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_UPDATE);
 
-        return self::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
+        return static::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
     }
 
     /**
@@ -92,7 +92,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_DELETE);
 
-        return self::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
+        return static::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
     }
 <?php if($generator->generateSortableBehavior): ?>
 
@@ -105,7 +105,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_SORT);
 
-        return self::getRoute($route, $params);
+        return static::getRoute($route, $params);
     }
 <?php endif; ?><?php if($generator->generateGalleryBehavior): ?>
     
@@ -118,7 +118,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_API_GALLERY);
 
-        return self::getRoute($route, $params);
+        return static::getRoute($route, $params);
     }
 <?php endif; ?>
 

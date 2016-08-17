@@ -35,9 +35,9 @@ $this->params['breadcrumbs'][] = \<?= $generator->generateString('heading_new_en
     ?>
 
     <?=
-    GxFlashHelper::alert(GxFlashHelper::has(GxFlashHelper::FLASH_SUCCESS), [
+    GxFlashHelper::alert(GxFlashHelper::has([GxFlashHelper::FLASH_SUCCESS]), [
         'type' => GxFlashHelper::success(),
-        'body' => GxFlashHelper::getFlash(GxFlashHelper::FLASH_SUCCESS),
+        'body' => GxFlashHelper::get(GxFlashHelper::FLASH_SUCCESS),
     ])
     ?>
 

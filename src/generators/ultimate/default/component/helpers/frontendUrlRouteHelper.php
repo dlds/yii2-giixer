@@ -32,7 +32,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_INDEX);
 
-        return self::getRoute($route, $params);
+        return static::getRoute($route, $params);
     }
 
     /**
@@ -45,6 +45,6 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_VIEW);
 
-        return self::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
+        return static::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
     }
 }
