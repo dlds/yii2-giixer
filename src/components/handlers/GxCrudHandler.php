@@ -28,6 +28,11 @@ use dlds\giixer\components\events\GxCrudEvent;
 abstract class GxCrudHandler extends \yii\base\Component
 {
 
+    /**
+     * @var string ActiveRecord classname
+     */
+    protected $model;
+
     // AFTER events
     const EVENT_AFTER_CREATE = 'e_after_create';
     const EVENT_AFTER_READ = 'e_after_read';
@@ -46,11 +51,15 @@ abstract class GxCrudHandler extends \yii\base\Component
      * Initializes CRUD handler
      * @throws \yii\base\ErrorException
      */
-    public function __construct()
+    public function __construct($model = false)
     {
-        $class = $this->modelClass();
+        if (!$model) {
+            $model = $this->modelClass();
+        }
 
-        if (!is_subclass_of($class, \yii\db\ActiveRecord::className())) {
+        $this->model = $model;
+
+        if (!is_subclass_of($this->model, \yii\db\ActiveRecord::className())) {
             throw new \yii\base\ErrorException('Invalid model class. Method "getModelClass" has to retrieve ActiveRecord descendant class.');
         }
     }
@@ -176,9 +185,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      */
     protected function createModel(GxCrudEvent &$event, $scope = null)
     {
-        $class = $this->modelClass();
-
-        $event->model = new $class;
+        $event->model = new $this->model;
 
         $this->updateModel($event, $scope);
     }
@@ -190,7 +197,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      */
     protected function findModel(GxCrudEvent &$event)
     {
-        $class = $this->modelClass();
+        $class = $this->model;
 
         $event->model = $class::findOne($event->id);
 

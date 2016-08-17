@@ -294,7 +294,7 @@ class Generator extends \yii\gii\generators\model\Generator
      * @var array used classes
      */
     public $usedClasses = [];
-    
+
     /**
      * @var array module aliases
      */
@@ -320,7 +320,7 @@ class Generator extends \yii\gii\generators\model\Generator
         if ($translations) {
             $this->translations = $translations;
         }
-        
+
         $aliases = Yii::$app->getModule('gii')->aliases;
 
         if ($aliases) {
@@ -371,60 +371,64 @@ class Generator extends \yii\gii\generators\model\Generator
         GxModelHelper::removeValidationRules($rules, 'validateModelClass', ['modelClass']);
 
         return ArrayHelper::merge([
-                    [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
-                    [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
-                    [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
-                    [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
-                    [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
-                    [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
+                [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
+                [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
+                [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
+                [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
                     return $model->generateMutation;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatemutation').is(':checked');
                     }"],
-                    [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
+                [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
                     return trim($model->mutationIgnoredFormAttributes);
                 }],
-                    [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
-                    [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
-                    [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
+                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
                     return $model->generateSluggableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                    [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
                     return $model->generateSluggableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                    [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
                     return $model->generateTimestampBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                    [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'required', 'when' => function($model) {
+                [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'required', 'when' => function($model) {
                     return $model->generateTimestampBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                    [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
-                    [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
+                [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
                     return $model->generateSortableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
-                    [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function($model) {
+                [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function($model) {
                     return $model->generateSortableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
-                    [['galleryTableName'], 'filter', 'filter' => 'trim'],
-                    [['galleryTableName'], 'validateTableName'],
-                    [['galleryTableName'], 'required', 'when' => function($model) {
+                [['galleryTableName'], 'filter', 'filter' => 'trim'],
+                [['galleryTableName'], 'validateTableName', 'when' => function($model) {
                     return $model->generateGalleryBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generategallerybehavior').is(':checked');
                     }"],
-                        ], $rules);
+                [['galleryTableName'], 'required', 'when' => function($model) {
+                    return $model->generateGalleryBehavior;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generategallerybehavior').is(':checked');
+                    }"],
+                ], $rules);
     }
 
     /**
@@ -773,7 +777,7 @@ class Generator extends \yii\gii\generators\model\Generator
                     $dropDownOptions[$enumValue] = Inflector::humanize($enumValue);
                 }
                 return "\$form->field(\$model, '$attribute')->dropDownList("
-                        . preg_replace("/\n\s*/", ' ', VarDumper::export($dropDownOptions)) . ", ['prompt' => ''])";
+                    . preg_replace("/\n\s*/", ' ', VarDumper::export($dropDownOptions)) . ", ['prompt' => ''])";
             } elseif ($column->phpType !== 'string' || $column->size === null) {
                 return "\$form->field(\$model, '$attribute')->$input()";
             } else {
