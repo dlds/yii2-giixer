@@ -119,7 +119,7 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
 
         if ($evt->isCreated())
         {
-            GxFlashHelper::setFlash(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_CREATE_SUCCESS));
+            GxFlashHelper::set(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_CREATE_SUCCESS));
 
             return $this->redirect(<?= $generator->helperComponent->getHelperClass('backendUrlRouteHelper', true) ?>::index());
         }
@@ -143,7 +143,7 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
 
         if ($evt->isUpdated())
         {
-            GxFlashHelper::setFlash(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_UPDATE_SUCCESS));
+            GxFlashHelper::set(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_UPDATE_SUCCESS));
         }
 
         return $this->render('update', [
@@ -165,12 +165,12 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
 
         if ($evt->isDeleted())
         {
-            GxFlashHelper::setFlash(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_DELETE_SUCCESS));
+            GxFlashHelper::set(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_DELETE_SUCCESS));
 
             return $this->redirect(<?= $generator->helperComponent->getHelperClass('backendUrlRouteHelper', true) ?>::index());
         }
 
-        GxFlashHelper::setFlash(GxFlashHelper::FLASH_ERROR, GxFlashHelper::message(GxFlashHelper::MESSAGE_DELETE_FAIL));
+        GxFlashHelper::set(GxFlashHelper::FLASH_ERROR, GxFlashHelper::message(GxFlashHelper::MESSAGE_DELETE_FAIL));
 
         return $handler->notProcessableFallback();
     }
