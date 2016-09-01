@@ -21,7 +21,7 @@ class GxElementHelper
      * @param boolean $withHash
      * @param string $suffix appended key
      */
-    public static function getId($id, $withHash = true, $suffix = null)
+    public static function id($id, $withHash = true, $suffix = null)
     {
         if ($suffix) {
             $id = sprintf('%s-%s', $id, $suffix);
