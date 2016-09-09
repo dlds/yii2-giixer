@@ -66,7 +66,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_VIEW);
 
-        return static::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
+        return static::getRoute($route, static::extractParams($model, $params));
     }
 
     /**
@@ -79,7 +79,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_UPDATE);
 
-        return static::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
+        return static::getRoute($route, static::extractParams($model, $params));
     }
 
     /**
@@ -92,7 +92,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     {
         $route = sprintf('/%s', self::ROUTE_DELETE);
 
-        return static::getRoute($route, ArrayHelper::merge(['id' => $model->primaryKey], $params));
+        return static::getRoute($route, static::extractParams($model, $params));
     }
 <?php if($generator->generateSortableBehavior): ?>
 

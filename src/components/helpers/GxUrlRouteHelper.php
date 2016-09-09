@@ -28,8 +28,13 @@ class GxUrlRouteHelper
 
     /**
      * Process route detecting based on giver rules
+     * ---
+     * Goes through all given rules and finds the one matching the current one.
+     * Retreives specified value or runs callback
+     * ---
      * @param array $rules
      * @param boolean $run indicated if given callback should be retrieved or run
+     * @return mixed
      */
     public static function detect(array $rules, $run = false)
     {
@@ -63,9 +68,14 @@ class GxUrlRouteHelper
     }
 
     /**
-     * Indicates if given route is current route
+     * Indicates if given array is current route
+     * ---
+     * Compares given array with current route. Compares route params 
+     * when strict option enabled
+     * ---
      * @param array $route given route
      * @param boolean $strict indicates if params should be strictly compared
+     * @return boolean
      */
     public static function isCurrent(array $route, $strict = true)
     {
@@ -85,8 +95,12 @@ class GxUrlRouteHelper
     }
 
     /**
-     * Retrieves route name
+     * Retrieves given route name
+     * ---
+     * Extract route name from given array
+     * ---
      * @param array $route given route
+     * @return array
      */
     public static function getName(array $route)
     {
@@ -100,8 +114,12 @@ class GxUrlRouteHelper
     }
 
     /**
-     * Retrieves route params
+     * Retrieves given route params
+     * ---
+     * Extract route params from given array
+     * ---
      * @param array $route given route
+     * @return array
      */
     public static function getParams(array $route)
     {
@@ -109,7 +127,27 @@ class GxUrlRouteHelper
     }
 
     /**
-     * @return string app param
+     * Retrieves route params based on given active record and additionals params
+     * ---
+     * Extract primary key from given AR as array ['id' => 1]
+     * and merges it with given additionals params
+     * ---
+     * @param \yii\db\ActiveRecord $model
+     * @param array $additionals
+     * @return array
+     */
+    public static function extractParams(\yii\db\ActiveRecord $model, array $additionals = [])
+    {
+        return ArrayHelper::merge(['id' => $model->primaryKey], $additionals);
+    }
+
+    /**
+     * Creates final route array
+     * ---
+     * Puts all route params together with route name 
+     * and retrieves it as single route array
+     * ---
+     * @return array
      */
     protected static function getRoute($route, $params = [], $extraParams = false)
     {
@@ -141,8 +179,8 @@ class GxUrlRouteHelper
     }
 
     /**
-     * Retrieves param name which disable lacale urls
-     * @return mixed param name or FALSE if param does not exist
+     * Retrieves params which will be added to every route creation
+     * @return array
      */
     protected static function getRouteExtraParams()
     {
@@ -150,7 +188,7 @@ class GxUrlRouteHelper
     }
 
     /**
-     * Pushes given param with its value into given params array
+     * Pushes given param with its value into given array
      * @param array $params
      * @param string $name param name
      * @param miced $value param value
@@ -163,7 +201,7 @@ class GxUrlRouteHelper
     }
 
     /**
-     * Removes invalid params from given array
+     * Removes params from given array
      * @param array $params
      */
     private static function removeParams(array &$params, array $toRemove = [])
