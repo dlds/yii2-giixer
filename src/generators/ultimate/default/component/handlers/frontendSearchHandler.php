@@ -7,13 +7,16 @@ echo "<?php\n";
 
 namespace <?= $generator->helperComponent->getNsByPattern(basename(__FILE__, '.php'), $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'), true)) ?>;
 
+use dlds\giixer\components\interfaces\GxSearchHandlerInterface;
+
 /**
  * This is frontend SEARCH handler for table "<?= $generator->generateTableName($generator->tableName) ?>".
  *
  * @inheritdoc
  * @see <?= $generator->helperModel->getModelClass(false, true)."\n" ?>
  */
-class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'), true) ?> extends <?= $generator->helperModel->getSearchClass(false, true) ?> {
+class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'), true) ?> extends <?= $generator->helperModel->getSearchClass(false, true) ?> implements GxSearchHandlerInterface
+{
 
     use \dlds\giixer\components\traits\GxSearchHandlerTrait;
 
@@ -21,7 +24,7 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
      * Applies default query to given dataprovider
      * @param \yii\data\ActiveDataProvider $dataProvider given data provider
      */
-    protected function applyDefaultSearchQuery(\yii\data\ActiveDataProvider &$dataProvider)
+    public function applyDefaultSearchQuery(\yii\data\ActiveDataProvider &$dataProvider)
     {
         // $dataProvider->isActive();
     }
