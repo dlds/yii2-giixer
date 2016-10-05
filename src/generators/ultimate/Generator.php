@@ -11,6 +11,7 @@ namespace dlds\giixer\generators\ultimate;
 
 use Yii;
 use ReflectionClass;
+use yii\helpers\VarDumper;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\View;
@@ -736,7 +737,7 @@ class Generator extends \yii\gii\generators\model\Generator
             }
         }
         $column = $tableSchema->columns[$attribute];
-
+        
         if ($column->phpType === 'boolean') {
             return "\$form->field(\$model, '$attribute')->checkbox()";
         } elseif ($column->type === 'text') {
@@ -751,7 +752,7 @@ class Generator extends \yii\gii\generators\model\Generator
 
                 $keys = array_keys($fk);
 
-                if (in_array($column->name, $keys) && $refTableSchema) {
+                if (in_array($column->name, $keys, true) && $refTableSchema) {
                     $refClassName = $this->getClassForTable($refTable, true, true);
 
                     if (is_array($refTableSchema->primaryKey)) {
