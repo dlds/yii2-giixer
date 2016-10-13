@@ -1,19 +1,23 @@
 <?php
+
+use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
+
 /* @var $this yii\web\View */
 /* @var $generator \dlds\giixer\generators\ultimate\Generator */
 
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->helperComponent->getNsByPattern(basename(__FILE__, '.php'), $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'), true)) ?>;
+namespace <?= ComponentHelper::ns($generator->helperComponent->getClass(ComponentHelper::RK_HANDLER_CRUD_FE)) ?>;
 
 /**
  * This is frontend CRUD handler for table "<?= $generator->generateTableName($generator->tableName) ?>".
  *
  * @inheritdoc
- * @see <?= $generator->helperComponent->getHandlerParentClass(basename(__FILE__, '.php'), false, true)."\n" ?>
+ * @see <?= ComponentHelper::root($generator->helperComponent->getParentClass(ComponentHelper::RK_HANDLER_CRUD_FE))."\n" ?>
  */
-class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'), true) ?> extends <?= $generator->helperComponent->getHandlerParentClass(basename(__FILE__, '.php'), false, true) ?> {
+class <?= ComponentHelper::basename($generator->helperComponent->getClass(ComponentHelper::RK_HANDLER_CRUD_FE)) ?> extends <?= ComponentHelper::root($generator->helperComponent->getParentClass(ComponentHelper::RK_HANDLER_CRUD_FE)) ?> 
+{
 
     /**
      * @inheritdoc
@@ -46,6 +50,5 @@ class <?= $generator->helperComponent->getHandlerClass(basename(__FILE__, '.php'
     {
         throw new \yii\web\ForbiddenHttpException;
     }
-
 
 }

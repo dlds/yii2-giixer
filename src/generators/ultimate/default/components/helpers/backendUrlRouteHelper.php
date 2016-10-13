@@ -1,21 +1,27 @@
 <?php
+
+use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
+use dlds\giixer\generators\ultimate\helpers\ModelHelper;
+
 /* @var $this yii\web\View */
 /* @var $generator \dlds\giixer\generators\ultimate\Generator */
 
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->helperComponent->getNsByPattern(basename(__FILE__, '.php'), $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true)) ?>;
+namespace <?= ComponentHelper::ns($generator->helperComponent->getClass(ComponentHelper::RK_HELPER_URL_ROUTE_BE)) ?>;
 
 use yii\helpers\ArrayHelper;
+use <?= $generator->helperModel->getClass(ModelHelper::RK_MODEL_CM) ?>;
 
 /**
  * This is backend ROUTE helper for table "<?= $generator->generateTableName($generator->tableName) ?>".
  *
  * @inheritdoc
- * @see <?= $generator->helperComponent->getHelperParentClass(basename(__FILE__, '.php'), false, true)."\n" ?>
+ * @see <?= $generator->helperComponent->getParentClass(ComponentHelper::RK_HELPER_URL_ROUTE_BE)."\n" ?>
  */
-class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true) ?> extends <?= $generator->helperComponent->getHelperParentClass(basename(__FILE__, '.php'), false, true) ?> {
+class <?= ComponentHelper::basename($generator->helperComponent->getClass(ComponentHelper::RK_HELPER_URL_ROUTE_BE)) ?> extends <?= ComponentHelper::root($generator->helperComponent->getParentClass(ComponentHelper::RK_HELPER_URL_ROUTE_BE)) . "\n" ?>
+{
 
     /**
      * Valid routes
@@ -29,7 +35,7 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
     const ROUTE_SORT = '<?= $generator->helperCrud->getRoute('sort') ?>';
 <?php endif; ?>
 <?php if($generator->generateGalleryBehavior): ?>
-    const ROUTE_API_GALLERY = '<?= $generator->helperCrud->getRoute('api-gallery') ?>';
+    const ROUTE_GALLERY = '<?= $generator->helperCrud->getRoute('gallery') ?>';
 <?php endif; ?>
 
     /**
@@ -58,11 +64,11 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 
     /**
      * Retrieves view route
-     * @param <?= $generator->helperModel->getModelClass(false, true) ?> $model given model
+     * @param <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> $model given model
      * @param array $params additional route params
      * @return array route
      */
-    public static function view(<?= $generator->helperModel->getModelClass(false, true) ?> $model, array $params = [])
+    public static function view(<?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> $model, array $params = [])
     {
         $route = sprintf('/%s', self::ROUTE_VIEW);
 
@@ -71,11 +77,11 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 
     /**
      * Retrieves update route
-     * @param <?= $generator->helperModel->getModelClass(false, true) ?> $model given model
+     * @param <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> $model given model
      * @param array $params additional route params
      * @return array route
      */
-    public static function update(<?= $generator->helperModel->getModelClass(false, true) ?> $model, array $params = [])
+    public static function update(<?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> $model, array $params = [])
     {
         $route = sprintf('/%s', self::ROUTE_UPDATE);
 
@@ -84,11 +90,11 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 
     /**
      * Retrieves delete route
-     * @param <?= $generator->helperModel->getModelClass(false, true) ?> $model given model
+     * @param <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> $model given model
      * @param array $params additional route params
      * @return array route
      */
-    public static function delete(<?= $generator->helperModel->getModelClass(false, true) ?> $model, array $params = [])
+    public static function delete(<?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> $model, array $params = [])
     {
         $route = sprintf('/%s', self::ROUTE_DELETE);
 
@@ -110,13 +116,13 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
 <?php endif; ?><?php if($generator->generateGalleryBehavior): ?>
     
     /**
-     * Retrieves API gallery route
+     * Retrieves gallery route
      * @param array $params additional route params
      * @return array route
      */
-    public static function apiGallery(array $params = [])
+    public static function gallery(array $params = [])
     {
-        $route = sprintf('/%s', self::ROUTE_API_GALLERY);
+        $route = sprintf('/%s', self::ROUTE_GALLERY);
 
         return static::getRoute($route, $params);
     }

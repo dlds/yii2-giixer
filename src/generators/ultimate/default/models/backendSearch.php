@@ -1,6 +1,6 @@
 <?php
 
-use yii\helpers\StringHelper;
+use dlds\giixer\generators\ultimate\helpers\ModelHelper;
 
 /* @var $this yii\web\View */
 /* @var $generator \dlds\giixer\generators\ultimate\Generator */
@@ -8,17 +8,17 @@ use yii\helpers\StringHelper;
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->helperModel->getNsByPattern(basename(__FILE__, '.php'), $generator->helperModel->getSearchClass(true)) ?>;
+namespace <?= ModelHelper::ns($generator->helperModel->getClass(ModelHelper::RK_SEARCH_BE)) ?>;
 
-use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php'), false) ?>;
+use <?= $generator->helperModel->getClass(ModelHelper::RK_MODEL_CM) ?>;
 
 /**
- * <?= $generator->helperModel->getSearchClass(true) ?> represents the model behind the search form about `<?= $generator->helperModel->getModelClass(true) ?>`.
+ * <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_SEARCH_BE)) ?> represents the model behind the searching of `<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?>`.
  */
-class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php'), true) ?> {
+class <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_SEARCH_BE)) ?> extends <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> 
+{
 
     /**
      * @var array allowd sorting attrs
@@ -32,9 +32,7 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
      */
     public function rules()
     {
-        return [
-            <?= implode(",\n            ", $rules) ?>,
-        ];
+        return [];
     }
 
     /**
@@ -55,7 +53,7 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
      */
     public function search($params)
     {
-        $query = <?= $generator->helperModel->getSearchParentClass(basename(__FILE__, '.php'), true) ?>::find();
+        $query = <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?>::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -63,8 +61,7 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
 
         $this->sortData($dataProvider);
 
-        if (!($this->load($params) && $this->validate()))
-        {
+        if (!($this->load($params) && $this->validate())) {
             $this->generalQuery($query, false);
 
             return $dataProvider;
@@ -107,7 +104,7 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
         <?= implode("\n        ", $conditions) ?>
     }
 
-     /**
+    /**
      * Retrieves sorting attrs
      * @return array
      */
@@ -124,6 +121,6 @@ class <?= $generator->helperModel->getSearchClass(true) ?> extends <?= $generato
      */
     public static function getDefaultOrder()
     {
-        return [static::tableName().'.<?= ($generator->generateSortableBehavior) ? $generator->sortableColumnAttribute : $primaryKey ?>' => SORT_DESC];
+        return [static::tableName() . '.<?= ($generator->generateSortableBehavior) ? $generator->sortableColumnAttribute : $primaryKey ?>' => SORT_DESC];
     }
 }

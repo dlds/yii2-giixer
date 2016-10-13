@@ -1,7 +1,8 @@
 <?php
 
-use yii\helpers\Inflector;
-use yii\helpers\StringHelper;
+use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
+use dlds\giixer\generators\ultimate\helpers\CrudHelper;
+use dlds\giixer\generators\ultimate\helpers\ModelHelper;
 
 /* @var $this yii\web\View */
 /* @var $generator \dlds\giixer\generators\ultimate\Generator */
@@ -18,9 +19,10 @@ use dlds\metronic\widgets\Portlet;
 use dlds\galleryManager\GalleryManager;
 <?php endif ?>
 use dlds\giixer\components\helpers\GxFlashHelper;
+use <?= $generator->helperComponent->getClass(ComponentHelper::RK_HELPER_URL_ROUTE_BE) ?>;
 
 /* @var $this yii\web\View */
-/* @var $model <?= $generator->helperModel->getModelClass(false, true) ?> */
+/* @var $model <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> */
 
 $this->title = \Yii::t('<?= $generator->i18nDefaultCategory ?>', 'title_update_{model}', [
         'model' => $model->__toString(),
@@ -30,7 +32,7 @@ $this->params['breadcrumbs'][] = ['label' => <?= $generator->helperCrud->getHead
 $this->params['breadcrumbs'][] = ['label' => $model->__toString()];
 ?>
 
-<div class="<?= $generator->helperCrud->getBaseClassKey() ?>-update">
+<div class="<?= $generator->helperCrud->getClassid(CrudHelper::RK_MODEL_CM) ?>-update">
 
     <?= "<?php 
     Portlet::begin([
@@ -76,8 +78,8 @@ $this->params['breadcrumbs'][] = ['label' => $model->__toString()];
             <?=
             GalleryManager::widget([
                 'model' => \$model,
-                'behaviorName' => ".$generator->helperModel->getModelClass(false, true)."::".$generator->getBehaviorConstantName(\dlds\giixer\Module::BEHAVIOR_NAME_GALLERY_MANAGER).",
-                'apiRoute' => ArrayHelper::getValue(".$generator->helperComponent->getHelperClass('backendUrlRouteHelper', false, true)."::apiGallery(), 0),
+                'behaviorName' => ".ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM))."::".$generator->getBehaviorConstantName(\dlds\giixer\Module::BEHAVIOR_NAME_GALLERY_MANAGER).",
+                'apiRoute' => ArrayHelper::getValue(".ComponentHelper::basename($generator->helperComponent->getClass(ComponentHelper::RK_HELPER_URL_ROUTE_BE))."::gallery(), 0),
             ]);
             ?>
             " ?>

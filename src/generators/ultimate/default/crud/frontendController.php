@@ -1,6 +1,8 @@
 <?php
-use yii\db\ActiveRecordInterface;
-use yii\helpers\StringHelper;
+
+use dlds\giixer\generators\ultimate\helpers\CrudHelper;
+use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
+use dlds\giixer\generators\ultimate\helpers\ModelHelper;
 
 /* @var $this yii\web\View */
 /* @var $generator dlds\giixer\generators\ultimate\Generator */
@@ -8,23 +10,24 @@ use yii\helpers\StringHelper;
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->helperCrud->getNsByPattern(basename(__FILE__, '.php'), $generator->helperCrud->getControllerClass(true)) ?>;
+namespace <?= CrudHelper::ns($generator->helperCrud->getClass(CrudHelper::RK_CONTROLLER_FE)) ?>;
 
-use <?= $generator->helperComponent->getHandlerClass('frontendCrudHandler', false, true, true) ?>;
-use <?= $generator->helperComponent->getHandlerClass('frontendSearchHandler', false, true, true) ?>;
+use <?= $generator->helperComponent->getClass(CrudHelper::RK_HANDLER_CRUD_FE) ?>;
+use <?= $generator->helperComponent->getClass(CrudHelper::RK_HANDLER_SEARCH_FE) ?>;
 
 /**
- * <?= $generator->helperCrud->getControllerClass(true) ?> implements the CRUD actions for <?= $generator->helperModel->getModelClass(true) ?> model.
+ * <?= CrudHelper::basename($generator->helperCrud->getClass(CrudHelper::RK_CONTROLLER_FE)) ?> implements the CRUD actions for <?= ModelHelper::root($generator->helperModel->getClass(CrudHelper::RK_MODEL_CM)) ?> model.
  */
-class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $generator->helperCrud->getControllerParentClass(false, true, \Yii::$app->getModule('gii')->getBaseClass($generator->helperCrud->getControllerClass(true), \dlds\giixer\Module::BASE_CONTROLLER_FRONTEND)) ?> {
+class <?= CrudHelper::basename($generator->helperCrud->getClass(CrudHelper::RK_CONTROLLER_FE)) ?> extends <?= CrudHelper::root($generator->helperCrud->getParentClass(CrudHelper::RK_CONTROLLER_FE)) ?> 
+{
 
     /**
-     * Lists all <?= $generator->helperModel->getModelClass(true) ?> models.
+     * Lists all <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $handler = new <?= $generator->helperComponent->getHandlerClass('frontendSearchHandler', true) ?>(\Yii::$app->request->queryParams);
+        $handler = new <?= ComponentHelper::basename($generator->helperComponent->getClass(ComponentHelper::RK_HANDLER_SEARCH_FE)) ?>(\Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchHandler' => $handler,
@@ -32,18 +35,17 @@ class <?= $generator->helperCrud->getControllerClass(true) ?> extends <?= $gener
     }
 
     /**
-     * Displays a single <?= $generator->helperModel->getModelClass(true) ?> model.
+     * Displays a single <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> model.
      * @param integer $id primary key
      * @return mixed
      */
     public function actionView($id)
     {
-        $handler = new <?= $generator->helperComponent->getHandlerClass('frontendCrudHandler', true) ?>();
+        $handler = new <?= ComponentHelper::basename($generator->helperComponent->getClass(ComponentHelper::RK_HANDLER_CRUD_FE)) ?>();
 
         $evt = $handler->read($id);
 
-        if (!$evt->isRead())
-        {
+        if (!$evt->isRead()) {
             return $handler->notFoundFallback();
         }
 

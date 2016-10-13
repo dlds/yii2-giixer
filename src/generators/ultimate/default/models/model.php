@@ -2,6 +2,7 @@
 
 use yii\helpers\Inflector;
 use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
+use dlds\giixer\generators\ultimate\helpers\ModelHelper;
 
 /* @var $this yii\web\View */
 /* @var $generator dlds\giixer\generators\ultimate\Generator */
@@ -12,14 +13,11 @@ use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->helperModel->getNsByPattern(basename(__FILE__, '.php'), $generator->helperModel->getModelClass(true)) ?>;
+namespace <?= ModelHelper::ns($generator->helperModel->getClass(ModelHelper::RK_MODEL)) ?>;
 
 use Yii;
-<?php foreach ($generator->usedClasses as $class): ?>
-use <?= $class.";\n" ?>
-<?php endforeach; ?>
 <?php if ($generator->generateGalleryBehavior): ?>
-use <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_HELPER, false, false).";\n" ?>
+use <?= $generator->helperComponent->getClass(ComponentHelper::RK_HELPER_IMAGE).";\n" ?>
 <?php endif; ?>
 
 /**
@@ -31,11 +29,12 @@ use <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_
 <?php if (!empty($relations)): ?>
  *
 <?php foreach ($relations as $name => $relation): ?>
- * @property <?= $generator->helperModel->getFullyQualifiedName($relation[1], true) . ($relation[2] ? '[]' : '') . ' $' . lcfirst($name) . "\n" ?>
+ * @property <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $relation[1])) . ($relation[2] ? '[]' : '') . ' $' . lcfirst($name) . "\n" ?>
 <?php endforeach; ?>
 <?php endif; ?>
  */
-abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $generator->helperModel->getModelParentClass(basename(__FILE__, '.php'), false, true) ?> {
+abstract class <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL)) ?> extends <?= ModelHelper::root($generator->helperModel->getParentClass(ModelHelper::RK_MODEL)) ?> 
+{
 
     <?= '// <editor-fold defaultstate="collapsed" desc="CONSTANTS: Relations names">'."\n" ?>
 <?php foreach ($relations as $name => $relation): ?>
@@ -135,7 +134,7 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
     public function getAssignedImageCover()
     {
         return $this->hasOne(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
-                ->where(['type' => <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_HELPER, true) ?>::getType()])
+                ->where(['type' => <?= ComponentHelper::root($generator->helperComponent->getClass(ModelHelper::RK_HELPER_IMAGE)) ?>::getType()])
                 ->orderBy(['rank' => SORT_ASC]);
     }
 
@@ -146,7 +145,7 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
     public function getAssignedImages()
     {
         return $this->hasMany(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
-                ->where(['type' => <?= $generator->helperComponent->getHelperClass(ComponentHelper::TMPL_IMAGE_HELPER, true) ?>::getType()]);
+                ->where(['type' => <?= ComponentHelper::root($generator->helperComponent->getClass(ModelHelper::RK_HELPER_IMAGE)) ?>::getType()]);
     }
 <?php endif; ?>
 
@@ -164,10 +163,10 @@ abstract class <?= $generator->helperModel->getModelClass(true) ?> extends <?= $
 
     /**
      * @inheritdoc
-     * @return <?= $generator->helperModel->getQueryClass(false, true) ?> the active query used by this AR class.
+     * @return <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_QUERY)) ?> the active query used by this AR class.
      */
     public static function find()
     {
-        return new <?= $generator->helperModel->getQueryClass(false, true) ?>(get_called_class());
+        return new <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_QUERY)) ?>(get_called_class());
     }
 }

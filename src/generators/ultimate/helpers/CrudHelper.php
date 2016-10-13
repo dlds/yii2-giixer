@@ -5,20 +5,16 @@ namespace dlds\giixer\generators\ultimate\helpers;
 use Yii;
 use yii\gii\CodeFile;
 use yii\helpers\Inflector;
-use yii\helpers\StringHelper;
+use yii\helpers\ArrayHelper;
 
-class CrudHelper extends BaseHelper {
+class CrudHelper extends BaseHelper
+{
 
     /**
      * Constant types
      */
-    const MODAL_SEARCH = 'MODAL_SEARCH';
-    const GRID_OVERVIEW = 'GRID_OVERVIEW';
-
-    /**
-     * Suffixes
-     */
-    const SUFFIX_CONTROLLER = 'Controller';
+    const CT_MODAL_SEARCH = 'MODAL_SEARCH';
+    const CT_GRID_OVERVIEW = 'GRID_OVERVIEW';
 
     /**
      * Retrieves required template files
@@ -29,17 +25,18 @@ class CrudHelper extends BaseHelper {
         $tmpls = [
             'backendController.php',
             'frontendController.php',
-            'views/index.php',
-            'views/create.php',
-            'views/update.php',
-            'views/overview/_search.php',
-            'views/overview/_grid.php',
-            'views/crud/_form.php',
+            'views/backendView/index.php',
+            'views/backendView/create.php',
+            'views/backendView/update.php',
+            'views/backendView/overview/_search.php',
+            'views/backendView/overview/_grid.php',
+            'views/backendView/crud/_form.php',
+            //'views/frontedView/index.php',
+            //'views/frontedView/view.php',
         ];
 
-        if (self::$generator->generateMutation)
-        {
-            $tmpls[] = 'views/crud/relations/mutation.php';
+        if (self::$generator->generateMutation) {
+            $tmpls[] = 'views/backendView/crud/relations/mutation.php';
         }
 
         return $tmpls;
@@ -52,12 +49,11 @@ class CrudHelper extends BaseHelper {
      */
     public function getRoute($action)
     {
-        $classname = strtolower($this->getBaseClassKey('-'));
+        $classname = strtolower($this->getClassid());
 
-        $module = $this->getModule();
+        $module = self::$generator->getModuleId();
 
-        if ($module)
-        {
+        if ($module) {
             return sprintf('%s/%s/%s', $module, $classname, $action);
         }
 
@@ -65,108 +61,20 @@ class CrudHelper extends BaseHelper {
     }
 
     /**
-     * Retrieves module name if CRUD is under module
-     * @return string module name
-     */
-    public function getModule()
-    {
-        $ns = $this->getNsByMap($this->getBaseClassName(), true);
-
-        if (false !== strpos($ns, 'modules'))
-        {
-            $parts = explode('\\', $ns);
-
-            return \yii\helpers\ArrayHelper::getValue($parts, 1, false);
-        }
-
-        return false;
-    }
-
-    /**
-     * Retrieves ID constant name
-     * @param string $type
-     */
-    public function getIdConstantName($type)
-    {
-        $classname = strtoupper($this->getBaseClassKey('_'));
-
-        return sprintf('ID_%s_%s', $type, $classname);
-    }
-
-    /**
-     * Retrieves controller class
-     * @return type
-     */
-    public function getControllerClass($basename = false, $root = false)
-    {
-        if (!self::$generator->controllerClass)
-        {
-            $classname = sprintf('%s%s', $this->getBaseClassName(), self::SUFFIX_CONTROLLER);
-
-            $class = $this->getFullyQualifiedName($classname, $root);
-        }
-        else
-        {
-            $class = self::$generator->controllerClass;
-        }
-
-        if ($basename)
-        {
-            return StringHelper::basename($class);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Retrieves CRUD Controller parent class
-     * @return string base class
-     */
-    public function getControllerParentClass($basename = false, $root = false, $customBaseClass = false)
-    {
-        $class = ($customBaseClass) ? $customBaseClass : \dlds\giixer\Module::DEFAULT_BASE_CONTROLLER;
-
-        if ($basename)
-        {
-            return StringHelper::basename($class);
-        }
-
-        if ($root)
-        {
-            return sprintf('\\%s', $class);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Retrieves CRUD controller file path alias
-     * @param string $ns namespace
-     */
-    public function getControllerFilePathAlias($ns)
-    {
-        $namespace = str_replace('{ns}', $this->getNsByMap($this->getControllerClass(true), true), $ns);
-
-        return sprintf('@%s', str_replace('\\', '/', $namespace));
-    }
-
-    /**
      * Generates CRUD views files
      * @param \yii\db\TableSchema $tableSchema
      * @param array $files holder
      */
-    public function generateController(\yii\db\TableSchema $tableSchema, &$files)
+    public function generateControllers(\yii\db\TableSchema $tableSchema, &$files)
     {
         $renderParams = [
             'actionParams' => $this->getControllerActionParams($tableSchema),
             'actionParamComments' => $this->getControllerActionParamComments($tableSchema),
         ];
 
-        foreach (self::$generator->controllerFilesMap as $tmpl => $ns)
-        {
-            $filePath = sprintf('%s/%s.php', \Yii::getAlias($this->getControllerFilePathAlias($ns)), $this->getControllerClass(true));
-
-            $tmplPath = sprintf('%s/%s.php', self::DIR_CRUD_TMPLS_PATH, $tmpl);
+        foreach (self::$generator->controllerFilesMap as $tmpl) {
+            $filePath = static::file($this->getFile($tmpl));
+            $tmplPath = static::tmpl(self::DIR_CRUD, $tmpl);
 
             $fileContent = self::$generator->render($tmplPath, $renderParams);
 
@@ -174,102 +82,6 @@ class CrudHelper extends BaseHelper {
                 $filePath, $fileContent
             );
         }
-    }
-
-    /**
-     * Generates URL parameters
-     * @return string
-     */
-    public function getControllerUrlParams(\yii\db\TableSchema $table)
-    {
-        $pks = $table->primaryKey;
-
-        if (count($pks) === 1)
-        {
-            if (is_subclass_of(self::$generator->getModelClassName(), 'yii\mongodb\ActiveRecord'))
-            {
-                return "'id' => (string)\$model->{$pks[0]}";
-            }
-            else
-            {
-                return "'id' => \$model->{$pks[0]}";
-            }
-        }
-        else
-        {
-            $params = [];
-            foreach ($pks as $pk)
-            {
-                if (is_subclass_of(self::$generator->getModelClassName(), 'yii\mongodb\ActiveRecord'))
-                {
-                    $params[] = "'$pk' => (string)\$model->$pk";
-                }
-                else
-                {
-                    $params[] = "'$pk' => \$model->$pk";
-                }
-            }
-
-            return implode(', ', $params);
-        }
-    }
-
-    /**
-     * Generates action parameters
-     * @return string
-     */
-    public function getControllerActionParams(\yii\db\TableSchema $table)
-    {
-        $pks = $table->primaryKey;
-
-        if (count($pks) === 1)
-        {
-            return '$id';
-        }
-        else
-        {
-            return '$'.implode(', $', $pks);
-        }
-    }
-
-    /**
-     * Generates parameter tags for phpdoc
-     * @return array parameter tags for phpdoc
-     */
-    public function getControllerActionParamComments(\yii\db\TableSchema $table)
-    {
-        $pks = $table->primaryKey;
-
-        if (count($pks) === 1)
-        {
-            return ['@param '.$table->columns[$pks[0]]->phpType.' $id'];
-        }
-        else
-        {
-            $params = [];
-            foreach ($pks as $pk)
-            {
-                $params[] = '@param '.$table->columns[$pk]->phpType.' $'.$pk;
-            }
-
-            return $params;
-        }
-    }
-
-    /**
-     * Retrieves heading
-     * @param boolean $plural
-     */
-    public function getHeading($plural = false)
-    {
-        $headingKey = sprintf('heading_%s', $this->getBaseClassKey('_'));
-
-        if ($plural)
-        {
-            return self::$generator->generateString(Inflector::pluralize($headingKey));
-        }
-
-        return self::$generator->generateString($headingKey);
     }
 
     /**
@@ -284,88 +96,149 @@ class CrudHelper extends BaseHelper {
             'columnNames' => $tableSchema->columnNames,
         ];
 
-        if (self::$generator->generateMutation)
-        {
+        if (self::$generator->generateMutation) {
             $renderParams['mutationColumns'] = self::$generator->getTableSchema(self::$generator->mutationJoinTableName)->columnNames;
             $renderParams['mutationSafeAttributes'] = self::$generator->getTableSchema(self::$generator->mutationJoinTableName)->columns;
         }
 
-        $this->processViewsDir($this->getViewsRootDir(), $renderParams, $files);
+        $this->processViewsDir($this->getViewsTmplDir(self::RK_VIEW_BE), self::RK_VIEW_BE, $renderParams, $files);
+        $this->processViewsDir($this->getViewsTmplDir(self::RK_VIEW_FE), self::RK_VIEW_FE, $renderParams, $files);
     }
 
     /**
+     * Generates action parameters
+     * @return string
+     */
+    protected function getControllerActionParams(\yii\db\TableSchema $table)
+    {
+        $pks = $table->primaryKey;
+
+        if (count($pks) === 1) {
+            return '$id';
+        } else {
+            return '$' . implode(', $', $pks);
+        }
+    }
+
+    /**
+     * Generates parameter tags for phpdoc
+     * @return array parameter tags for phpdoc
+     */
+    protected function getControllerActionParamComments(\yii\db\TableSchema $table)
+    {
+        $pks = $table->primaryKey;
+
+        if (count($pks) === 1) {
+            return ['@param ' . $table->columns[$pks[0]]->phpType . ' $id'];
+        } else {
+            $params = [];
+            foreach ($pks as $pk) {
+                $params[] = '@param ' . $table->columns[$pk]->phpType . ' $' . $pk;
+            }
+
+            return $params;
+        }
+    }
+
+    /**
+     * Retrieves heading
+     * @param boolean $plural
+     */
+    public function getHeading($plural = false)
+    {
+        $headingKey = sprintf('heading_%s', $this->getClassid(self::RK_MODEL_CM, false, '_'));
+
+        if ($plural) {
+            return self::$generator->generateString(Inflector::pluralize($headingKey));
+        }
+
+        return self::$generator->generateString($headingKey);
+    }
+    
+    /**
      * Scans and renders CRUD views files
-     * @param sting $sourceDir dir to be scanned
+     * @param sting $dir dir to be scanned
      * @param array $renderParams params pushed to render function
      * @param array $files holder
      */
-    protected function processViewsDir($sourceDir, $renderParams, &$files)
+    protected function processViewsDir($dir, $key, $renderParams, &$files)
     {
-        foreach (scandir($sourceDir) as $filename)
-        {
-            $tmplPath = sprintf('%s/%s', $sourceDir, $filename);
+        foreach (scandir($dir) as $filename) {
 
-            if (is_file($tmplPath) && pathinfo($filename, PATHINFO_EXTENSION) === 'php')
-            {
-                $destFile = trim(str_replace($this->getViewsRootDir(), '', $tmplPath), '/');
-
-                if ($filename == 'mutation.php')
-                {
-                    if (!self::$generator->generateMutation)
-                    {
-                        continue;
-                    }
-
-                    $destFile = str_replace('mutation', Inflector::camel2id(self::$generator->mutationJoinTableName), $destFile);
-                }
-
-                $content = self::$generator->renderFile($tmplPath, $renderParams);
-
-                $files[] = new CodeFile(sprintf('%s/%s', $this->getViewsDestDir($filename), $destFile), $content);
+            if ('.' === $filename || '..' === $filename) {
+                continue;
             }
-            elseif ($filename != '.' && $filename != '..' && is_dir($tmplPath))
-            {
-                $this->processViewsDir($tmplPath, $renderParams, $files);
+
+            $tmplPath = static::tmpl($dir, $filename, false);
+
+            if (is_dir($tmplPath)) {
+                $keys = ArrayHelper::merge((array)$key, (array)$filename);
+                $this->processViewsDir($tmplPath, $keys, $renderParams, $files);
             }
+
+            if (!is_file($tmplPath) || pathinfo($filename, PATHINFO_EXTENSION) !== 'php') {
+                continue;
+            }
+
+            if ($filename === 'mutation.php' && !self::$generator->generateMutation) {
+                continue;
+            }
+
+            if (is_array($key)) {
+                // keyname
+                $kn = \yii\helpers\ArrayHelper::getValue($key, 0);
+                // filename
+                $fn = sprintf('%s/%s', implode('/', array_slice($key, 1)), $filename);
+                // filepath
+                $filePath = $this->getViewFile($kn, $fn);
+            } else {
+                $filePath = $this->getViewFile($key, $filename);
+            }
+
+            if ($filename == 'mutation.php') {
+                $filePath = str_replace('mutation', Inflector::camel2id(self::$generator->mutationJoinTableName), $filePath);
+            }
+
+            $fileContent = self::$generator->renderFile($tmplPath, $renderParams);
+
+            $files[] = new CodeFile(
+                $filePath, $fileContent
+            );
         }
     }
 
     /**
-     * Retrieves CRUD views root dir
+     * Retrieves CRUD views template dir
      * @return string path
      */
-    protected function getViewsRootDir()
+    protected function getViewsTmplDir($subdir = false)
     {
-        return sprintf('%s/%s', self::$generator->getTemplatePath(), self::DIR_CRUD_VIEWS_PATH);
+        $dir = static::dir(self::DIR_VIEWS);
+
+        if ($subdir) {
+            $dir = sprintf('%s/%s', $dir, $subdir);
+        }
+
+        return sprintf('%s/%s', self::$generator->getTemplatePath(), $dir);
     }
 
     /**
-     * Retrieves CRUD views destination dir
+     * Retrieves CRUD views destination file path
      * @return string path
      */
-    protected function getViewsDestDir($filename)
+    protected function getViewFile($key, $filename)
     {
-        if (empty(self::$generator->viewPath))
-        {
-            return Yii::getAlias($this->getViewPathFromBaseClass($filename));
-        }
-        else
-        {
-            return Yii::getAlias(self::$generator->viewPath);
-        }
-    }
+        $rule = ArrayHelper::getValue(static::$nsRules, $key);
 
-    /**
-     * @return string the controller ID (without the module ID prefix)
-     */
-    protected function getViewPathFromBaseClass($filename)
-    {
-        $key = $this->getBaseClassKey();
+        if (!$rule) {
+            return false;
+        }
 
-        $ns = $this->getNsByMap(sprintf('%s/%s', $key, $filename));
+        $ns = $this->getFqn($this->getClassid($key), $rule, $key);
 
         $alias = str_replace('\\', '/', $ns);
 
-        return sprintf('@%s/%s', $alias, $key);
+        return Yii::getAlias(sprintf('@%s/%s', $alias, $filename));
     }
+
 }

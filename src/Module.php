@@ -19,16 +19,6 @@ class Module extends \yii\gii\Module
 {
 
     /**
-     * Bases identifications
-     */
-    const BASE_CONTROLLER_BACKEND = 'base_controller_backend';
-    const BASE_CONTROLLER_FRONTEND = 'base_controller_frontend';
-    const BASE_URL_ROUTE_HELPER = 'base_url_route_helper';
-    const BASE_URL_RULE_HELPER = 'base_url_rule_helper';
-    const BASE_ELEMENT_HELPER_BACKEND = 'base_element_helper_backend';
-    const BASE_ELEMENT_HELPER_FRONTEND = 'base_element_helper_frontend';
-
-    /**
      * Defaults
      */
     const DEFAULT_BASE_COMPONENT = 'yii\\base\\Component';
@@ -146,11 +136,16 @@ class Module extends \yii\gii\Module
      */
     public static function findMatch($subject, array $map, $default = false)
     {
+        var_dump($subject);
         foreach ($map as $regex => $value) {
+            
+            $pattern = generators\ultimate\helpers\BaseHelper::sanitazeNsRegex($regex);
+            
             if (preg_match('%' . $regex . '%', $subject)) {
                 return $value;
             }
         }
+        die();
 
         return $default;
     }

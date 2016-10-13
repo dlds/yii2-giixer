@@ -7,18 +7,8 @@ use yii\gii\CodeFile;
 use yii\helpers\StringHelper;
 use yii\helpers\Inflector;
 
-class ModelHelper extends BaseHelper {
-
-    /**
-     * Suffixes
-     */
-    const SUFFIX_QUERY = 'Query';
-    const SUFFIX_SEARCH = 'Search';
-
-    /**
-     * Suffixes
-     */
-    const SUFFIX_MODEL = '';
+class ModelHelper extends BaseHelper
+{
 
     /**
      * @var array
@@ -33,72 +23,38 @@ class ModelHelper extends BaseHelper {
     {
         return [
             'model.php',
-            'backendModel.php',
-            'frontendModel.php',
             'commonModel.php',
             'query.php',
-            'backendQuery.php',
-            'frontendQuery.php',
             'backendSearch.php',
             'frontendSearch.php',
         ];
     }
 
     /**
-     * Retrieves MODEL class
-     * @return type
+     * Generates MODEL ActiveRecord files
+     * @param \yii\db\TableSchema $tableSchema
+     * @param array $files holder
      */
-    public function getSearchClass($basename = false, $root = true)
+    public function generateModels(\yii\db\TableSchema $tableSchema, &$files)
     {
-        if (!self::$generator->searchClass)
-        {
-            $classname = sprintf('%s%s', $this->getBaseClassName(), self::SUFFIX_SEARCH);
+        $renderParams = [
+            'columns' => $tableSchema->columns,
+            'labels' => $this->generateModelLabels($tableSchema),
+            'rules' => $this->generateModelRules($tableSchema),
+            'relations' => $this->generateModelRelations($tableSchema),
+        ];
 
-            $class = $this->getFullyQualifiedName($classname, $root);
+        foreach (self::$generator->modelFilesMap as $tmpl) {
+
+            $filePath = static::file($this->getFile($tmpl));
+            $tmplPath = static::tmpl(self::DIR_MODELS, $tmpl);
+
+            $fileContent = self::$generator->render($tmplPath, $renderParams);
+
+            $files[] = new CodeFile(
+                $filePath, $fileContent
+            );
         }
-        else
-        {
-            $class = $this->generator->searchClass;
-        }
-
-        if ($basename)
-        {
-            return StringHelper::basename($class);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Retrieves MODEL Query parent class
-     * @return type
-     */
-    public function getSearchParentClass($key, $basename = false, $root = false)
-    {
-        $class = $this->getParentClass($key, $this->getModelClass(true));
-
-        if ($basename)
-        {
-            return StringHelper::basename($class);
-        }
-
-        if ($root)
-        {
-            return sprintf('\\%s', $class);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Retrieves MODEL file path alias
-     * @param string $ns namespace
-     */
-    public function getSearchFilePathAlias($ns)
-    {
-        $namespace = str_replace('{ns}', $this->getNsByMap($this->getSearchClass(true, false), true), $ns);
-
-        return sprintf('@%s', str_replace('\\', '/', $namespace));
     }
 
     /**
@@ -116,13 +72,32 @@ class ModelHelper extends BaseHelper {
             'primaryKey' => \yii\helpers\ArrayHelper::getValue($tableSchema->primaryKey, 0, 'id'),
         ];
 
-        foreach (self::$generator->searchFilesMap as $tmpl => $ns)
-        {
-            $filePath = sprintf('%s/%s.php', \Yii::getAlias($this->getSearchFilePathAlias($ns)), $this->getSearchClass(true));
+        foreach (self::$generator->searchFilesMap as $tmpl) {
 
-            $tmplPath = sprintf('%s/%s.php', self::DIR_MODEL_TMPLS_PATH, $tmpl);
+            $filePath = static::file($this->getFile($tmpl));
+            $tmplPath = static::tmpl(self::DIR_MODELS, $tmpl);
 
             $fileContent = self::$generator->render($tmplPath, $renderParams);
+
+            $files[] = new CodeFile(
+                $filePath, $fileContent
+            );
+        }
+    }
+
+    /**
+     * Generates MODEL Query files
+     * @param \yii\db\TableSchema $tableSchema
+     * @param CodeFile $files
+     */
+    public function generateQueries(\yii\db\TableSchema $tableSchema, &$files)
+    {
+        foreach (self::$generator->queryFilesMap as $tmpl) {
+
+            $filePath = static::file($this->getFile($tmpl));
+            $tmplPath = static::tmpl(self::DIR_MODELS, $tmpl);
+
+            $fileContent = self::$generator->render($tmplPath, []);
 
             $files[] = new CodeFile(
                 $filePath, $fileContent
@@ -134,13 +109,11 @@ class ModelHelper extends BaseHelper {
      * Generates validation rules for the search model.
      * @return array the generated validation rules
      */
-    public function generateSearchRules(\yii\db\TableSchema $table)
+    protected function generateSearchRules(\yii\db\TableSchema $table)
     {
         $types = [];
-        foreach ($table->columns as $column)
-        {
-            switch ($column->type)
-            {
+        foreach ($table->columns as $column) {
+            switch ($column->type) {
                 case Schema::TYPE_SMALLINT:
                 case Schema::TYPE_INTEGER:
                 case Schema::TYPE_BIGINT:
@@ -165,9 +138,8 @@ class ModelHelper extends BaseHelper {
         }
 
         $rules = [];
-        foreach ($types as $type => $columns)
-        {
-            $rules[] = "[['".implode("', '", $columns)."'], '$type']";
+        foreach ($types as $type => $columns) {
+            $rules[] = "[['" . implode("', '", $columns) . "'], '$type']";
         }
 
         return $rules;
@@ -176,7 +148,7 @@ class ModelHelper extends BaseHelper {
     /**
      * @return array searchable attributes
      */
-    public function getSearchAttributes(\yii\db\TableSchema $table)
+    protected function getSearchAttributes(\yii\db\TableSchema $table)
     {
         return $table->getColumnNames();
     }
@@ -185,27 +157,19 @@ class ModelHelper extends BaseHelper {
      * Generates the attribute labels for the search model.
      * @return array the generated attribute labels (name => label)
      */
-    public function generateSearchLabels(\yii\db\TableSchema $table, $attributeLabels)
+    protected function generateSearchLabels(\yii\db\TableSchema $table, $attributeLabels)
     {
         $labels = [];
-        foreach ($table->getColumnNames() as $name)
-        {
-            if (isset($attributeLabels[$name]))
-            {
+        foreach ($table->getColumnNames() as $name) {
+            if (isset($attributeLabels[$name])) {
                 $labels[$name] = $attributeLabels[$name];
-            }
-            else
-            {
-                if (!strcasecmp($name, 'id'))
-                {
+            } else {
+                if (!strcasecmp($name, 'id')) {
                     $labels[$name] = 'ID';
-                }
-                else
-                {
+                } else {
                     $label = Inflector::camel2words($name);
-                    if (!empty($label) && substr_compare($label, ' id', -3, 3, true) === 0)
-                    {
-                        $label = substr($label, 0, -3).' ID';
+                    if (!empty($label) && substr_compare($label, ' id', -3, 3, true) === 0) {
+                        $label = substr($label, 0, -3) . ' ID';
                     }
                     $labels[$name] = $label;
                 }
@@ -219,20 +183,17 @@ class ModelHelper extends BaseHelper {
      * Generates search conditions
      * @return array
      */
-    public function generateSearchConditions(\yii\db\TableSchema $table)
+    protected function generateSearchConditions(\yii\db\TableSchema $table)
     {
         $columns = [];
-        foreach ($table->columns as $column)
-        {
+        foreach ($table->columns as $column) {
             $columns[$column->name] = $column->type;
         }
 
         $likeConditions = [];
         $hashConditions = [];
-        foreach ($columns as $column => $type)
-        {
-            switch ($type)
-            {
+        foreach ($columns as $column => $type) {
+            switch ($type) {
                 case Schema::TYPE_SMALLINT:
                 case Schema::TYPE_INTEGER:
                 case Schema::TYPE_BIGINT:
@@ -253,179 +214,16 @@ class ModelHelper extends BaseHelper {
         }
 
         $conditions = [];
-        if (!empty($hashConditions))
-        {
+        if (!empty($hashConditions)) {
             $conditions[] = "\$query->andFilterWhere([\n"
-                .str_repeat(' ', 12).implode("\n".str_repeat(' ', 12), $hashConditions)
-                ."\n".str_repeat(' ', 8)."]);\n";
+                . str_repeat(' ', 12) . implode("\n" . str_repeat(' ', 12), $hashConditions)
+                . "\n" . str_repeat(' ', 8) . "]);\n";
         }
-        if (!empty($likeConditions))
-        {
-            $conditions[] = "\$query".implode("\n".str_repeat(' ', 12), $likeConditions).";\n";
+        if (!empty($likeConditions)) {
+            $conditions[] = "\$query" . implode("\n" . str_repeat(' ', 12), $likeConditions) . ";\n";
         }
 
         return $conditions;
-    }
-
-    /**
-     * Retrieves MODEL class
-     * @return type
-     */
-    public function getQueryClass($basename = false, $root = false)
-    {
-        if (!self::$generator->queryClass)
-        {
-            $classname = sprintf('%s%s', $this->getBaseClassName(), self::SUFFIX_QUERY);
-
-            $class = $this->getFullyQualifiedName($classname, $root);
-        }
-        else
-        {
-            $class = $this->generator->queryClass;
-        }
-
-        if ($basename)
-        {
-            return StringHelper::basename($class);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Retrieves MODEL Query parent class
-     * @return type
-     */
-    public function getQueryParentClass($key, $basename = false, $root = false)
-    {
-        $class = $this->getParentClass($key, $this->getQueryClass(true), \dlds\giixer\Module::DEFAULT_BASE_QUERY);
-
-        if ($basename)
-        {
-            return StringHelper::basename($class);
-        }
-
-        if ($root)
-        {
-            return sprintf('\\%s', $class);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Retrieves MODEL file path alias
-     * @param string $ns namespace
-     */
-    public function getQueryFilePathAlias($ns)
-    {
-        $namespace = str_replace('{ns}', $this->getNsByMap($this->getQueryClass(true), true), $ns);
-
-        return sprintf('@%s', str_replace('\\', '/', $namespace));
-    }
-
-    /**
-     * Generates MODEL Query files
-     * @param \yii\db\TableSchema $tableSchema
-     * @param CodeFile $files
-     */
-    public function generateQueries(\yii\db\TableSchema $tableSchema, &$files)
-    {
-        $renderParams = [
-            //'className' => $queryClassName,
-            //'modelClassName' => $modelClassName,
-        ];
-
-        foreach (self::$generator->queryFilesMap as $tmpl => $ns)
-        {
-            $filePath = sprintf('%s/%s.php', \Yii::getAlias($this->getQueryFilePathAlias($ns)), $this->getQueryClass(true));
-
-            $tmplPath = sprintf('%s/%s.php', self::DIR_MODEL_TMPLS_PATH, $tmpl);
-
-            $fileContent = self::$generator->render($tmplPath, $renderParams);
-
-            $files[] = new CodeFile(
-                $filePath, $fileContent
-            );
-        }
-    }
-
-    /**
-     * Retrieves MODEL class
-     * @return type
-     */
-    public function getModelClass($basename = false, $root = false)
-    {
-        $classname = $this->getBaseClassName();
-
-        $class = $this->getFullyQualifiedName($classname, $root);
-
-        if ($basename)
-        {
-            return StringHelper::basename($class);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Retrieves MODEL parent class
-     * @return type
-     */
-    public function getModelParentClass($key, $basename = false, $root = false)
-    {
-        $class = $this->getParentClass($key, $this->getModelClass(true), \dlds\giixer\Module::DEFAULT_BASE_ACTIVE_RECORD);
-
-        if ($basename)
-        {
-            return StringHelper::basename($class);
-        }
-
-        if ($root)
-        {
-            return sprintf('\\%s', $class);
-        }
-
-        return $class;
-    }
-
-    /**
-     * Retrieves MODEL file path alias
-     * @param string $ns namespace
-     */
-    public function getModelFilePathAlias($ns)
-    {
-        $namespace = str_replace('{ns}', $this->getNsByMap($this->getModelClass(true), true), $ns);
-
-        return sprintf('@%s', str_replace('\\', '/', $namespace));
-    }
-
-    /**
-     * Generates MODEL ActiveRecord files
-     * @param \yii\db\TableSchema $tableSchema
-     * @param array $files holder
-     */
-    public function generateModels(\yii\db\TableSchema $tableSchema, &$files)
-    {
-        $renderParams = [
-            'columns' => $tableSchema->columns,
-            'labels' => $this->generateModelLabels($tableSchema),
-            'rules' => $this->generateModelRules($tableSchema),
-            'relations' => $this->generateModelRelations($tableSchema),
-        ];
-
-        foreach (self::$generator->modelFilesMap as $tmpl => $ns)
-        {
-            $filePath = sprintf('%s/%s.php', \Yii::getAlias($this->getModelFilePathAlias($ns)), $this->getModelClass(true));
-
-            $tmplPath = sprintf('%s/%s.php', self::DIR_MODEL_TMPLS_PATH, $tmpl);
-
-            $fileContent = self::$generator->render($tmplPath, $renderParams);
-
-            $files[] = new CodeFile(
-                $filePath, $fileContent
-            );
-        }
     }
 
     /**
@@ -455,16 +253,15 @@ class ModelHelper extends BaseHelper {
      */
     protected function generateModelRelations(\yii\db\TableSchema $tableSchema)
     {
-        if (!isset(self::$relations[$tableSchema->name]))
-        {
+        if (!isset(self::$relations[$tableSchema->name])) {
             self::$relations = self::$generator->generateRelations();
         }
 
-        if (!isset(self::$relations[$tableSchema->name]))
-        {
+        if (!isset(self::$relations[$tableSchema->name])) {
             return [];
         }
 
         return self::$relations[$tableSchema->name];
     }
+
 }

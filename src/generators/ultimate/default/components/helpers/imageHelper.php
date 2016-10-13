@@ -1,22 +1,24 @@
 <?php
+
+use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
+use dlds\giixer\generators\ultimate\helpers\ModelHelper;
+
 /* @var $this yii\web\View */
 /* @var $generator \dlds\giixer\generators\ultimate\Generator */
 
 echo "<?php\n";
 ?>
 
-namespace <?= $generator->helperComponent->getNsByPattern(basename(__FILE__, '.php'), $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true)) ?>;
+namespace <?= ComponentHelper::ns($generator->helperComponent->getClass(ComponentHelper::RK_HELPER_IMAGE)) ?>;
 
 use yii\helpers\ArrayHelper;
-<?php foreach ($generator->usedClasses as $class): ?>
-use <?= $class.";\n" ?>
-<?php endforeach; ?>
 
 /**
  * This is common IMAGE helper for table "<?= $generator->generateTableName($generator->tableName) ?>".
  *
  */
-class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php'), true) ?> extends <?= sprintf('\\%s', $baseClass) ?> {
+class <?= ComponentHelper::basename($generator->helperComponent->getClass(ComponentHelper::RK_HELPER_IMAGE)) ?> extends <?= ComponentHelper::root($generator->helperComponent->getParentClass(ComponentHelper::RK_HELPER_IMAGE)) ."\n" ?>
+{
 
     /**
      * Specific versions
@@ -46,6 +48,6 @@ class <?= $generator->helperComponent->getHelperClass(basename(__FILE__, '.php')
      */
     public static function modelClass()
     {
-        return <?= $generator->helperModel->getModelClass(true) ?>::className();
+        return <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?>::className();
     }
 }

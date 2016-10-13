@@ -2,6 +2,8 @@
 
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
+use dlds\giixer\generators\ultimate\helpers\ModelHelper;
+use dlds\giixer\generators\ultimate\helpers\CrudHelper;
 
 /* @var $this yii\web\View */
 /* @var $generator \dlds\giixer\generators\ultimate\Generator */
@@ -12,11 +14,11 @@ echo "<?php\n";
 ?>
 
 /* @var $this yii\web\View */
-/* @var $model <?= ltrim($generator->helperModel->getFullyQualifiedName($generator->mutationJoinTableName), '\\') ?> */
+/* @var $model <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->mutationJoinTableName)) ?> */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="<?= Inflector::camel2id(StringHelper::basename($generator->mutationJoinTableName)) ?>-form">
+<div class="<?= CrudHelper::basename($generator->helperCrud->getClassid(CrudHelper::RK_MODEL_CM, $generator->mutationJoinTableName)) ?>-index">
     <?php
     foreach ($mutationColumns as $attribute)
     {

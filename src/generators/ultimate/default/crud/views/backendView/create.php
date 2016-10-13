@@ -1,7 +1,7 @@
 <?php
 
-use yii\helpers\Inflector;
-use yii\helpers\StringHelper;
+use dlds\giixer\generators\ultimate\helpers\CrudHelper;
+use dlds\giixer\generators\ultimate\helpers\ModelHelper;
 
 /* @var $this yii\web\View */
 /* @var $generator \dlds\giixer\generators\ultimate\Generator */
@@ -14,7 +14,7 @@ use dlds\metronic\widgets\Portlet;
 use dlds\giixer\components\helpers\GxFlashHelper;
 
 /* @var $this yii\web\View */
-/* @var $model <?= $generator->helperModel->getModelClass(false, true) ?> */
+/* @var $model <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?> */
 
 $this->title = \Yii::t('<?= $generator->i18nDefaultCategory ?>', 'title_create_new_{model}', [
         'model' => \<?= $generator->helperCrud->getHeading() ?>,
@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = ['label' => <?= $generator->helperCrud->getHead
 $this->params['breadcrumbs'][] = \<?= $generator->generateString('heading_new_entry') ?>;
 ?>
 
-<div class="<?= $generator->helperCrud->getBaseClassKey() ?>-create">
+<div class="<?= $generator->helperCrud->getClassid(CrudHelper::RK_MODEL_CM) ?>-create">
 
     <?= "<?php 
     Portlet::begin([
