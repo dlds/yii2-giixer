@@ -10,7 +10,7 @@ use Yii;
  * ... here comes property docs ...
  *
  */
-abstract class MyModel extends \dlds\giixer\components\GxActiveRecord {
+class MyModel extends \dlds\giixer\components\GxActiveRecord {
 
     /**
      * Relations names
@@ -40,7 +40,7 @@ abstract class MyModel extends \dlds\giixer\components\GxActiveRecord {
      * Appropriate ActiveQuery is assigned to the model right in this base class
      */
     public static function find() {
-        return new \app\modules\kernel\models\db\query\AppAuthorQuery(get_called_class());
+        return new \common\modules\kernel\models\db\query\AppAuthorQuery(get_called_class());
     }
 
 }

@@ -50,22 +50,12 @@ with descriptions about what they stand for. Each is placed on notional level as
     * Editable and maintained by developer
     * Manual changes **are not** lost after any giixer generation
     * File is placed in `common\models\db` or `common\modules\modulename\models\db`
-3. **Frontend/Backend AR**
-    * Extends **Common AR**
-    * Low level AR 
-    * Editable and maintained by developer
-    * Lie in separate application scopes `frontend` or `backend`
-    * Only these models can be directly used by application
-    * Namespaces are usually `app\models\db` or `app\modules\modulename\models\db` 
-    * Files are placed in corresponding location to their namespaces with `app` replaced by `frontend` or `backend`
+    * Only this model can be directly used by application
 
 > Structure schema is shown in [this diagram](https://github.com/dlds/yii2-giixer/blob/master/docs/schemas/ar_structure.png)
 
 This AR model structure gives you opportunity to easily update your DB schema
-and still be able to regenerate your AR models without loosing your current code changes.
-
-Because of same namespace for backend and frontend AR you can easily move some application logic to common scope
-and avoid code duplication while AR models will be still found.
+and still be able to regenerate your AR model without loosing your current code changes.
 
 > Some additional features stored in **Base AR** is shown in [MyModel](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/models/MyModel.php)
 
@@ -79,20 +69,13 @@ Giixer creates following 3 ActiveQuery (AQ) classes during ARs generation.
     * Extends `\yii\db\ActiveQuery`
     * Editable and maintained by developer
     * File is placed in `common\models\db\base` or `common\modules\modulename\models\db\base`
-2. **Frontend/Backend AQ**
-    * Low level AQ which extends **Common AQ**
-    * Editable and maintained by developer
-    * Always loaded in **Base AR** (Only these can be directly used by application)
-    * Namespaces are usually `app\models\db\query` or `app\modules\modulename\models\db\query` 
-    * Files are placed in corresponding location to their namespaces with `app` part replaced by `frontend` or `backend`
+    * Always loaded in **Base AR** (Only this can be directly used by application)
 
-Base AR will automatically loads appropriate AQ based on current application scope even 
-both low level AQs have same namespace. That is because frontend application 
-does not have access to backend application scope and vice versa.
+Base AR will automatically loads appropriate AQ.
 
 > Structure schema is shown in [this diagram](https://github.com/dlds/yii2-giixer/blob/master/docs/schemas/aq_structure.png)
 
-Giixer generated default AQ logic stored in **Common AQ** to be able to easily use appropriate AR model class in custom queries.
+Giixer generates default AQ logic to be able to easily use appropriate AR model class in custom queries.
 
 > Default AQ logic is show in [MyModelQuery](https://github.com/dlds/yii2-giixer/blob/master/docs/classes/models/MyModelQuery.php)
 
@@ -230,19 +213,45 @@ is divided into modules and you need to generate classes for these modules.
 
 ```
 [
-    '^Edu[a-zA-Z]+Form$' => 'app\\modules\\edu\models\\forms'
-    '^Shop[a-zA-Z]+Form$' => 'app\\modules\\shop\\models\\forms'
-    '^Edu[a-zA-Z]+Search$' => 'app\\modules\\edu\\models\\db\\search',
-    '^Shop[a-zA-Z]+Search$' => 'app\\modules\\shop\\models\\db\\search',
+    '^{Modules}[a-zA-Z]+Form$' => '{module}\models\\forms',
+    '^Core[a-zA-Z]+Form$' => 'models\\forms',
+    '^{modules}-[a-z-]+$' => '{module}\\views',
 ]
 ```
-In example above application has two modules Edu and Shop.
+In example above we can see our application contains modules and also some direct laying "Core" files.
 
-Regex is used as array keys and required namespace is used for array values. 
-Giixer than use appropriate namespaces for matched class names and generates
-its files in path corresponding namespace.
+You can see that we defined also rule for views to be able to place generated view files to appropriate folder.
 
----
+There are some special tags you can use when you specifying your rules.
+
+##### Special tags #####
+
+- {Module} - will be replaced with current module name
+- {Modules} - will be replaced with all modules names regex
+- {module} - will be replaced with current module id
+- {modules} - will be replaced with all modules ids regex
+
+To be able to use these special tags you have to specify your modules names and ids.
+
+```
+[
+    'edu' => 'Edu',
+    'shop' => 'Shop',
+    // ...
+]
+```
+
+Array index is used for modules IDs. Array values for modules Names.
+
+During generation Giixer will automatically replace these tags so final rules look like bellow *(we are generating some Edu model)*.
+
+```
+[
+    '^(Edu|Shop){1}[a-zA-Z]+Form$' => 'modules\edu\models\\forms',
+    '^Core[a-zA-Z]+Form$' => 'models\\forms',
+    '^(edu|shop){1}-[a-z-]+$' => 'modules\edu\\views',
+]
+```
 
 #### `bases` option
 
@@ -250,28 +259,19 @@ Defines base classes for specific components, controllers and other application 
 
 ```
 [
-	dlds\giixer\Module::BASE_CONTROLLER_BACKEND => [
-    	'^Edu[a-zA-Z]+Controller$' => 'backend\\modules\\edu\\controllers\\base\\EduBaseController',
-		'^Shop[a-zA-Z]+Controller$' => 'backend\\modules\\shop\\controllers\\base\\ShopBaseController',
+	BaseHelper::RK_CONTROLLER_BE => [
+		'{Modules}[a-zA-Z]+Controller$' => '{module}\\controllers\\base\\{Module}BaseController',
+		'Core[a-zA-Z]+Controller$' => 'controllers\\base\\CoreBaseController',
 	],
-	dlds\giixer\Module::BASE_CONTROLLER_FRONTEND => [
-		'^Edu[a-zA-Z]+Controller$' => 'frontend\\modules\\edu\\controllers\\base\\EduBaseController',
-		'^Shop[a-zA-Z]+Controller$' => 'frontend\\modules\\shop\\controllers\\base\\ShopBaseController',
-	],
-	dlds\giixer\Module::BASE_URL_ROUTE_HELPER => 'common\\components\\helpers\\url\\UrlRouteHelper',
-	dlds\giixer\Module::BASE_URL_RULE_HELPER => 'common\\components\\helpers\\url\\UrlRuleHelper',
-	dlds\giixer\Module::BASE_ELEMENT_HELPER_BACKEND => [
-		'^Edu[a-zA-Z]+Helper$' => 'backend\\modules\\edu\\components\\helpers\\EduElementHelper',
-		'^Shop[a-zA-Z]+Helper' => 'backend\\modules\\shop\\components\\helpers\\ShopElementHelper',
-	],
-	dlds\giixer\Module::BASE_ELEMENT_HELPER_FRONTEND => [
-		'^Edu[a-zA-Z]+Helper$' => 'frontend\\modules\\edu\\components\\helpers\\EduElementHelper',
-		'^Shop[a-zA-Z]+Helper' => 'frontend\\modules\\shop\\components\\helpers\\ShopElementHelper',
-	],
+	BaseHelper::RK_CONTROLLER_FE => [
+		'{Modules}[a-zA-Z]+Controller$' => '{module}\\controllers\\base\\{Module}BaseController',
+		'Core[a-zA-Z]+Controller$' => 'controllers\\base\\CoreBaseController',
+    ],
+    // ...
 ]	
 ```
 
-Above you can see configuration for two application modules Edu and Shop which both has custom base controller classes, UrlRoute and UrlRule base class and Helper class.
+Above you can see configuration for modules controllers which have custom base classes.
 
 > If custom controller (frontend or backend) base class is specified it must extends **GxController**. Otherwise the **GxController** will be used directly as parent class. (**GxController** extends default `\yii\web\Controller`).
 
@@ -303,8 +303,7 @@ Defines custom translations categories.
 ```
 [
 	'dynagrid' => [
- 		'^Edu[a-zA-Z]+$' => 'edu/dynagrid	',
-		'^Shop[a-zA-Z]+$' => 'shop/dynagrid',
+ 		'^{Modules}[a-zA-Z]+$' => '{module}/dynagrid',
     ],
 ],
 ```
