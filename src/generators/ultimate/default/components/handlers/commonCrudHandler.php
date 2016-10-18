@@ -26,6 +26,6 @@ class <?= ComponentHelper::basename($generator->helperComponent->getClass(Compon
      */
     protected function modelClass()
     {
-        return <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?>::classname();
+        return <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM)) ?>::classname();
     }
 }
