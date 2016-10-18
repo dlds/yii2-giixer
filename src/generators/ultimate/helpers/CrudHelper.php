@@ -102,7 +102,7 @@ class CrudHelper extends BaseHelper
         }
 
         $this->processViewsDir($this->getViewsTmplDir(self::RK_VIEW_BE), self::RK_VIEW_BE, $renderParams, $files);
-        $this->processViewsDir($this->getViewsTmplDir(self::RK_VIEW_FE), self::RK_VIEW_FE, $renderParams, $files);
+        //$this->processViewsDir($this->getViewsTmplDir(self::RK_VIEW_FE), self::RK_VIEW_FE, $renderParams, $files);
     }
 
     /**
