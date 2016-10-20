@@ -1,0 +1,362 @@
+<?php
+
+namespace dlds\giixer\components\traits\codecept;
+
+use yii\helpers\ArrayHelper;
+use yii\helpers\StringHelper;
+
+trait GxVerification
+{
+
+    use \Codeception\Specify;
+
+    /**
+     * Runs all attributes verification based on given configuration
+     * @param \yii\base\Model $model
+     * @param array $configs
+     */
+    public function runVerification(\yii\base\Model $model, array $configs)
+    {
+        foreach ($configs as $attr => $config) {
+            $this->runAttrVerification($model, $attr, $config);
+        }
+    }
+
+    /**
+     * Runs single attribute verification base on given configuration
+     * @param \yii\base\Model $model
+     * @param string $attr
+     * @param array $config
+     */
+    protected function runAttrVerification(\yii\base\Model $model, $attr, array $config)
+    {
+        foreach ($config as $rule) {
+            $this->verifyAttrRule($model, $attr, $rule);
+        }
+    }
+
+    /**
+     * Verifies single model attribute according to given rule
+     * @param \yii\base\Model $model
+     * @param string $attr
+     * @param array $rule
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function verifyAttrRule(\yii\base\Model $model, $attr, array $rule)
+    {
+        $type = ArrayHelper::getValue($rule, 0);
+
+        if (!$type) {
+            throw new \yii\base\InvalidConfigException('Verify rule cannot be empty array.');
+        }
+
+        switch ($type) {
+            case static::vrfRequired():
+                $this->verifyRequired($model, $attr);
+                break;
+
+            case static::vrfNullable():
+                $this->verifyNullable($model, $attr);
+                break;
+
+            case static::vrfString():
+                $length = ArrayHelper::getValue($rule, 1, []);
+                $this->verifyString($model, $attr, $length);
+                break;
+
+            case static::vrfInvalid():
+                $values = ArrayHelper::getValue($rule, 1, []);
+                $this->verifyInvalid($model, $attr, $values);
+                break;
+
+            case static::vrfValid():
+                $values = ArrayHelper::getValue($rule, 1, []);
+                $this->verifyValid($model, $attr, $values);
+                break;
+
+            case static::vrfForeignKey():
+                $classname = ArrayHelper::getValue($rule, 1, []);
+                $this->verifyForeignKey($model, $attr, $classname);
+                break;
+        }
+    }
+
+    /**
+     * Verifies that given attribute is required
+     * @param \yii\base\Model $model
+     * @param string $attr
+     * @param string $specify
+     */
+    public function verifyRequired(\yii\base\Model $model, $attr, $specify = '%s is required')
+    {
+        $this->specify(sprintf($specify, $attr), function() use($model, $attr) {
+            $model->$attr = null;
+            verify($model->validate([$attr]))->false();
+        });
+    }
+    
+    /**
+     * Verifies that given attribute is not required and can be null
+     * @param \yii\base\Model $model
+     * @param string $attr
+     * @param string $specify
+     */
+    public function verifyNullable(\yii\base\Model $model, $attr, $specify = '%s is nullable')
+    {
+        $this->specify(sprintf($specify, $attr), function() use($model, $attr) {
+            $model->$attr = null;
+            verify($model->validate([$attr]))->true();
+        });
+    }
+
+    /**
+     * Verifies that given attribute is string with specific min and max length
+     * @param \yii\base\Model $model
+     * @param string $attr
+     * @param string $specify
+     */
+    public function verifyString(\yii\base\Model $model, $attr, array $length, $specify = '%s is string (%s, %s)')
+    {
+        $min = ArrayHelper::getValue($length, 0, 0);
+        $max = ArrayHelper::getValue($length, 1, 255);
+
+        $this->specify(sprintf($specify, $attr, $min, $max), function() use($model, $attr, $min, $max) {
+
+            $tooShort = $min - 1;
+            $tooLong = $max + 1;
+
+            if ($tooShort >= 0) {
+                $model->$attr = static::valRandomString($tooShort);
+                verify($model->validate([$attr]))->false();
+            }
+
+            $model->$attr = static::valRandomString($tooLong);
+            verify($model->validate([$attr]))->false();
+        });
+    }
+
+    /**
+     * Verifies that given attribute cannot contains given values
+     * @param \yii\base\Model $model
+     * @param string $attr
+     * @param string $specify
+     */
+    public function verifyInvalid(\yii\base\Model $model, $attr, array $values, $specify = '%s is invalid')
+    {
+        $examples = static::specifyExamples($values);
+
+        $this->specify(sprintf($specify, $attr), function($value) use($model, $attr) {
+            $model->$attr = $value;
+            verify($model->validate([$attr]))->false();
+        }, $examples);
+    }
+
+    /**
+     * Verifies that given attribute may contains given values
+     * @param \yii\base\Model $model
+     * @param string $attr
+     * @param string $specify
+     */
+    public function verifyValid(\yii\base\Model $model, $attr, array $values, $specify = '%s is ok')
+    {
+        $examples = static::specifyExamples($values);
+
+        $this->specify(sprintf($specify, $attr), function($value) use($model, $attr) {
+            $model->$attr = $value;
+            verify($model->validate([$attr]))->true();
+        }, $examples);
+    }
+
+    /**
+     * Verifies that given attribute may contains given values
+     * @param \yii\base\Model $model
+     * @param string $attr
+     * @param string $specify
+     */
+    public function verifyForeignKey(\yii\base\Model $model, $attr, $classname, $specify = '%s is foreign key')
+    {
+        $pk = static::valMaxPrimaryKey($classname);
+
+        $this->specify(sprintf($specify, $attr), function() use($model, $attr, $pk) {
+            $model->$attr = $pk;
+            verify($model->validate([$attr]))->true();
+
+            $model->$attr = $pk + 1;
+            verify($model->validate([$attr]))->false();
+        });
+    }
+
+    /**
+     * Generates random string with specified length
+     * @return $str the string
+     */
+    public static function valRandomString($length = 6)
+    {
+        $string = "";
+        $characters = array_merge(range('A', 'Z'), range('a', 'z'), range('0', '9'));
+        $max = count($characters) - 1;
+        for ($i = 0; $i < $length; $i++) {
+            $rand = mt_rand(0, $max);
+            $string .= $characters[$rand];
+        }
+        return $string;
+    }
+
+    /**
+     * Retrieves invalid email values
+     * @return array
+     */
+    public static function valInvalidEmails()
+    {
+        return [
+            'plain text',
+            'without@domain',
+            'without.at.com',
+        ];
+    }
+
+    /**
+     * Retrieves invalid email values
+     * @return array
+     */
+    public static function valValidEmails()
+    {
+        return [
+            'info@email.com',
+            'dot.separated@email.eu',
+        ];
+    }
+
+    /**
+     * Retrieves maximum value for primary key of table assigned to given classname
+     * @param string $classname
+     * @return int
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function valMaxPrimaryKey($classname)
+    {
+        if (!is_subclass_of($classname, \yii\db\ActiveRecord::className())) {
+            throw new \yii\base\InvalidConfigException('Foreign Key verification can be used only when related classname is subclass of ActiveRecord.');
+        }
+
+        $pk = $classname::primaryKey();
+
+        if (count($pk) != 1) {
+            throw new \yii\base\InvalidConfigException('Foreign Key verification can be used only for relations with single column primary key.');
+        }
+
+        return $classname::find()->max(ArrayHelper::getValue($pk, 0));
+    }
+
+    /**
+     * Specifies examples based on given values
+     * ---
+     * Retrieves array in proper format
+     * ---
+     * @param array $values
+     * @return array
+     */
+    public static function specifyExamples(array $values)
+    {
+        $examples = ['examples' => []];
+
+        foreach ($values as $value) {
+            $examples['examples'][] = [$value];
+        }
+
+        return $examples;
+    }
+
+    /**
+     * Retrieves default configuration for email verification
+     * @param bolean $required
+     * @return array
+     */
+    public static function cfgEmail($required = true)
+    {
+        $config = [
+                [static::vrfInvalid(), static::valInvalidEmails()],
+                [static::vrfValid(), static::valValidEmails()]
+        ];
+
+        if ($required) {
+            $config[] = [static::vrfRequired()];
+        }
+
+        return $config;
+    }
+
+    /**
+     * Retrieves default configuration for relation (foreign keys) verification
+     * @param string $classname
+     * @param bolean $required
+     * @return array
+     */
+    public static function cfgRelation($classname, $required = true)
+    {
+        $config = [
+                [static::vrfForeignKey(), $classname]
+        ];
+
+        if ($required) {
+            $config[] = [static::vrfRequired()];
+        }
+
+        return $config;
+    }
+
+    /**
+     * REQUIRED verification rule key
+     * @return string
+     */
+    public static function vrfRequired()
+    {
+        return StringHelper::basename(__METHOD__);
+    }
+    
+    /**
+     * NULLABLE verification rule key
+     * @return string
+     */
+    public static function vrfNullable()
+    {
+        return StringHelper::basename(__METHOD__);
+    }
+
+    /**
+     * STRING verification rule key
+     * @return string
+     */
+    public static function vrfString()
+    {
+        return StringHelper::basename(__METHOD__);
+    }
+
+    /**
+     * INVALID verification rule key
+     * @return string
+     */
+    public static function vrfInvalid()
+    {
+        return StringHelper::basename(__METHOD__);
+    }
+
+    /**
+     * VALID verification rule key
+     * @return string
+     */
+    public static function vrfValid()
+    {
+        return StringHelper::basename(__METHOD__);
+    }
+
+    /**
+     * FOREIGN KEY verification rule key
+     * @return string
+     */
+    public static function vrfForeignKey()
+    {
+        return StringHelper::basename(__METHOD__);
+    }
+
+}
