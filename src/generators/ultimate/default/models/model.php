@@ -125,6 +125,19 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
         <?= $relation[0] . "\n" ?>
     }
 <?php endforeach; ?>
+    
+<?php foreach ($relations as $name => $relation): ?>
+<?php if($generator->canGenerateRelationSetter($name)): ?>
+    /**
+     * Assigns given relation model
+     * @param <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $name)) ?> $model
+     */
+    public function set<?= $name ?>(<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $name)) ?> $model)
+    {
+        <?= $generator->getRelationSetterSyntax($name) . "\n" ?>
+    }
+<?php endif; ?>
+<?php endforeach; ?>
 <?php if ($generator->generateGalleryBehavior): ?>
 
     /**

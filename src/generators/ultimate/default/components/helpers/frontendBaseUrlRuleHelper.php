@@ -11,7 +11,7 @@ echo "<?php\n";
 namespace <?= ComponentHelper::ns($generator->helperComponent->getClass(ComponentHelper::RK_HELPER_URL_RULE_BASE_FE)) ?>;
 
 /**
-* This is frontend URL RULE helper for table "<?= $generator->generateTableName($generator->tableName) ?>".
+* This is module main frontend URL RULE helper
 *
 * @inheritdoc
 * @see <?= $generator->helperComponent->getParentClass(ComponentHelper::RK_HELPER_URL_RULE_BASE_FE)."\n" ?>
