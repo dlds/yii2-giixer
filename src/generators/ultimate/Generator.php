@@ -1161,7 +1161,7 @@ class Generator extends \yii\gii\generators\model\Generator
 
             $definition = BaseHelper::definition($attrs);
         
-            return "return implode(' ', \$this->getAttributes($a))";
+            return "return implode(' ', \$this->getAttributes($definition))";
         }
 
         return sprintf('return $this->%s', ArrayHelper::getValue($attrs, 0));

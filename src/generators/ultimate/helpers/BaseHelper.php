@@ -559,4 +559,21 @@ class BaseHelper
         return sprintf('%s/%s', implode('/', $rule), $name);
     }
 
+    /**
+     * Retrieves PHP definition syntax of given value
+     * ---
+     * Retrieves array as ['value1', 'value2'].
+     * ---
+     * @param mixed $value
+     * @return string
+     */
+    public static function definition($value)
+    {
+        if (is_array($value)) {
+            return sprintf('[\'%s\']', join('\', \'', $value));
+}
+        
+        return $value;
+    }
+
 }

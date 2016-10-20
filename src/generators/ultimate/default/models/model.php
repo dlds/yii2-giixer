@@ -155,7 +155,7 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
     public function getRecordPrint()
     {
 <?php if($generator->recordPrintAttr): ?>
-        return $this-><?= $generator->recordPrintAttr ?>;
+        return <?= $generator->getRecordPrintSyntax() ?>;
 <?php else: ?>
         return $this->primaryKey;
 <?php endif; ?>
