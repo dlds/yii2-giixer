@@ -939,17 +939,27 @@ class Generator extends \yii\gii\generators\model\Generator
         $db = $this->getDbConnection();
         $schema = $db->getTableSchema($this->tableName, true);
 
-        if ($schema) {
-            if (!in_array($this->$attribute, $schema->columnNames)) {
-                $mutationSchema = $db->getTableSchema($this->mutationJoinTableName, true);
+        if (!$schema) {
+            $this->addError($attribute, sprintf("Cannot load schema for table '%s'.", $this->tableName));
+            return false;
+        }
 
-                if ($this->generateMutation && in_array($this->$attribute, $mutationSchema->columnNames)) {
-                    return true;
+        $attrs = explode(',', $this->$attribute);
+
+        foreach ($attrs as $attr) {
+            if (!in_array($attr, $schema->columnNames) && !$this->generateMutation) {
+                $this->addError($attribute, sprintf("Table '%s' does not contain attribute '%s'.", $schema->name, $attr));
+                return false;
                 }
 
-                $this->addError($attribute, sprintf("Table '%s' does not contain attribute '%s'.", $schema->name, $this->$attribute));
+            if (!in_array($attr, $schema->columnNames)) {
+                $mutationSchema = $db->getTableSchema($this->mutationJoinTableName, true);
+                if (!in_array($attr, $mutationSchema->columnNames)) {
+                    $this->addError($attribute, sprintf("Table '%s' does not contain attribute '%s'.", $schema->name, $attr));
+                    return false;
             }
         }
+    }
     }
 
     /**
@@ -1138,6 +1148,23 @@ class Generator extends \yii\gii\generators\model\Generator
     public function getBehaviorName($key)
     {
         return Module::BEHAVIOR_NAME_PREFIX . $key;
+    }
+
+    /**
+     * Retrieves recordPrint attribude class method syntax/body;
+     */
+    public function getRecordPrintSyntax()
+    {
+        $attrs = explode(',', $this->recordPrintAttr);
+
+        if (count($attrs) > 1) {
+
+            $definition = BaseHelper::definition($attrs);
+        
+            return "return implode(' ', \$this->getAttributes($a))";
+        }
+
+        return sprintf('return $this->%s', ArrayHelper::getValue($attrs, 0));
     }
 
     /**
