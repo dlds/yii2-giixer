@@ -50,6 +50,8 @@ trait GxVerification
             throw new \yii\base\InvalidConfigException('Verify rule cannot be empty array.');
         }
 
+        \Codeception\Util\Debug::debug(sprintf('ATTR: %s', $attr));
+        
         switch ($type) {
             case static::vrfRequired():
                 $this->verifyRequired($model, $attr);
@@ -90,11 +92,14 @@ trait GxVerification
     public function verifyRequired(\yii\base\Model $model, $attr, $specify = '%s is required')
     {
         $this->specify(sprintf($specify, $attr), function() use($model, $attr) {
+            
+            \Codeception\Util\Debug::debug('- verifying REQUIRED');
+            
             $model->$attr = null;
             verify($model->validate([$attr]))->false();
         });
     }
-    
+
     /**
      * Verifies that given attribute is not required and can be null
      * @param \yii\base\Model $model
@@ -104,6 +109,9 @@ trait GxVerification
     public function verifyNullable(\yii\base\Model $model, $attr, $specify = '%s is nullable')
     {
         $this->specify(sprintf($specify, $attr), function() use($model, $attr) {
+            
+            \Codeception\Util\Debug::debug('- verifying NULLABLE');
+            
             $model->$attr = null;
             verify($model->validate([$attr]))->true();
         });
@@ -126,11 +134,18 @@ trait GxVerification
             $tooLong = $max + 1;
 
             if ($tooShort >= 0) {
+                
                 $model->$attr = static::valRandomString($tooShort);
+                
+                \Codeception\Util\Debug::debug(sprintf('- verifying TOO SHORT (%s)', $model->$attr));
+            
                 verify($model->validate([$attr]))->false();
             }
 
             $model->$attr = static::valRandomString($tooLong);
+            
+            \Codeception\Util\Debug::debug(sprintf('- verifying TOO LONG (%s)', $model->$attr));
+            
             verify($model->validate([$attr]))->false();
         });
     }
@@ -146,6 +161,9 @@ trait GxVerification
         $examples = static::specifyExamples($values);
 
         $this->specify(sprintf($specify, $attr), function($value) use($model, $attr) {
+            
+            \Codeception\Util\Debug::debug(sprintf('- verifying INVALID (%s)', $value));
+            
             $model->$attr = $value;
             verify($model->validate([$attr]))->false();
         }, $examples);
@@ -162,6 +180,9 @@ trait GxVerification
         $examples = static::specifyExamples($values);
 
         $this->specify(sprintf($specify, $attr), function($value) use($model, $attr) {
+            
+            \Codeception\Util\Debug::debug(sprintf('- verifying VALID (%s)', $value));
+            
             $model->$attr = $value;
             verify($model->validate([$attr]))->true();
         }, $examples);
@@ -178,6 +199,9 @@ trait GxVerification
         $pk = static::valMaxPrimaryKey($classname);
 
         $this->specify(sprintf($specify, $attr), function() use($model, $attr, $pk) {
+            
+            \Codeception\Util\Debug::debug('- verifying FOREIGN KEY');
+            
             $model->$attr = $pk;
             verify($model->validate([$attr]))->true();
 
@@ -268,6 +292,43 @@ trait GxVerification
     }
 
     /**
+     * Retrieves default configuration for simple text verification
+     * @param bolean $required
+     * @return array
+     */
+    public static function cfgText($required = true)
+    {
+        $config = [
+                [static::vrfValid(), [250, '250', 'text', true, false]],
+        ];
+
+        if ($required) {
+            $config[] = [static::vrfRequired()];
+        }
+
+        return $config;
+    }
+    
+    /**
+     * Retrieves default configuration for integer verification
+     * @param bolean $required
+     * @return array
+     */
+    public static function cfgInteger($required = true)
+    {
+        $config = [
+                [static::vrfInvalid(), ['string', 'another words']],
+                [static::vrfValid(), [1, 100, 1000000, '23500']],
+        ];
+
+        if ($required) {
+            $config[] = [static::vrfRequired()];
+        }
+
+        return $config;
+    }
+
+    /**
      * Retrieves default configuration for email verification
      * @param bolean $required
      * @return array
@@ -313,7 +374,7 @@ trait GxVerification
     {
         return StringHelper::basename(__METHOD__);
     }
-    
+
     /**
      * NULLABLE verification rule key
      * @return string
