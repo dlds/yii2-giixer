@@ -295,7 +295,14 @@ class BaseHelper
             return self::$generator->messageCategory;
         }
 
-        return \yii\helpers\BaseInflector::camel2id(self::basename($this->getClass(self::RK_MODEL_CM)), '/');
+        $basename = self::basename($this->getClass(self::RK_MODEL_CM));
+
+        if (static::$generator->isDbView()) {
+            $prefix = ucfirst(str_replace('_', '', static::$generator->dbViewPrefix));
+            $basename = str_replace($prefix, '', $basename);
+        }
+
+        return \yii\helpers\BaseInflector::camel2id($basename, '/');
     }
 
     /**
@@ -571,8 +578,8 @@ class BaseHelper
     {
         if (is_array($value)) {
             return sprintf('[\'%s\']', join('\', \'', $value));
-}
-        
+        }
+
         return $value;
     }
 

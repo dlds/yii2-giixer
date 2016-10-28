@@ -36,13 +36,18 @@ use <?= $generator->helperComponent->getClass(ComponentHelper::RK_HELPER_IMAGE).
  */
 abstract class <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::RK_MODEL)) ?> extends <?= ModelHelper::root($generator->helperModel->getParentClass(ModelHelper::RK_MODEL)) ?> 
 {
-
+<?php if($generator->isDbView()): ?>
+    use \dlds\giixer\components\traits\GxReadOnlyActiveRecordTrait;
+<?php endif; ?>
+<?php if(count($relations)): ?>
+    
     <?= '// <editor-fold defaultstate="collapsed" desc="CONSTANTS: Relations names">'."\n" ?>
 <?php foreach ($relations as $name => $relation): ?>
     const <?= sprintf('%s%s', dlds\giixer\Module::RELATION_NAME_PREFIX, strtoupper(Inflector::camel2id($name, '_'))) ?> = '<?= lcfirst($name) ?>';
 <?php endforeach; ?>
     <?= '// </editor-fold>'."\n" ?>
-
+<?php endif; ?>
+    
     /**
      * @inheritdoc
      */
@@ -60,8 +65,8 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
         return Yii::$app->get('<?= $generator->db ?>');
     }
 <?php endif; ?>
-
 <?php if ($generator->canGenerateBehaviors()): ?>
+    
     /**
      * @inheritdoc
      */
@@ -90,7 +95,8 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
         ];
     }
 <?php endif; ?>
-
+<?php if ($generator->canGenerateRules()): ?>
+    
     /**
      * @inheritdoc
      */
@@ -104,6 +110,7 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
 <?php endif; ?>
         return $rules;
     }
+<?php endif; ?>
 
     /**
      * @inheritdoc
@@ -126,9 +133,9 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
         <?= $relation[0] . "\n" ?>
     }
 <?php endforeach; ?>
-    
 <?php foreach ($relations as $name => $relation): ?>
 <?php if($generator->canGenerateRelationSetter($relation, $name)): ?>
+    
     /**
      * Assigns given relation model
      * @param <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getRelationClass($relation))) ?> $model
@@ -168,11 +175,7 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
      */
     public function getRecordPrint()
     {
-<?php if($generator->recordPrintAttr): ?>
         <?= $generator->getRecordPrintSyntax() ?>;
-<?php else: ?>
-        return $this->primaryKey;
-<?php endif; ?>
     }
 
     /**

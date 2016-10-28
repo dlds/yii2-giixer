@@ -274,6 +274,11 @@ class Generator extends \yii\gii\generators\model\Generator
     public $bases = [];
 
     /**
+     * @var string prefix which determines db views
+     */
+    public $dbViewPrefix = 'v_';
+
+    /**
      * Inits generator
      */
     public function init()
@@ -489,6 +494,14 @@ class Generator extends \yii\gii\generators\model\Generator
     }
 
     /**
+     * Indicates if current table is db view
+     */
+    public function isDbView()
+    {
+        return 0 === strpos($this->tableName, $this->dbViewPrefix);
+    }
+
+    /**
      * @inheritdoc
      */
     public function hints()
@@ -581,17 +594,19 @@ class Generator extends \yii\gii\generators\model\Generator
         // Generate MODEL query classes
         $this->helperModel->generateQueries($tableSchema, $files);
 
-        // Generate MODEL search classes
-        $this->helperModel->generateSearches($tableSchema, $files);
+        if (!$this->isDbView()) {
+            // Generate MODEL search classes
+            $this->helperModel->generateSearches($tableSchema, $files);
 
-        // Generate CRUD controller
-        $this->helperCrud->generateControllers($tableSchema, $files);
+            // Generate CRUD controller
+            $this->helperCrud->generateControllers($tableSchema, $files);
 
-        // Generate CRUD views
-        $this->helperCrud->generateViews($tableSchema, $files);
+            // Generate CRUD views
+            $this->helperCrud->generateViews($tableSchema, $files);
 
-        // Generate COMPONENTS
-        $this->helperComponent->generateComponents($tableSchema, $files);
+            // Generate COMPONENTS
+            $this->helperComponent->generateComponents($tableSchema, $files);
+        }
 
         return $files;
     }
@@ -995,7 +1010,16 @@ class Generator extends \yii\gii\generators\model\Generator
      */
     public function canGenerateBehaviors()
     {
-        return !empty($this->getBehaviorsToGenerate());
+        return !empty($this->getBehaviorsToGenerate()) && !$this->isDbView();
+    }
+
+    /**
+     * Indicates if rules should be generated into model
+     * @return boolean
+     */
+    public function canGenerateRules()
+    {
+        return !$this->isDbView();
     }
 
     /**
@@ -1117,6 +1141,14 @@ class Generator extends \yii\gii\generators\model\Generator
      */
     public function getRecordPrintSyntax()
     {
+        if($this->isDbView()) {
+            return "throw new \yii\base\NotSupportedException";
+        }
+        
+        if(!$this->recordPrintAttr) {
+            return "parent::recordPrint()";
+        }
+        
         $attrs = explode(',', $this->recordPrintAttr);
 
         if (count($attrs) > 1) {
@@ -1168,7 +1200,7 @@ class Generator extends \yii\gii\generators\model\Generator
     {
         return ArrayHelper::getValue($relation, 1);
     }
-    
+
     /**
      * Return relation syntax from given definition
      * @param array $relation
@@ -1193,7 +1225,7 @@ class Generator extends \yii\gii\generators\model\Generator
         }
 
         $relSyntax = $this->getRelationSyntax($relation);
-        
+
         if (!$relSyntax) {
             return false;
         }
@@ -1205,7 +1237,7 @@ class Generator extends \yii\gii\generators\model\Generator
         }
 
         $relTable = Inflector::camel2id($relClass, '_');
-        
+
         foreach ($schema->foreignKeys as $fks) {
 
             if ($relTable !== ArrayHelper::remove($fks, 0)) {
@@ -1215,13 +1247,13 @@ class Generator extends \yii\gii\generators\model\Generator
             if (count($fks) > 1) {
                 continue;
             }
-            
+
             $key = key($fks);
-            
-            if(false === strpos($relSyntax, $key)) {
+
+            if (false === strpos($relSyntax, $key)) {
                 continue;
             }
-            
+
             return $key;
         }
 
