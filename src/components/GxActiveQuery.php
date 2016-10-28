@@ -29,6 +29,7 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
         return $this;
     }
 
+    
     /**
      * Retrieves active data provider based on given activequery
      * @param \yii\db\ActiveQuery $query
@@ -40,6 +41,17 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
         return new \yii\data\ActiveDataProvider(\yii\helpers\ArrayHelper::merge(['query' => $this], $config));
     }
 
+    /**
+     * Retrieves column name together with model table name
+     * @param string $name
+     * @return string
+     */
+    protected function col($name)
+    {
+        return sprintf('%s.%s', $this->modelTable(), $name);
+    }
+
+    
     /**
      * Retrieves assigned model class
      * @return \yii\db\ActiveRecord
