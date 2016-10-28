@@ -299,7 +299,7 @@ trait GxVerification
     {
         $config = [
             [static::vrfInvalid(), ['string', '12 44']],
-            [static::vrfValid(), ['1', 1, '0', 0, null]],
+            [static::vrfValid(), ['1', 1, '0', 0, null, 234]],
         ];
 
         return $config;

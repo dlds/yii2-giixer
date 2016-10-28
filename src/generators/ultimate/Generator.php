@@ -356,61 +356,61 @@ class Generator extends \yii\gii\generators\model\Generator
         GxModelHelper::removeValidationRules($rules, 'validateModelClass', ['modelClass']);
 
         return ArrayHelper::merge([
-                    [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
-                    [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
-                    [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
-                    [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
-                    [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
-                    [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
-                        return $model->generateMutation;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
+                [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
+                [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
+                [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
+                    return $model->generateMutation;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatemutation').is(':checked');
                     }"],
-                    [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
-                        return trim($model->mutationIgnoredFormAttributes);
-                    }],
-                    [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
-                    [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
-                    [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
-                        return $model->generateSluggableBehavior;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
+                    return trim($model->mutationIgnoredFormAttributes);
+                }],
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
+                [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
+                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
+                    return $model->generateSluggableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                    [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
-                        return $model->generateSluggableBehavior;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                    return $model->generateSluggableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                    [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
-                        return $model->generateTimestampBehavior;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                    return $model->generateTimestampBehavior;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                    [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'required', 'when' => function($model) {
-                        return $model->generateTimestampBehavior;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'required', 'when' => function($model) {
+                    return $model->generateTimestampBehavior;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                    [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
-                    [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
-                        return $model->generateSortableBehavior;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
+                [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
+                    return $model->generateSortableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
-                    [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function($model) {
-                        return $model->generateSortableBehavior;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function($model) {
+                    return $model->generateSortableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
-                    [['galleryTableName'], 'filter', 'filter' => 'trim'],
-                    [['galleryTableName'], 'validateTableName', 'when' => function($model) {
-                        return $model->generateGalleryBehavior;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['galleryTableName'], 'filter', 'filter' => 'trim'],
+                [['galleryTableName'], 'validateTableName', 'when' => function($model) {
+                    return $model->generateGalleryBehavior;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generategallerybehavior').is(':checked');
                     }"],
-                    [['galleryTableName'], 'required', 'when' => function($model) {
-                        return $model->generateGalleryBehavior;
-                    }, 'whenClient' => "function (attribute, value) {
+                [['galleryTableName'], 'required', 'when' => function($model) {
+                    return $model->generateGalleryBehavior;
+                }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generategallerybehavior').is(':checked');
                     }"],
                 ], $rules);
@@ -1131,63 +1131,101 @@ class Generator extends \yii\gii\generators\model\Generator
 
     /**
      * Indicates if relation setter could be generated
-     * @param type $name
+     * @param array $relation definition
+     * @return boolean
      */
-    public function canGenerateRelationSetter($name)
+    public function canGenerateRelationSetter(array $relation, $name)
     {
-        $schema = $this->getTableSchema();
-
-        if (!$schema) {
-            return "return false;";
+        if (!$this->getRelationFk($relation, $name)) {
+            return false;
         }
 
-        $relTable = Inflector::camel2id($name, '_');
-
-        foreach ($schema->foreignKeys as $refs) {
-
-            if ($relTable !== ArrayHelper::remove($refs, 0)) {
-                continue;
-            }
-
-            if (count($refs) > 1) {
-                return false;
-            }
-
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
      * Retrieves relation setter syntax
+     * @param array $relation definition
+     * @return string
      */
-    public function getRelationSetterSyntax($name)
+    public function getRelationSetterSyntax(array $relation, $name)
+    {
+        $fk = $this->getRelationFk($relation, $name);
+
+        if (!$fk) {
+            return "throw new \yii\base\NotSupportedException();";
+        }
+
+        return "return \$this->$fk = \$model->primaryKey;";
+    }
+
+    /**
+     * Return relation class from given definition
+     * @param array $relation
+     * @return string
+     */
+    public function getRelationClass(array $relation)
+    {
+        return ArrayHelper::getValue($relation, 1);
+    }
+    
+    /**
+     * Return relation syntax from given definition
+     * @param array $relation
+     * @return string
+     */
+    public function getRelationSyntax(array $relation)
+    {
+        return ArrayHelper::getValue($relation, 0);
+    }
+
+    /**
+     * Retrieves relation foreign key according to current table
+     * @param array $relation
+     * @return boolean
+     */
+    protected function getRelationFk(array $relation, $name)
     {
         $schema = $this->getTableSchema();
 
         if (!$schema) {
-            return "return false;";
+            return false;
         }
 
-        $relTable = Inflector::camel2id($name, '_');
+        $relSyntax = $this->getRelationSyntax($relation);
+        
+        if (!$relSyntax) {
+            return false;
+        }
 
-        foreach ($schema->foreignKeys as $refs) {
+        $relClass = $this->getRelationClass($relation);
 
-            if ($relTable !== ArrayHelper::remove($refs, 0)) {
+        if (!$relClass) {
+            return false;
+        }
+
+        $relTable = Inflector::camel2id($relClass, '_');
+        
+        foreach ($schema->foreignKeys as $fks) {
+
+            if ($relTable !== ArrayHelper::remove($fks, 0)) {
                 continue;
             }
 
-            if (count($refs) > 1) {
-                break;
+            if (count($fks) > 1) {
+                continue;
             }
-
-            $fk = key($refs);
-
-            return "return \$this->$fk = \$model->primaryKey;";
+            
+            $key = key($fks);
+            
+            if(false === strpos($relSyntax, $key)) {
+                continue;
+            }
+            
+            return $key;
         }
 
-        return "throw new \yii\base\NotSupportedException();";
+        return false;
     }
 
     /**

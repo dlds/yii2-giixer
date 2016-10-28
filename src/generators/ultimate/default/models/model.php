@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use dlds\giixer\generators\ultimate\helpers\ComponentHelper;
 use dlds\giixer\generators\ultimate\helpers\ModelHelper;
@@ -127,14 +128,14 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
 <?php endforeach; ?>
     
 <?php foreach ($relations as $name => $relation): ?>
-<?php if($generator->canGenerateRelationSetter($name)): ?>
+<?php if($generator->canGenerateRelationSetter($relation, $name)): ?>
     /**
      * Assigns given relation model
-     * @param <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $name)) ?> $model
+     * @param <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getRelationClass($relation))) ?> $model
      */
-    public function set<?= $name ?>(<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $name)) ?> $model)
+    public function set<?= $name ?>(<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getRelationClass($relation))) ?> $model)
     {
-        <?= $generator->getRelationSetterSyntax($name) . "\n" ?>
+        <?= $generator->getRelationSetterSyntax($relation, $name) . "\n" ?>
     }
 <?php endif; ?>
 <?php endforeach; ?>
