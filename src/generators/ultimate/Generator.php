@@ -279,6 +279,11 @@ class Generator extends \yii\gii\generators\model\Generator
     public $dbViewPrefix = 'v_';
 
     /**
+     * @var array relation methods name aliases
+     */
+    public $relAliases;
+
+    /**
      * Inits generator
      */
     public function init()
@@ -315,6 +320,12 @@ class Generator extends \yii\gii\generators\model\Generator
 
         if ($bases) {
             $this->bases = $bases;
+        }
+        
+        $relAliases = Yii::$app->getModule('gii')->relAliases;
+
+        if ($relAliases) {
+            $this->relAliases = $relAliases;
         }
 
         $this->namespaces = Yii::$app->getModule('gii')->namespaces;
@@ -624,20 +635,53 @@ class Generator extends \yii\gii\generators\model\Generator
 
         $definitions = ArrayHelper::getValue($relations, $this->tableName, []);
 
+        // sanitaze all definitions
         foreach ($definitions as $key => $rules) {
 
             $fqn = helpers\BaseHelper::root($this->helperModel->getClass(ModelHelper::RK_MODEL_CM, $rules[1]));
 
-            $classname = $rules[0];
-
-            $relations[$this->tableName][$key][0] = str_replace($rules[1], $fqn, $rules[0]);
+            $sanitazed = $this->sanitazeRelationDefinition($rules, $fqn);
+            
+            // if relation alias does not exists just replace origin definition with sanitazed
+            if (!isset($this->relAliases[$key])) {
+                $relations[$this->tableName][$key][0] = $sanitazed;
+                continue;
+            }
+            
+            // duplicate relation definition
+            $relations[$this->tableName][$this->relAliases[$key]] = $relations[$this->tableName][$key];
+            
+            // remove origin definition
+            unset($relations[$this->tableName][$key]);
+            
+            // sanitaze relation alias
+            $relations[$this->tableName][$this->relAliases[$key]][0] = $sanitazed;
         }
 
         if ($relations && isset($relations[$this->tableName])) {
             ksort($relations[$this->tableName]);
         }
-
+        
         return $relations;
+    }
+    
+    /**
+     * Sanitazes relation definition
+     * @param array $rules
+     * @param string $fqn
+     */
+    protected function sanitazeRelationDefinition(array $rules, $fqn)
+    {
+        $sanitazed = str_replace($rules[1], $fqn, $rules[0]);
+        
+        foreach ($this->relAliases as $name => $alias) {
+            $name = lcfirst($name);
+            $alias = lcfirst($alias);
+            
+            $sanitazed = str_replace($name, $alias, $sanitazed);
+        }
+        
+        return $sanitazed;
     }
 
     /**
@@ -1141,14 +1185,14 @@ class Generator extends \yii\gii\generators\model\Generator
      */
     public function getRecordPrintSyntax()
     {
-        if($this->isDbView()) {
+        if ($this->isDbView()) {
             return "throw new \yii\base\NotSupportedException";
         }
-        
-        if(!$this->recordPrintAttr) {
+
+        if (!$this->recordPrintAttr) {
             return "parent::recordPrint()";
         }
-        
+
         $attrs = explode(',', $this->recordPrintAttr);
 
         if (count($attrs) > 1) {

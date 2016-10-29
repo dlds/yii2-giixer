@@ -313,7 +313,8 @@ trait GxVerification
     public static function cfgText($required = true)
     {
         $config = [
-            [static::vrfValid(), [250, '250', 'text', true, false]],
+            [static::vrfValid(), ['250', 'text']],
+            [static::vrfInvalid(), [250, true, false]],
         ];
 
         if ($required) {

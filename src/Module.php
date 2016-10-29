@@ -78,9 +78,9 @@ class Module extends \yii\gii\Module
     public $translations = ['en'];
 
     /**
-     * @var array modules names aliases
+     * @var array relation name aliases
      */
-    public $aliases = [];
+    public $relAliases = [];
 
     /**
      * @var array messages categories rules
