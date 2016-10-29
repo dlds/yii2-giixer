@@ -295,12 +295,14 @@ trait GxVerification
      * Retrieves default configuration for boolean verification
      * @return array
      */
-    public static function cfgBoolean()
+    public static function cfgBoolean($required = true)
     {
         $config = [
             [static::vrfInvalid(), ['string', '12 44']],
-            [static::vrfValid(), ['1', 1, '0', 0, null, 234]],
+            [static::vrfValid(), ['1', 1, '0', 0, 234]],
         ];
+        
+        static::addRequiredCfg($config, $required);
 
         return $config;
     }
@@ -317,9 +319,7 @@ trait GxVerification
             [static::vrfInvalid(), [250, true, false]],
         ];
 
-        if ($required) {
-            $config[] = [static::vrfRequired()];
-        }
+        static::addRequiredCfg($config, $required);
 
         return $config;
     }
@@ -329,16 +329,15 @@ trait GxVerification
      * @param bolean $required
      * @return array
      */
-    public static function cfgInteger($required = true)
+    public static function cfgInteger($required = true, $unsigned = false)
     {
         $config = [
             [static::vrfInvalid(), ['string', 'another words']],
             [static::vrfValid(), [1, 100, 1000000, '23500']],
+            [($unsigned) ? static::vrfInvalid() : static::vrfValid(), [-1, -100, -1000000, '-23500']],
         ];
 
-        if ($required) {
-            $config[] = [static::vrfRequired()];
-        }
+        static::addRequiredCfg($config, $required);
 
         return $config;
     }
@@ -355,9 +354,7 @@ trait GxVerification
             [static::vrfValid(), static::valValidEmails()]
         ];
 
-        if ($required) {
-            $config[] = [static::vrfRequired()];
-        }
+        static::addRequiredCfg($config, $required);
 
         return $config;
     }
@@ -374,11 +371,34 @@ trait GxVerification
             [static::vrfForeignKey(), $classname]
         ];
 
-        if ($required) {
-            $config[] = [static::vrfRequired()];
-        }
+        static::addRequiredCfg($config, $required);
 
         return $config;
+    }
+
+    /**
+     * Adds required verification to given existing configuration
+     * @param array $config
+     * @param boolen $isRequired
+     */
+    public static function addRequiredCfg(array &$config, $isRequired)
+    {
+        if ($isRequired) {
+            $config[] = [static::vrfRequired()];
+        } else {
+            $config[] = [static::vrfNullable()];
+        }
+    }
+    
+    /**
+     * Extends given config with additional rules
+     * @param array $cfg
+     * @param array $rules
+     * @return array
+     */
+    public static function extendCfg(array $cfg, array $rules)
+    {
+        return ArrayHelper::merge($cfg, $rules);
     }
 
     /**
