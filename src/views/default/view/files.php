@@ -8,7 +8,6 @@ use yii\gii\CodeFile;
 /* @var $files CodeFile[] */
 /* @var $answers array */
 /* @var $id string panel ID */
-
 ?>
 <div class="default-view-files">
     <div id="action-toggle" class="btn-group btn-group-xs pull-right">
@@ -16,7 +15,7 @@ use yii\gii\CodeFile;
             <input type="checkbox" value="<?= CodeFile::OP_CREATE ?>" checked> Create
         </label>
         <label class="btn btn-default active" title="Filter files that are unchanged.">
-            <input type="checkbox" value="<?= CodeFile::OP_SKIP ?>" checked> Unchanged
+            <input type="checkbox" value="<?= CodeFile::OP_SKIP ?>"> Unchanged
         </label>
         <label class="btn btn-warning active" title="Filter files that are overwritten">
             <input type="checkbox" value="<?= CodeFile::OP_OVERWRITE ?>" checked> Overwrite
@@ -45,45 +44,47 @@ use yii\gii\CodeFile;
         </thead>
         <tbody>
             <?php foreach ($files as $file): ?>
-            <?php
-            if ($file->operation === CodeFile::OP_OVERWRITE) {
-                $trClass = 'warning';
-            } elseif ($file->operation === CodeFile::OP_SKIP) {
-                $trClass = 'active';
-            } elseif ($file->operation === CodeFile::OP_CREATE) {
-                $trClass = 'success';
-            } else {
-                $trClass = '';
-            }
-            ?>
-            <tr class="<?= "$file->operation $trClass" ?>">
-                <td class="file">
-                    <?= Html::a(Html::encode($file->getRelativePath()), ['preview', 'id' => $id, 'file' => $file->id], ['class' => 'preview-code', 'data-title' => $file->getRelativePath()]) ?>
-                    <?php if ($file->operation === CodeFile::OP_OVERWRITE): ?>
-                        <?= Html::a('diff', ['diff', 'id' => $id, 'file' => $file->id], ['class' => 'diff-code label label-warning', 'data-title' => $file->getRelativePath()]) ?>
+                <?php
+                $trStyle = '';
+                if ($file->operation === CodeFile::OP_OVERWRITE) {
+                    $trClass = 'warning';
+                } elseif ($file->operation === CodeFile::OP_SKIP) {
+                    $trClass = 'active';
+                    $trStyle = 'display:none;';
+                } elseif ($file->operation === CodeFile::OP_CREATE) {
+                    $trClass = 'success';
+                } else {
+                    $trClass = '';
+                }
+                ?>
+                <tr class="<?= "$file->operation $trClass" ?>"<?= ($trStyle) ? sprintf(' style="%s"', $trStyle) : '' ?>>
+                    <td class="file">
+                        <?= Html::a(Html::encode($file->getRelativePath()), ['preview', 'id' => $id, 'file' => $file->id], ['class' => 'preview-code', 'data-title' => $file->getRelativePath()]) ?>
+                        <?php if ($file->operation === CodeFile::OP_OVERWRITE): ?>
+                            <?= Html::a('diff', ['diff', 'id' => $id, 'file' => $file->id], ['class' => 'diff-code label label-warning', 'data-title' => $file->getRelativePath()]) ?>
+                        <?php endif; ?>
+                    </td>
+                    <td class="action">
+                        <?php
+                        if ($file->operation === CodeFile::OP_SKIP) {
+                            echo 'unchanged';
+                        } else {
+                            echo $file->operation;
+                        }
+                        ?>
+                    </td>
+                    <?php if ($fileChangeExists): ?>
+                        <td class="check">
+                            <?php
+                            if ($file->operation === CodeFile::OP_SKIP) {
+                                echo '&nbsp;';
+                            } else {
+                                echo Html::checkBox("answers[{$file->id}]", isset($answers) ? isset($answers[$file->id]) : ($file->operation === CodeFile::OP_CREATE));
+                            }
+                            ?>
+                        </td>
                     <?php endif; ?>
-                </td>
-                <td class="action">
-                    <?php
-                    if ($file->operation === CodeFile::OP_SKIP) {
-                        echo 'unchanged';
-                    } else {
-                        echo $file->operation;
-                    }
-                    ?>
-                </td>
-                <?php if ($fileChangeExists): ?>
-                <td class="check">
-                    <?php
-                    if ($file->operation === CodeFile::OP_SKIP) {
-                        echo '&nbsp;';
-                    } else {
-                        echo Html::checkBox("answers[{$file->id}]", isset($answers) ? isset($answers[$file->id]) : ($file->operation === CodeFile::OP_CREATE));
-                    }
-                    ?>
-                </td>
-                <?php endif; ?>
-            </tr>
+                </tr>
             <?php endforeach; ?>
         </tbody>
     </table>

@@ -1190,7 +1190,7 @@ class Generator extends \yii\gii\generators\model\Generator
         }
 
         if (!$this->recordPrintAttr) {
-            return "parent::recordPrint()";
+            return "return parent::recordPrint()";
         }
 
         $attrs = explode(',', $this->recordPrintAttr);
