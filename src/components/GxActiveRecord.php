@@ -49,7 +49,7 @@ abstract class GxActiveRecord extends ActiveRecord
         if (false === $formName) {
             $formName = '';
         }
-        
+
         return parent::load($data, $formName);
     }
 
@@ -126,6 +126,19 @@ abstract class GxActiveRecord extends ActiveRecord
         }
 
         return $records;
+    }
+
+    /**
+     * Retrieves class name without namespace
+     * ---
+     * Calls parent method parent::className and remove namespece using StringHelepr
+     * ---
+     * @see \yii\helpers\StringHelper
+     * @return string
+     */
+    public static function baseName()
+    {
+        return \yii\helpers\StringHelper::basename(parent::className());
     }
 
 }

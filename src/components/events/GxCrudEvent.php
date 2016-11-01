@@ -52,6 +52,11 @@ class GxCrudEvent extends \yii\base\Event
     public $model;
 
     /**
+     * @var boolean indicates if CRUD action should be prevented
+     */
+    private $prevent = false;
+
+    /**
      * Indicates if create action was successful
      * @return boolean
      */
@@ -94,6 +99,23 @@ class GxCrudEvent extends \yii\base\Event
     public function isProcessed()
     {
         return null !== $this->result;
+    }
+
+    /**
+     * Indicates if action is prevented
+     * @return boolean
+     */
+    public function isPrevented()
+    {
+        return $this->prevent;
+    }
+
+    /**
+     * Prevents CRUD action
+     */
+    public function prevent()
+    {
+        $this->prevent = true;
     }
 
 }

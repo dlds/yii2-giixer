@@ -217,10 +217,13 @@ abstract class GxCrudHandler extends \yii\base\Component
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
         if ($event->model && $event->model->load($event->input, $scope)) {
+        
             $this->trigger(self::EVENT_BEFORE_CHANGE, $event);
-
-            $event->result = $event->model->save();
-
+            
+            if(!$event->isPrevented()) {
+                $event->result = $event->model->save();
+            }
+            
             $this->trigger(self::EVENT_AFTER_CHANGE, $event);
         }
     }
