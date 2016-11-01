@@ -12,7 +12,7 @@ namespace dlds\giixer\components\handlers;
 use dlds\giixer\components\events\GxCrudEvent;
 
 /**
- * This is base CRUD handler class used 
+ * This is base CRUD handler class used
  * for invoking Create, Read, Update, Delete event on AR models classes.
  * ---
  * CRUD handler defines scenarion for these events/actions and handles
@@ -219,7 +219,9 @@ abstract class GxCrudHandler extends \yii\base\Component
         if ($event->model && $event->model->load($event->input, $scope)) {
             $this->trigger(self::EVENT_BEFORE_CHANGE, $event);
 
-            $event->result = $event->model->save();
+            if (!$event->isPrevented()) {
+                $event->result = $event->model->save();
+            }
 
             $this->trigger(self::EVENT_AFTER_CHANGE, $event);
         }

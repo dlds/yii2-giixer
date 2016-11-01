@@ -11,7 +11,7 @@ namespace dlds\giixer\components\events;
 
 /**
  * This is simple CRUD event class used by GxCrudHandler descendants.
- * Class holds type of CRUD action, input data, primary key and instance 
+ * Class holds type of CRUD action, input data, primary key and instance
  * of assigned AR and result of CRUD action.
  * @see http://www.yiiframework.com/doc-2.0/guide-concept-events.html
  */
@@ -50,6 +50,11 @@ class GxCrudEvent extends \yii\base\Event
      * @var \dlds\giixer\components\GxActiveRecord AR model used in CRUD action
      */
     public $model;
+
+    /**
+     * @var boolean indicates if CRUD action should be prevented
+     */
+    private $prevent = false;
 
     /**
      * Indicates if create action was successful
@@ -94,6 +99,23 @@ class GxCrudEvent extends \yii\base\Event
     public function isProcessed()
     {
         return null !== $this->result;
+    }
+
+    /**
+     * Indicates if action is prevented
+     * @return boolean
+     */
+    public function isPrevented()
+    {
+        return $this->prevent;
+    }
+
+    /**
+     * Prevents CRUD action
+     */
+    public function prevent()
+    {
+        $this->prevent = true;
     }
 
 }
