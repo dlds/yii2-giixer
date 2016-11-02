@@ -9,7 +9,6 @@
 
 namespace dlds\giixer\components\helpers;
 
-use yii\helpers\Html;
 use dlds\metronic\widgets\Alert;
 
 /**
@@ -33,12 +32,10 @@ class GxFlashHelper
     /**
      * Messages Keys
      */
-    const MESSAGE_SUCCESS = 'flash_success';
     const MESSAGE_CREATE_SUCCESS = 'flash_create_success';
     const MESSAGE_UPDATE_SUCCESS = 'flash_update_success';
     const MESSAGE_DELETE_SUCCESS = 'flash_delete_success';
     // fails
-    const MESSAGE_FAIL = 'flash_fail';
     const MESSAGE_CREATE_FAIL = 'flash_create_fail';
     const MESSAGE_UPDATE_FAIL = 'flash_update_fail';
     const MESSAGE_DELETE_FAIL = 'flash_delete_fail';
@@ -52,30 +49,6 @@ class GxFlashHelper
         if (\Yii::$app && isset(\Yii::$app->session)) {
             \Yii::$app->session->setFlash($key, $value);
         }
-    }
-
-    /**
-     * Sets success flash
-     * @param string $msg
-     */
-    public static function setSuccess($msg = false)
-    {
-        if (!$msg) {
-            $msg = static::message(self::MESSAGE_SUCCESS);
-        }
-        static::set(self::FLASH_SUCCESS, $msg);
-    }
-
-    /**
-     * Sets failed flash
-     * @param string $msg
-     */
-    public static function setFail($msg = false)
-    {
-        if (!$msg) {
-            $msg = static::message(self::MESSAGE_FAIL);
-        }
-        static::set(self::FLASH_ERROR, $msg);
     }
 
     /**
@@ -157,30 +130,6 @@ class GxFlashHelper
     }
 
     /**
-     * Retrieve value based on given rules
-     * ---
-     * Rules is an array containing flash keys and values to be retrieved.
-     * For example [
-     *      self::FLASH_ERROR => 'error value',
-     *      self::FLASH_SUCCESS => 'success value',
-     * ]
-     * ---
-     * @param array $rules given rules
-     * @param mixed $default
-     * @return mixed
-     */
-    public static function valueBy(array $rules, $default = false)
-    {
-        foreach ($rules as $key => $value) {
-            if (self::get($key)) {
-                return $value;
-            }
-        }
-
-        return $default;
-    }
-
-    /**
      * Prints alert widget if given condition is true
      * otherwise it will print default value
      * @param boolean $condition
@@ -195,42 +144,6 @@ class GxFlashHelper
         }
 
         return Alert::widget($options);
-    }
-
-    /**
-     * Prints alert widget containing error summary of validated model
-     * @param \yii\base\Model $model
-     * @return string
-     */
-    public static function alertValidation(\yii\base\Model $model)
-    {
-        return static::alert($model->hasErrors(), [
-                'type' => static::error(),
-                'body' => Html::errorSummary($model),
-        ]);
-    }
-
-    /**
-     * Prints alert widget based on gived rules
-     * @param array $rules
-     * @return string
-     */
-    public static function alertAuto(array $rules = [])
-    {
-        if (!$rules) {
-
-            $rules = [
-                self::FLASH_ERROR => static::error(),
-                self::FLASH_SUCCESS => static::success(),
-            ];
-        }
-
-        $type = static::valueBy($rules);
-
-        return static::alert(static::has(array_keys($rules)), [
-                'type' => $type,
-                'body' => static::search(array_keys($rules)),
-        ]);
     }
 
     /**
