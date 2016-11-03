@@ -39,12 +39,21 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
 <?php if($generator->isDbView()): ?>
     use \dlds\giixer\components\traits\GxReadOnlyActiveRecordTrait;
 <?php endif; ?>
+<?php if($generator->generateMutation): ?>
+    
+    // <editor-fold defaultstate="collapsed" desc="CONSTANTS: Aliases names">
+    const AN_CURRENT_LANGUAGE = 'a_<?= $generator->tableName ?>_current_lng';
+    // </editor-fold>
+<?php endif; ?>    
 <?php if(count($relations)): ?>
     
     <?= '// <editor-fold defaultstate="collapsed" desc="CONSTANTS: Relations names">'."\n" ?>
 <?php foreach ($relations as $name => $relation): ?>
     const <?= sprintf('%s%s', dlds\giixer\Module::RELATION_NAME_PREFIX, strtoupper(Inflector::camel2id($name, '_'))) ?> = '<?= lcfirst($name) ?>';
 <?php endforeach; ?>
+<?php if($generator->generateMutation): ?>
+    const RN_CURRENT_LANGUAGE = 'currentLanguage';
+<?php endif; ?>
     <?= '// </editor-fold>'."\n" ?>
 <?php endif; ?>
     
@@ -133,6 +142,20 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
         <?= $relation[0] . "\n" ?>
     }
 <?php endforeach; ?>
+<?php if($generator->generateMutation): ?>
+    
+    /**
+     * Current language relation
+     * @return ActiveQuery relation
+     */
+    public function getCurrentLanguage()
+    {
+    return $this->hasOne(<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getClassName($generator->mutationJoinTableName))) ?>::className(), <?= $generator->getRelationKey($generator->mutationJoinTableName, true) ?>)
+            ->innerJoinWith([<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getClassName($generator->mutationJoinTableName))) ?>::<?= sprintf('%s%s', \dlds\giixer\Module::RELATION_NAME_PREFIX, strtoupper($generator->mutationSourceTableName)) ?> => function($query) {
+                    $query->isCurrent(self::AN_CURRENT_LANGUAGE);
+                }]);
+    }
+<?php endif; ?>
 <?php foreach ($relations as $name => $relation): ?>
 <?php if($generator->canGenerateRelationSetter($relation, $name)): ?>
     

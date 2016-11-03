@@ -24,7 +24,7 @@ class <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::R
      * @var array allowd sorting attrs
      */
     public $sortAttrs = [
-        '<?= implode("',\n         '", $generator->filterSortAttrs($attributes)) ?>'
+        '<?= implode("',\n        '", $generator->filterSortAttrs($attributes)) ?>'
     ];
 
     /**
@@ -32,7 +32,12 @@ class <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::R
      */
     public function rules()
     {
-        return [];
+        $rules = parent::rules();
+
+        $this->removeValidationRules($rules, 'required');
+        $this->removeValidationRules($rules, 'exist');
+
+        return $rules;
     }
 
     /**
@@ -101,7 +106,7 @@ class <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::R
      */
     protected function additionalQuery(\yii\db\ActiveQuery &$query)
     {
-        <?= implode("\n        ", $conditions) ?>
+        <?= implode("\n        ", str_replace(").'", ") . '", $conditions)) ?>
     }
 
     /**
@@ -123,4 +128,5 @@ class <?= ModelHelper::basename($generator->helperModel->getClass(ModelHelper::R
     {
         return [static::tableName() . '.<?= ($generator->generateSortableBehavior) ? $generator->sortableColumnAttribute : $primaryKey ?>' => SORT_DESC];
     }
+    
 }
