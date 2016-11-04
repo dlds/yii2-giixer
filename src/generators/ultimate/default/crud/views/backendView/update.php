@@ -42,12 +42,7 @@ $this->params['breadcrumbs'][] = ['label' => $model->__toString()];
     ]);
     ?>
 
-    <?=
-    GxFlashHelper::alert(GxFlashHelper::has([GxFlashHelper::FLASH_SUCCESS]), [
-        'type' => GxFlashHelper::success(),
-        'body' => GxFlashHelper::get(GxFlashHelper::FLASH_SUCCESS),
-    ])
-    ?>
+    <?= GxFlashHelper::alertAuto() ?>
 
     <?=
     \$this->render('crud/_form', [

@@ -43,18 +43,19 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
     
     // <editor-fold defaultstate="collapsed" desc="CONSTANTS: Aliases names">
     const AN_CURRENT_LANGUAGE = 'a_<?= $generator->tableName ?>_current_lng';
+    
     // </editor-fold>
 <?php endif; ?>    
 <?php if(count($relations)): ?>
-    
-    <?= '// <editor-fold defaultstate="collapsed" desc="CONSTANTS: Relations names">'."\n" ?>
+    // <editor-fold defaultstate="collapsed" desc="CONSTANTS: Relations names">
 <?php foreach ($relations as $name => $relation): ?>
     const <?= sprintf('%s%s', dlds\giixer\Module::RELATION_NAME_PREFIX, strtoupper(Inflector::camel2id($name, '_'))) ?> = '<?= lcfirst($name) ?>';
 <?php endforeach; ?>
 <?php if($generator->generateMutation): ?>
     const RN_CURRENT_LANGUAGE = 'currentLanguage';
 <?php endif; ?>
-    <?= '// </editor-fold>'."\n" ?>
+    
+    // </editor-fold>
 <?php endif; ?>
     
     /**
@@ -209,4 +210,5 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
     {
         return new <?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_QUERY)) ?>(get_called_class());
     }
+    
 }

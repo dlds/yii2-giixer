@@ -30,13 +30,7 @@ use <?= $generator->helperComponent->getClass(ComponentHelper::RK_HELPER_URL_ROU
 
     <?= "<?php " ?>$form = ActiveForm::begin(); ?>
 
-    <?= "<?=
-    GxFlashHelper::alert(\$model->hasErrors(), [
-        'type' => Alert::TYPE_DANGER,
-        'body' => \$form->errorSummary(\$model),
-    ])
-    ?>
-    " ?>
+    <?= "<?= GxFlashHelper::alertValidation(\$model) ?>" ?>
 
     <?php if ($generator->generateMutation): ?>
 <?= "<?=

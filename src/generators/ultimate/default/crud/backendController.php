@@ -120,7 +120,7 @@ class <?= CrudHelper::basename($generator->helperCrud->getClass(CrudHelper::RK_C
         $evt = $handler->create(\Yii::$app->request->post());
 
         if ($evt->isCreated()) {
-            GxFlashHelper::set(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_CREATE_SUCCESS));
+            GxFlashHelper::setSuccess();
 
             return $this->redirect(<?= ComponentHelper::basename($generator->helperComponent->getClass(ComponentHelper::RK_HELPER_URL_ROUTE_BE)) ?>::index());
         }
@@ -143,7 +143,7 @@ class <?= CrudHelper::basename($generator->helperCrud->getClass(CrudHelper::RK_C
         $evt = $handler->update($id, \Yii::$app->request->post());
 
         if ($evt->isUpdated()) {
-            GxFlashHelper::set(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_UPDATE_SUCCESS));
+            GxFlashHelper::setSuccess();
         }
 
         return $this->render('update', [
@@ -164,12 +164,12 @@ class <?= CrudHelper::basename($generator->helperCrud->getClass(CrudHelper::RK_C
         $evt = $handler->delete($id);
 
         if ($evt->isDeleted()) {
-            GxFlashHelper::set(GxFlashHelper::FLASH_SUCCESS, GxFlashHelper::message(GxFlashHelper::MESSAGE_DELETE_SUCCESS));
+            GxFlashHelper::setSuccess();
 
             return $this->redirect(<?= ComponentHelper::basename($generator->helperComponent->getClass(ComponentHelper::RK_HELPER_URL_ROUTE_BE)) ?>::index());
         }
 
-        GxFlashHelper::set(GxFlashHelper::FLASH_ERROR, GxFlashHelper::message(GxFlashHelper::MESSAGE_DELETE_FAIL));
+        GxFlashHelper::setFail();
 
         return $handler->notProcessableFallback();
     }
