@@ -1104,8 +1104,6 @@ class Generator extends \yii\gii\generators\model\Generator
                 'url' => sprintf('%s::getUrl()', $helperClassName),
                 'versions' => sprintf('%s::getVersions()', $helperClassName),
                 'extension' => sprintf('%s::getExtension()', $helperClassName),
-                'hasName' => 'false',
-                'hasDescription' => 'false',
                 'tableName' => $this->galleryTableName,
             ];
         }
