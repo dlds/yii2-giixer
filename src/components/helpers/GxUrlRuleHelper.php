@@ -10,6 +10,7 @@
 namespace dlds\giixer\components\helpers;
 
 use yii\web\UrlRule;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is enhaced url rule helper useful for url rules manipulation
@@ -19,20 +20,12 @@ abstract class GxUrlRuleHelper extends UrlRule
 {
 
     /**
-     * @var string connection ID
+     * Retrieves url rule helper id
+     * @return string
      */
-    public $connectionID = 'db';
-
-    /**
-     * @inheritdoc
-     */
-    public function init()
+    public static function id()
     {
-        if ($this->name === null) {
-            $this->name = __CLASS__;
-        }
-
-        return parent::init();
+        return \yii\helpers\StringHelper::basename(static::className());
     }
 
     /**
@@ -48,12 +41,12 @@ abstract class GxUrlRuleHelper extends UrlRule
     public static function getRule($pattern, $route, $host = false, $verb = false, $mode = false)
     {
         $rule = [
-            'class' => self::className(),
+            'class' => static::className(),
             'pattern' => $pattern,
             'route' => $route,
         ];
 
-        $definition = static::getHostDefinition($host);
+        $definition = static::getHost($host);
 
         if ($definition) {
             $rule['host'] = $definition;
@@ -71,32 +64,36 @@ abstract class GxUrlRuleHelper extends UrlRule
     }
 
     /**
-     * Retrieves all hosts definitions or just one definition for given host Id
+     * Retrieves host definition
      * ---
      * To be able to retrieved only single host definition put host ID
      * as first parameter of this method.
      * ---
-     * @param int|string $host host ID
-     * @return string|array|boolean host/hosts definition(s)
+     * @param int|string $id
+     * @return string|array|null host/hosts definition(s)
      */
-    public static function getHostDefinition($host = false)
+    public static function getHost($id = false)
     {
-        return null;
+        if (false === $id) {
+            $id = static::id();
+        }
+
+        if (false === $id) {
+            return null;
+        }
+
+        $definitions = static::hosts();
+
+        return ArrayHelper::getValue($definitions, $id, null);
     }
 
     /**
-     * Retrieves default host definition
-     * ---
-     * Used when application has multiple domains or subdomains
-     * and specified rules work only on specified hosts
-     * ---
-     * If application has single domain/host the method should retrieve FALSE
-     * or definition of single domain
-     * @return string|boolean default host definition
+     * Retrieves hosts definitions
+     * @return array
      */
-    public static function getHostDefault()
+    protected static function hosts()
     {
-        return null;
+        return [];
     }
 
 }
