@@ -74,6 +74,10 @@ abstract class GxUrlRuleHelper extends UrlRule
      */
     public static function getHost($id = false)
     {
+        if (null === $id) {
+            return null;
+        }
+
         if (false === $id) {
             $id = static::id();
         }

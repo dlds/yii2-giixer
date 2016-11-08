@@ -22,7 +22,7 @@ class <?= ComponentHelper::basename($generator->helperComponent->getClass(Compon
     /**
      * @inheritdoc
      */
-    public static function getHostDefault()
+    public static function hosts()
     {
         return false;
     }
