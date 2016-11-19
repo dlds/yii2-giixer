@@ -128,6 +128,17 @@ abstract class GxActiveRecord extends ActiveRecord
         return $records;
     }
 
+    public static function column($name, \Closure $callback = null)
+    {
+        $query = static::find()->select($name);
+
+        if (is_callable($callback)) {
+            call_user_func($callback, $query);
+        }
+
+        return $query->column();
+    }
+
     /**
      * Retrieves class name without namespace
      * ---

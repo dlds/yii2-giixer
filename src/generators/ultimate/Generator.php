@@ -321,7 +321,7 @@ class Generator extends \yii\gii\generators\model\Generator
         if ($bases) {
             $this->bases = $bases;
         }
-        
+
         $relAliases = Yii::$app->getModule('gii')->relAliases;
 
         if ($relAliases) {
@@ -641,30 +641,32 @@ class Generator extends \yii\gii\generators\model\Generator
             $fqn = helpers\BaseHelper::root($this->helperModel->getClass(ModelHelper::RK_MODEL_CM, $rules[1]));
 
             $sanitazed = $this->sanitazeRelationDefinition($rules, $fqn);
-            
+
+            $classAliases = ArrayHelper::getValue($this->relAliases, BaseHelper::basename($this->helperModel->getClass(ModelHelper::RK_MODEL_CM)));
+
             // if relation alias does not exists just replace origin definition with sanitazed
-            if (!isset($this->relAliases[$key])) {
+            if (!$classAliases || !isset($classAliases[$key])) {
                 $relations[$this->tableName][$key][0] = $sanitazed;
                 continue;
             }
-            
+
             // duplicate relation definition
-            $relations[$this->tableName][$this->relAliases[$key]] = $relations[$this->tableName][$key];
-            
+            $relations[$this->tableName][$classAliases[$key]] = $relations[$this->tableName][$key];
+
             // remove origin definition
             unset($relations[$this->tableName][$key]);
-            
+
             // sanitaze relation alias
-            $relations[$this->tableName][$this->relAliases[$key]][0] = $sanitazed;
+            $relations[$this->tableName][$classAliases[$key]][0] = $sanitazed;
         }
 
         if ($relations && isset($relations[$this->tableName])) {
             ksort($relations[$this->tableName]);
         }
-        
+
         return $relations;
     }
-    
+
     /**
      * Sanitazes relation definition
      * @param array $rules
@@ -673,14 +675,19 @@ class Generator extends \yii\gii\generators\model\Generator
     protected function sanitazeRelationDefinition(array $rules, $fqn)
     {
         $sanitazed = str_replace($rules[1], $fqn, $rules[0]);
-        
-        foreach ($this->relAliases as $name => $alias) {
-            $name = lcfirst($name);
-            $alias = lcfirst($alias);
-            
-            $sanitazed = str_replace($name, $alias, $sanitazed);
+
+        foreach ($this->relAliases as $class => $bunch) {
+            if (!is_array($bunch)) {
+                continue;
+            }
+            foreach ($bunch as $name => $alias) {
+                $name = lcfirst($name);
+                $alias = lcfirst($alias);
+
+                $sanitazed = str_replace($name, $alias, $sanitazed);
+            }
         }
-        
+
         return $sanitazed;
     }
 
@@ -1409,6 +1416,47 @@ class Generator extends \yii\gii\generators\model\Generator
         }
 
         return $attrs;
+    }
+
+    /**
+     * Adds inverse relations
+     *
+     * @param array $relations relation declarations
+     * @return array relation declarations extended with inverse relation names
+     * @since 2.0.5
+     */
+    protected function addInverseRelations($relations)
+    {
+        $relationNames = [];
+        foreach ($this->getSchemaNames() as $schemaName) {
+            foreach ($this->getDbConnection()->getSchema()->getTableSchemas($schemaName) as $table) {
+                $className = $this->generateClassName($table->fullName);
+                foreach ($table->foreignKeys as $refs) {
+                    $refTable = $refs[0];
+                    $refTableSchema = $this->getDbConnection()->getTableSchema($refTable);
+                    unset($refs[0]);
+                    $fks = array_keys($refs);
+
+                    if (!$refTableSchema) {
+                        throw new \yii\db\Exception(sprintf('Table "%s" does not exist.', $refTable));
+                    }
+
+                    $leftRelationName = $this->generateRelationName($relationNames, $table, $fks[0], false);
+                    $relationNames[$table->fullName][$leftRelationName] = true;
+                    $hasMany = $this->isHasManyRelation($table, $fks);
+                    $rightRelationName = $this->generateRelationName(
+                        $relationNames, $refTableSchema, $className, $hasMany
+                    );
+                    $relationNames[$refTableSchema->fullName][$rightRelationName] = true;
+
+                    $relations[$table->fullName][$leftRelationName][0] = rtrim($relations[$table->fullName][$leftRelationName][0], ';')
+                        . "->inverseOf('" . lcfirst($rightRelationName) . "');";
+                    $relations[$refTableSchema->fullName][$rightRelationName][0] = rtrim($relations[$refTableSchema->fullName][$rightRelationName][0], ';')
+                        . "->inverseOf('" . lcfirst($leftRelationName) . "');";
+                }
+            }
+        }
+        return $relations;
     }
 
 }

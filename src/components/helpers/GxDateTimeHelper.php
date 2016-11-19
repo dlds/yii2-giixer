@@ -24,7 +24,8 @@ class GxDateTimeHelper
     /**
      * UNIX
      */
-    const UNIX_HOUR = 3600;
+    const UNIX_MIN = 60;
+    const UNIX_HOUR = self::UNIX_MIN * 60;
     const UNIX_DAY = self::UNIX_HOUR * 24;
     const UNIX_WEEK = self::UNIX_DAY * 7;
     const UNIX_MONTH = self::UNIX_DAY * 30;
@@ -44,11 +45,71 @@ class GxDateTimeHelper
     const FORMAT_DAY_MONTH_YEAR = 'php:d.m.Y';
 
     /**
+     * Retrieves years in unix format
+     * @param int $count
+     * @return int
+     */
+    public static function years($count)
+    {
+        return $count * self::UNIX_YEAR;
+    }
+
+    /**
+     * Retrieves months in unix format
+     * @param int $count
+     * @return int
+     */
+    public static function months($count)
+    {
+        return $count * self::UNIX_MONTH;
+    }
+
+    /**
+     * Retrieves weeks in unix format
+     * @param int $count
+     * @return int
+     */
+    public static function weeks($count)
+    {
+        return $count * self::UNIX_WEEK;
+    }
+
+    /**
+     * Retrieves days in unix format
+     * @param int $count
+     * @return int
+     */
+    public static function days($count)
+    {
+        return $count * self::UNIX_DAY;
+    }
+
+    /**
+     * Retrieves hours in unix format
+     * @param int $count
+     * @return int
+     */
+    public static function hours($count)
+    {
+        return $count * self::UNIX_HOUR;
+    }
+
+    /**
+     * Retrieves mins in unix format
+     * @param int $count
+     * @return int
+     */
+    public static function mins($count)
+    {
+        return $count * self::UNIX_MIN;
+    }
+
+    /**
      * Retrieves midnights count between two timestamps
      * @param int $since timestmap 1
      * @param int $to timestmap 2
      */
-    public static function getMidnightsCount($since, $to)
+    public static function midnights($since, $to)
     {
         $date1 = new \DateTime(date('Y-m-d', $since));
         $date2 = new \DateTime(date('Y-m-d', $to));
@@ -57,12 +118,28 @@ class GxDateTimeHelper
     }
 
     /**
+     * Indicates if given born timestampe is in age or older then given age
+     * @param int $age
+     * @param int $born
+     * @param int|boolean $now
+     * @return boolean
+     */
+    public static function reachAge($age, $born, $now = false)
+    {
+        if (false === $now) {
+            $now = time();
+        }
+
+        return $now - $born >= $age;
+    }
+
+    /**
      * Retrieves timestamp bounds
      * @param type $timestamp
      * @param type $interval
      * @return type
      */
-    public static function getBounds($timestamp, $interval = self::UNIX_DAY, $timezone = 'Europe/Prague')
+    public static function bounds($timestamp, $interval = self::UNIX_DAY, $timezone = 'Europe/Prague')
     {
         $dtNow = new \DateTime();
 
@@ -71,7 +148,7 @@ class GxDateTimeHelper
 
         $dtNow->setTimestamp($timestamp);
 
-        $rules = static::getBoundsRules($interval);
+        $rules = static::boundsRules($interval);
 
         // create begin bound from current time
         $begin = clone $dtNow;
@@ -105,7 +182,7 @@ class GxDateTimeHelper
      * @param int $interval given time interval
      * @return array rules
      */
-    private static function getBoundsRules($interval)
+    private static function boundsRules($interval)
     {
         return [
             self::BOUND_MIN => [

@@ -128,4 +128,15 @@ class GxModelHelper
         }
     }
 
+    /**
+     * Retrieves column definition
+     * @param string $table
+     * @param string $name
+     * @return string
+     */
+    public static function col($table, $name)
+    {
+        return sprintf('%s.%s', $table, $name);
+    }
+
 }
