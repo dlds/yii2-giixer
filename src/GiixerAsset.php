@@ -25,6 +25,7 @@ class GiixerAsset extends AssetBundle
             //'main.css',
     ];
     public $js = [
+        'gii.js',
         'giixer.js',
     ];
     public $depends = [
