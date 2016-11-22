@@ -139,4 +139,25 @@ class GxModelHelper
         return sprintf('%s.%s', $table, $name);
     }
 
+    /**
+     * Pulls primary key if given entity is \yii\base\Model
+     * @param \yii\base\Model $entity
+     * @param boolan $throwException
+     * @return \yii\base\Model
+     * @throws \InvalidArgumentException
+     */
+    public static function pullPk($entity, $throwException = true)
+    {
+        if (!($entity instanceof \yii\base\Model)) {
+
+            if ($throwException) {
+                throw new \InvalidArgumentException('Given entity is not "\yii\base\Model" class descendant.');
+            }
+
+            return $entity;
+        }
+
+        return $entity->primaryKey;
+    }
+
 }
