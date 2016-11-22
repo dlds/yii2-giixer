@@ -136,7 +136,6 @@ class Module extends \yii\gii\Module
      */
     public static function findMatch($subject, array $map, $default = false)
     {
-        var_dump($subject);
         foreach ($map as $regex => $value) {
             
             $pattern = generators\ultimate\helpers\BaseHelper::sanitazeNsRegex($regex);
@@ -145,7 +144,6 @@ class Module extends \yii\gii\Module
                 return $value;
             }
         }
-        die();
 
         return $default;
     }
