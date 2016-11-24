@@ -27,7 +27,6 @@ class GxActiveFixture extends \yii\test\ActiveFixture
     public $resetIntegrity = true;
 
     /**
-      /**
      * Loads the fixture.
      *
      * The default implementation will first clean up the table by calling [[resetTable()]].
