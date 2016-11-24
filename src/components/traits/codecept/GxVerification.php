@@ -301,7 +301,7 @@ trait GxVerification
             [static::vrfInvalid(), ['string', '12 44']],
             [static::vrfValid(), ['1', 1, '0', 0, 234]],
         ];
-        
+
         static::addRequiredCfg($config, $required);
 
         return $config;
@@ -332,9 +332,27 @@ trait GxVerification
     public static function cfgInteger($required = true, $unsigned = false)
     {
         $config = [
-            [static::vrfInvalid(), ['string', 'another words']],
+            [static::vrfInvalid(), ['string', 'another words', 200.34]],
             [static::vrfValid(), [1, 100, 1000000, '23500']],
             [($unsigned) ? static::vrfInvalid() : static::vrfValid(), [-1, -100, -1000000, '-23500']],
+        ];
+
+        static::addRequiredCfg($config, $required);
+
+        return $config;
+    }
+
+    /**
+     * Retrieves default configuration for float verification
+     * @param bolean $required
+     * @return array
+     */
+    public static function cfgFloat($required = true, $unsigned = false)
+    {
+        $config = [
+            [static::vrfInvalid(), ['string', 'another words']],
+            [static::vrfValid(), [1, 100, 1000000, '23500', 200.34, '200.34']],
+            [($unsigned) ? static::vrfInvalid() : static::vrfValid(), [-1, -100, -1000000, '-23500', -200.34]],
         ];
 
         static::addRequiredCfg($config, $required);
@@ -389,7 +407,7 @@ trait GxVerification
             $config[] = [static::vrfNullable()];
         }
     }
-    
+
     /**
      * Extends given config with additional rules
      * @param array $cfg
