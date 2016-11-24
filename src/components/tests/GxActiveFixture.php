@@ -27,6 +27,7 @@ class GxActiveFixture extends \yii\test\ActiveFixture
     public $resetIntegrity = true;
 
     /**
+      /**
      * Loads the fixture.
      *
      * The default implementation will first clean up the table by calling [[resetTable()]].
@@ -46,6 +47,28 @@ class GxActiveFixture extends \yii\test\ActiveFixture
         foreach ($this->getData() as $alias => $row) {
             $primaryKeys = $this->db->schema->insert($table->fullName, $row);
             $this->data[$alias] = array_merge($row, $primaryKeys);
+        }
+    }
+
+    /**
+     * Returns the fixture data.
+     *
+     * The default implementation will try to return the fixture data by including the external file specified by [[dataFile]].
+     * The file should return an array of data rows (column name => column value), each corresponding to a row in the table.
+     *
+     * If the data file does not exist, an empty array will be returned.
+     *
+     * @return array the data rows to be inserted into the database table.
+     */
+    protected function getData()
+    {
+        if ($this->dataFile === null) {
+            $class = new \ReflectionClass($this);
+            $dataFile = dirname($class->getFileName()) . '/../_data/' . str_replace('_', '/', $this->getTableSchema()->fullName) . '.php';
+
+            return is_file($dataFile) ? require($dataFile) : parent::getData();
+        } else {
+            return parent::getData();
         }
     }
 
