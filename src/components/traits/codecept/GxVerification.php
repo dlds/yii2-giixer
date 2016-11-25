@@ -13,7 +13,7 @@ trait GxVerification
     /**
      * @var \yii\base\Model
      */
-    protected $model;
+    private $_verificated;
 
     /**
      * Runs all attributes verification based on given configuration
@@ -96,14 +96,14 @@ trait GxVerification
      */
     public function verifyRequired(\yii\base\Model $model, $attr, $specify = '%s is required')
     {
-        $this->model = $model;
+        $this->_verificated = $model;
 
         $this->specify(sprintf($specify, $attr), function() use($attr) {
 
             \Codeception\Util\Debug::debug('- verifying REQUIRED');
 
-            $this->model->$attr = null;
-            verify($this->model->validate([$attr]))->false();
+            $this->_verificated->$attr = null;
+            verify($this->_verificated->validate([$attr]))->false();
         });
     }
 
@@ -115,14 +115,14 @@ trait GxVerification
      */
     public function verifyNullable(\yii\base\Model $model, $attr, $specify = '%s is nullable')
     {
-        $this->model = $model;
+        $this->_verificated = $model;
 
         $this->specify(sprintf($specify, $attr), function() use($attr) {
 
             \Codeception\Util\Debug::debug('- verifying NULLABLE');
 
-            $this->model->$attr = null;
-            verify($this->model->validate([$attr]))->true();
+            $this->_verificated->$attr = null;
+            verify($this->_verificated->validate([$attr]))->true();
         });
     }
 
@@ -134,7 +134,7 @@ trait GxVerification
      */
     public function verifyString(\yii\base\Model $model, $attr, array $length, $specify = '%s is string (%s, %s)')
     {
-        $this->model = $model;
+        $this->_verificated = $model;
 
         $min = ArrayHelper::getValue($length, 0, 0);
         $max = ArrayHelper::getValue($length, 1, 255);
@@ -146,18 +146,18 @@ trait GxVerification
 
             if ($tooShort >= 0) {
 
-                $this->model->$attr = static::valRandomString($tooShort);
+                $this->_verificated->$attr = static::valRandomString($tooShort);
 
-                \Codeception\Util\Debug::debug(sprintf('- verifying TOO SHORT (%s)', $this->model->$attr));
+                \Codeception\Util\Debug::debug(sprintf('- verifying TOO SHORT (%s)', $this->_verificated->$attr));
 
-                verify($this->model->validate([$attr]))->false();
+                verify($this->_verificated->validate([$attr]))->false();
             }
 
-            $this->model->$attr = static::valRandomString($tooLong);
+            $this->_verificated->$attr = static::valRandomString($tooLong);
 
-            \Codeception\Util\Debug::debug(sprintf('- verifying TOO LONG (%s)', $this->model->$attr));
+            \Codeception\Util\Debug::debug(sprintf('- verifying TOO LONG (%s)', $this->_verificated->$attr));
 
-            verify($this->model->validate([$attr]))->false();
+            verify($this->_verificated->validate([$attr]))->false();
         });
     }
 
@@ -169,7 +169,7 @@ trait GxVerification
      */
     public function verifyInvalid(\yii\base\Model $model, $attr, array $values, $specify = '%s is invalid')
     {
-        $this->model = $model;
+        $this->_verificated = $model;
 
         $examples = static::specifyExamples($values);
 
@@ -177,8 +177,8 @@ trait GxVerification
 
             \Codeception\Util\Debug::debug(sprintf('- verifying INVALID (%s)', $value));
 
-            $this->model->$attr = $value;
-            verify($this->model->validate([$attr]))->false();
+            $this->_verificated->$attr = $value;
+            verify($this->_verificated->validate([$attr]))->false();
         }, $examples);
     }
 
@@ -190,7 +190,7 @@ trait GxVerification
      */
     public function verifyValid(\yii\base\Model $model, $attr, array $values, $specify = '%s is ok')
     {
-        $this->model = $model;
+        $this->_verificated = $model;
 
         $examples = static::specifyExamples($values);
 
@@ -198,8 +198,8 @@ trait GxVerification
 
             \Codeception\Util\Debug::debug(sprintf('- verifying VALID (%s)', $value));
 
-            $this->model->$attr = $value;
-            verify($this->model->validate([$attr]))->true();
+            $this->_verificated->$attr = $value;
+            verify($this->_verificated->validate([$attr]))->true();
         }, $examples);
     }
 
@@ -211,7 +211,7 @@ trait GxVerification
      */
     public function verifyForeignKey(\yii\base\Model $model, $attr, $classname, $specify = '%s is foreign key')
     {
-        $this->model = $model;
+        $this->_verificated = $model;
 
         $pk = static::valMaxPrimaryKey($classname);
 
@@ -219,11 +219,11 @@ trait GxVerification
 
             \Codeception\Util\Debug::debug('- verifying FOREIGN KEY');
 
-            $this->model->$attr = $pk;
-            verify($this->model->validate([$attr]))->true();
+            $this->_verificated->$attr = $pk;
+            verify($this->_verificated->validate([$attr]))->true();
 
-            $this->model->$attr = $pk + 1;
-            verify($this->model->validate([$attr]))->false();
+            $this->_verificated->$attr = $pk + 1;
+            verify($this->_verificated->validate([$attr]))->false();
         });
     }
 
