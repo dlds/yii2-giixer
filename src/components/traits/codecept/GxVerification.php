@@ -28,7 +28,7 @@ trait GxVerification
      * @param string $attr
      * @param array $config
      */
-    protected function runAttrVerification(\yii\base\Model $model, $attr, array $config)
+    public function runAttrVerification(\yii\base\Model $model, $attr, array $config)
     {
         foreach ($config as $rule) {
             $this->verifyAttrRule($model, $attr, $rule);
