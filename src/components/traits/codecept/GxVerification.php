@@ -11,6 +11,11 @@ trait GxVerification
     use \Codeception\Specify;
 
     /**
+     * @var \yii\base\Model
+     */
+    protected $model;
+
+    /**
      * Runs all attributes verification based on given configuration
      * @param \yii\base\Model $model
      * @param array $configs
@@ -91,12 +96,14 @@ trait GxVerification
      */
     public function verifyRequired(\yii\base\Model $model, $attr, $specify = '%s is required')
     {
-        $this->specify(sprintf($specify, $attr), function() use($model, $attr) {
+        $this->model = $model;
+
+        $this->specify(sprintf($specify, $attr), function() use($attr) {
 
             \Codeception\Util\Debug::debug('- verifying REQUIRED');
 
-            $model->$attr = null;
-            verify($model->validate([$attr]))->false();
+            $this->model->$attr = null;
+            verify($this->model->validate([$attr]))->false();
         });
     }
 
@@ -108,12 +115,14 @@ trait GxVerification
      */
     public function verifyNullable(\yii\base\Model $model, $attr, $specify = '%s is nullable')
     {
-        $this->specify(sprintf($specify, $attr), function() use($model, $attr) {
+        $this->model = $model;
+
+        $this->specify(sprintf($specify, $attr), function() use($attr) {
 
             \Codeception\Util\Debug::debug('- verifying NULLABLE');
 
-            $model->$attr = null;
-            verify($model->validate([$attr]))->true();
+            $this->model->$attr = null;
+            verify($this->model->validate([$attr]))->true();
         });
     }
 
@@ -125,28 +134,30 @@ trait GxVerification
      */
     public function verifyString(\yii\base\Model $model, $attr, array $length, $specify = '%s is string (%s, %s)')
     {
+        $this->model = $model;
+
         $min = ArrayHelper::getValue($length, 0, 0);
         $max = ArrayHelper::getValue($length, 1, 255);
 
-        $this->specify(sprintf($specify, $attr, $min, $max), function() use($model, $attr, $min, $max) {
+        $this->specify(sprintf($specify, $attr, $min, $max), function() use($attr, $min, $max) {
 
             $tooShort = $min - 1;
             $tooLong = $max + 1;
 
             if ($tooShort >= 0) {
 
-                $model->$attr = static::valRandomString($tooShort);
+                $this->model->$attr = static::valRandomString($tooShort);
 
-                \Codeception\Util\Debug::debug(sprintf('- verifying TOO SHORT (%s)', $model->$attr));
+                \Codeception\Util\Debug::debug(sprintf('- verifying TOO SHORT (%s)', $this->model->$attr));
 
-                verify($model->validate([$attr]))->false();
+                verify($this->model->validate([$attr]))->false();
             }
 
-            $model->$attr = static::valRandomString($tooLong);
+            $this->model->$attr = static::valRandomString($tooLong);
 
-            \Codeception\Util\Debug::debug(sprintf('- verifying TOO LONG (%s)', $model->$attr));
+            \Codeception\Util\Debug::debug(sprintf('- verifying TOO LONG (%s)', $this->model->$attr));
 
-            verify($model->validate([$attr]))->false();
+            verify($this->model->validate([$attr]))->false();
         });
     }
 
@@ -158,14 +169,16 @@ trait GxVerification
      */
     public function verifyInvalid(\yii\base\Model $model, $attr, array $values, $specify = '%s is invalid')
     {
+        $this->model = $model;
+
         $examples = static::specifyExamples($values);
 
-        $this->specify(sprintf($specify, $attr), function($value) use($model, $attr) {
+        $this->specify(sprintf($specify, $attr), function($value) use($attr) {
 
             \Codeception\Util\Debug::debug(sprintf('- verifying INVALID (%s)', $value));
 
-            $model->$attr = $value;
-            verify($model->validate([$attr]))->false();
+            $this->model->$attr = $value;
+            verify($this->model->validate([$attr]))->false();
         }, $examples);
     }
 
@@ -177,14 +190,16 @@ trait GxVerification
      */
     public function verifyValid(\yii\base\Model $model, $attr, array $values, $specify = '%s is ok')
     {
+        $this->model = $model;
+
         $examples = static::specifyExamples($values);
 
-        $this->specify(sprintf($specify, $attr), function($value) use($model, $attr) {
+        $this->specify(sprintf($specify, $attr), function($value) use($attr) {
 
             \Codeception\Util\Debug::debug(sprintf('- verifying VALID (%s)', $value));
 
-            $model->$attr = $value;
-            verify($model->validate([$attr]))->true();
+            $this->model->$attr = $value;
+            verify($this->model->validate([$attr]))->true();
         }, $examples);
     }
 
@@ -196,17 +211,19 @@ trait GxVerification
      */
     public function verifyForeignKey(\yii\base\Model $model, $attr, $classname, $specify = '%s is foreign key')
     {
+        $this->model = $model;
+
         $pk = static::valMaxPrimaryKey($classname);
 
-        $this->specify(sprintf($specify, $attr), function() use($model, $attr, $pk) {
+        $this->specify(sprintf($specify, $attr), function() use($attr, $pk) {
 
             \Codeception\Util\Debug::debug('- verifying FOREIGN KEY');
 
-            $model->$attr = $pk;
-            verify($model->validate([$attr]))->true();
+            $this->model->$attr = $pk;
+            verify($this->model->validate([$attr]))->true();
 
-            $model->$attr = $pk + 1;
-            verify($model->validate([$attr]))->false();
+            $this->model->$attr = $pk + 1;
+            verify($this->model->validate([$attr]))->false();
         });
     }
 
@@ -300,6 +317,22 @@ trait GxVerification
         $config = [
             [static::vrfInvalid(), ['string', '12 44']],
             [static::vrfValid(), ['1', 1, '0', 0, 234]],
+        ];
+
+        static::addRequiredCfg($config, $required);
+
+        return $config;
+    }
+
+    /**
+     * Retrieves default configuration for simple text verification
+     * @param bolean $required
+     * @return array
+     */
+    public static function cfgString($min, $max, $required = true)
+    {
+        $config = [
+            [static::vrfString(), [$min, $max]],
         ];
 
         static::addRequiredCfg($config, $required);
