@@ -74,7 +74,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      * @param string $scope given scope for massive assignment
      * @return instance|null
      */
-    public function create(array $attrs, $scope = null)
+    public function create(array $attrs = null, $scope = null)
     {
         $event = new GxCrudEvent(['input' => $attrs, 'type' => GxCrudEvent::TYPE_CREATE]);
 
@@ -120,7 +120,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      * @param string $scope given scope for massive assignment
      * @return instance | null
      */
-    public function update($pk, array $attrs, $scope = null)
+    public function update($pk, array $attrs = null, $scope = null)
     {
         $event = new GxCrudEvent(['id' => $pk, 'input' => $attrs, 'type' => GxCrudEvent::TYPE_UPDATE]);
 
@@ -216,10 +216,10 @@ abstract class GxCrudHandler extends \yii\base\Component
     {
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
-        if ($event->model && $event->model->load($event->input, $scope)) {
+        if ($event->model && ($event->model->load($event->input, $scope) || $event->isForced())) {
             $this->trigger(self::EVENT_BEFORE_CHANGE, $event);
 
-            if (!$event->isPrevented()) {
+            if (!$event->isPrevented() || $event->isForced()) {
                 $event->result = $event->model->save();
             }
 
@@ -234,7 +234,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      */
     protected function deleteModel(GxCrudEvent &$event)
     {
-        if ($event->model) {
+        if ($event->model && (!$event->isPrevented() || $event->isForced())) {
             $event->result = $event->model->delete();
         }
     }
