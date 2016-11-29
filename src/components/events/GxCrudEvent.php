@@ -59,7 +59,7 @@ class GxCrudEvent extends \yii\base\Event
     /**
      * @var boolean indicates if CRUD action is forced
      */
-    private $force = true;
+    private $force = false;
 
     /**
      * Indicates if create action was successful
