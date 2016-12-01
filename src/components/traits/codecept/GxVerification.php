@@ -315,8 +315,8 @@ trait GxVerification
     public static function cfgBoolean($required = true)
     {
         $config = [
-            [static::vrfInvalid(), ['string', '12 44']],
-            [static::vrfValid(), ['1', 1, '0', 0, 234]],
+            [static::vrfInvalid(), ['string', 'true', 'false']],
+            [static::vrfValid(), ['1', 1, '0', 0]],
         ];
 
         static::addRequiredCfg($config, $required);
