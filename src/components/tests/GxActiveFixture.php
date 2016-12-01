@@ -64,7 +64,7 @@ class GxActiveFixture extends \yii\test\ActiveFixture
     {
         if ($this->dataFile === null) {
             $class = new \ReflectionClass($this);
-            $dataFile = dirname($class->getFileName()) . '/../_data/' . str_replace('_', '/', $this->getTableSchema()->fullName) . '.php';
+            $dataFile = $this->dirData($class) . '/' . str_replace('_', '/', $this->getTableSchema()->fullName) . '.php';
 
             return is_file($dataFile) ? require($dataFile) : parent::getData();
         } else {
@@ -104,4 +104,11 @@ class GxActiveFixture extends \yii\test\ActiveFixture
         $this->db->createCommand()->checkIntegrity(true)->execute();
     }
 
+    /**
+     * Retreives data dir path
+     */
+    protected function dirData(\ReflectionClass $class)
+    {
+        return dirname($class->getFileName());
+    }
 }
