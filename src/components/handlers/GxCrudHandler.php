@@ -74,7 +74,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      * @param string $scope given scope for massive assignment
      * @return instance|null
      */
-    public function create(array $attrs = null, $scope = null)
+    public function create(array $attrs, $scope = null)
     {
         $event = new GxCrudEvent(['input' => $attrs, 'type' => GxCrudEvent::TYPE_CREATE]);
 
