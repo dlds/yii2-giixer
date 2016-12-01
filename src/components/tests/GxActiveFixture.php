@@ -24,7 +24,7 @@ class GxActiveFixture extends \yii\test\ActiveFixture
     /**
      * @var boolean indicates if foreign keys will be checked
      */
-    public $resetIntegrity = true;
+    public $checkIntegrity = true;
 
     /**
       /**
@@ -80,7 +80,7 @@ class GxActiveFixture extends \yii\test\ActiveFixture
     {
         $table = $this->getTableSchema();
 
-        if (!$this->resetIntegrity) {
+        if (!$this->checkIntegrity) {
             $this->truncateTable($table);
         } else {
             $this->db->createCommand()->delete($table->fullName)->execute();
