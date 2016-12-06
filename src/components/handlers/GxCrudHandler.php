@@ -120,7 +120,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      * @param string $scope given scope for massive assignment
      * @return instance | null
      */
-    public function update($pk, array $attrs = null, $scope = null)
+    public function update($pk, array $attrs, $scope = null)
     {
         $event = new GxCrudEvent(['id' => $pk, 'input' => $attrs, 'type' => GxCrudEvent::TYPE_UPDATE]);
 
