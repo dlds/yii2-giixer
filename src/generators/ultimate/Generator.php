@@ -123,6 +123,16 @@ class Generator extends \yii\gii\generators\model\Generator
     public $galleryTableName = 'core_image';
 
     /**
+     * @var boolean indicates if default behavior should be generated
+     */
+    public $generateAlwaysAssignableBehavior = false;
+
+    /**
+     * @var string gallery table name
+     */
+    public $alwaysAssignableTableName = 'core_default';
+
+    /**
      * @var boolean indicates if sortable behavior should be generated
      */
     public $generateSortableBehavior = false;
@@ -375,7 +385,7 @@ class Generator extends \yii\gii\generators\model\Generator
                 [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
                 [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
                 [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
-                [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateSortableBehavior'], 'boolean'],
+                [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateAlwaysAssignableBehavior', 'generateSortableBehavior'], 'boolean'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
                     return $model->generateMutation;
@@ -428,6 +438,18 @@ class Generator extends \yii\gii\generators\model\Generator
                     return $model->generateGalleryBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generategallerybehavior').is(':checked');
+                    }"],
+                [['alwaysAssignableTableName'], 'validateAlwaysAssignableBehavior'],
+                [['alwaysAssignableTableName'], 'filter', 'filter' => 'trim'],
+                [['alwaysAssignableTableName'], 'validateTableName', 'when' => function($model) {
+                    return $model->generateAlwaysAssignableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generatealwaysassignablebehavior').is(':checked');
+                    }"],
+                [['alwaysAssignableTableName'], 'required', 'when' => function($model) {
+                    return $model->generateAlwaysAssignableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generatealwaysassignablebehavior').is(':checked');
                     }"],
                 ], $rules);
     }
@@ -557,6 +579,7 @@ class Generator extends \yii\gii\generators\model\Generator
             'sortableKeyAtAttribute' => 'This defines table primary key if is different from standart.',
             'timestampUpdatedAtAttribute' => 'This is the name of the table attribute which should be used as updated at timestamp value.',
             'generateGalleryBehavior' => 'This indicates whether the generator should generate dlds/yii2-gallerymanager behavior in main model class.',
+            'generateAlwaysAssignableBehavior' => 'This indicates whether the generator should generate default relations in main model class.',
         ]);
     }
 
@@ -578,6 +601,9 @@ class Generator extends \yii\gii\generators\model\Generator
                     return $db->getSchema()->getTableNames();
                 },
                 'galleryTableName' => function () use ($db) {
+                    return $db->getSchema()->getTableNames();
+                },
+                'alwaysAssignableTableName' => function () use ($db) {
                     return $db->getSchema()->getTableNames();
                 },
             ];
@@ -658,6 +684,20 @@ class Generator extends \yii\gii\generators\model\Generator
 
             // sanitaze relation alias
             $relations[$this->tableName][$classAliases[$key]][0] = $sanitazed;
+        }
+
+        // add default indicationr relation
+        if ($this->generateAlwaysAssignableBehavior) {
+
+            $cls = $this->getClassName($this->alwaysAssignableTableName);
+            $clsFqn = ModelHelper::root($this->helperModel->getClass(ModelHelper::RK_MODEL_CM, $cls));
+            $dfn = "return \$this->hasOne($clsFqn::className(), ['owner_id' => 'id'])->where(['owner_type' => $clsFqn::aliasOfClass(static::className()])->orderBy(['rank' => SORT_ASC]);";
+
+            $relations[$this->tableName][$cls] = [
+                $dfn,
+                $cls,
+                false
+            ];
         }
 
         if ($relations && isset($relations[$this->tableName])) {
@@ -921,6 +961,27 @@ class Generator extends \yii\gii\generators\model\Generator
                 }
             }
         }
+    }
+
+    /**
+     * Validates Always Assignable behavior
+     * @param type $attribute
+     */
+    public function validateAlwaysAssignableBehavior($attribute)
+    {
+        $tableName = $this->alwaysAssignableTableName;
+
+        $cls = $this->getClassName($this->alwaysAssignableTableName);
+        $clsFqn = ModelHelper::root($this->helperModel->getClass(ModelHelper::RK_MODEL_CM, $cls));
+
+        $traits = class_uses($clsFqn);
+
+        if (!in_array(\dlds\giixer\components\traits\GxAlwaysAssignable::class, $traits)) {
+            $this->addError($attribute, sprintf('Target table model (%s) must use %s', $cls, \dlds\giixer\components\traits\GxAlwaysAssignable::class));
+            return false;
+        }
+
+        return true;
     }
 
     /**

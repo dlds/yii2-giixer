@@ -65,7 +65,7 @@ class GxActiveFixture extends \yii\test\ActiveFixture
         if ($this->dataFile === null) {
             $class = new \ReflectionClass($this);
             $dataFile = $this->dirData($class) . '/' . str_replace('_', '/', $this->getTableSchema()->fullName) . '.php';
-
+            
             return is_file($dataFile) ? require($dataFile) : parent::getData();
         } else {
             return parent::getData();

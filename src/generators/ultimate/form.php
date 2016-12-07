@@ -114,6 +114,20 @@ echo $form->field($generator, 'recordPrintAttr');
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-12" style="background-color: #FFFFE0;margin-bottom:15px">
+        <div class="row" style="margin-top:15px">
+            <div class="col-md-12">
+                <?= $form->field($generator, 'generateAlwaysAssignableBehavior')->sticky()->checkbox() ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $form->field($generator, 'alwaysAssignableTableName') ?>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row" style="margin-bottom: 15px">
     <div class="col-md-12">
         <?= Html::a('Advanced settings', '#advanced-settings', ['class' => 'visibility-toggler']) ?>

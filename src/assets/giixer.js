@@ -77,6 +77,13 @@ yii.giixer = (function ($) {
                 'form .field-generator-gallerytablename',
             ];
             initOnChangeVisibilityToggle(generateGalleryBehaviorToggler, generateGalleryBehaviorTogglerTargets, ':checked');
+            
+            // register on check visibility toggler callback
+            var generateAlwaysAssignableBehaviorToggler = $('form #generator-generatealwaysassignablebehavior');
+            var generateAlwaysAssignableBehaviorTogglerTargets = [
+                'form .field-generator-defaulttablename',
+            ];
+            initOnChangeVisibilityToggle(generateAlwaysAssignableBehaviorToggler, generateAlwaysAssignableBehaviorTogglerTargets, ':checked');
 
             // toggle visibility once at begin to ensure elements are in proper state
             toggleVisibility(generateMutationToggler, generateMutationTogglerTargets, ':checked');
@@ -84,6 +91,7 @@ yii.giixer = (function ($) {
             toggleVisibility(generateTimestampBehaviorToggler, generateTimestampBehaviorTogglerTargets, ':checked');
             toggleVisibility(generateSortableBehaviorToggler, generateSortableBehaviorTogglerTargets, ':checked');
             toggleVisibility(generateGalleryBehaviorToggler, generateGalleryBehaviorTogglerTargets, ':checked');
+            toggleVisibility(generateAlwaysAssignableBehaviorToggler, generateAlwaysAssignableBehaviorTogglerTargets, ':checked');
         }
     };
 })(jQuery);
