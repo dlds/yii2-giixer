@@ -151,10 +151,10 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
      */
     public function getCurrentLanguage()
     {
-    return $this->hasOne(<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getClassName($generator->mutationJoinTableName))) ?>::className(), <?= $generator->getRelationKey($generator->mutationJoinTableName, true) ?>)
-            ->innerJoinWith([<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getClassName($generator->mutationJoinTableName))) ?>::<?= sprintf('%s%s', \dlds\giixer\Module::RELATION_NAME_PREFIX, strtoupper($generator->mutationSourceTableName)) ?> => function($query) {
-                    $query->isCurrent(self::AN_CURRENT_LANGUAGE);
-                }]);
+        return $this->hasOne(<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getClassName($generator->mutationJoinTableName))) ?>::className(), <?= $generator->getRelationKey($generator->mutationJoinTableName, true) ?>)
+                ->innerJoinWith([<?= ModelHelper::root($generator->helperModel->getClass(ModelHelper::RK_MODEL_CM, $generator->getClassName($generator->mutationJoinTableName))) ?>::<?= sprintf('%s%s', \dlds\giixer\Module::RELATION_NAME_PREFIX, strtoupper($generator->mutationSourceTableName)) ?> => function($query) {
+                        $query->isCurrent(self::AN_CURRENT_LANGUAGE);
+                    }]);
     }
 <?php endif; ?>
 <?php foreach ($relations as $name => $relation): ?>
