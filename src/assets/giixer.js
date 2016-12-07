@@ -81,7 +81,7 @@ yii.giixer = (function ($) {
             // register on check visibility toggler callback
             var generateAlwaysAssignableBehaviorToggler = $('form #generator-generatealwaysassignablebehavior');
             var generateAlwaysAssignableBehaviorTogglerTargets = [
-                'form .field-generator-defaulttablename',
+                'form .field-generator-alwaysassignabletablename',
             ];
             initOnChangeVisibilityToggle(generateAlwaysAssignableBehaviorToggler, generateAlwaysAssignableBehaviorTogglerTargets, ':checked');
 
