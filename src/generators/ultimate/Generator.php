@@ -691,7 +691,7 @@ class Generator extends \yii\gii\generators\model\Generator
 
             $cls = $this->getClassName($this->alwaysAssignableTableName);
             $clsFqn = ModelHelper::root($this->helperModel->getClass(ModelHelper::RK_MODEL_CM, $cls));
-            $dfn = "return \$this->hasOne($clsFqn::className(), ['owner_id' => 'id'])->where(['owner_type' => $clsFqn::aliasOfClass(static::className()])->orderBy(['rank' => SORT_ASC]);";
+            $dfn = "return \$this->hasOne($clsFqn::className(), ['owner_id' => 'id'])->where(['owner_type' => $clsFqn::aliasOfClass(static::className())])->orderBy(['rank' => SORT_ASC]);";
 
             $relations[$this->tableName][$cls] = [
                 $dfn,
