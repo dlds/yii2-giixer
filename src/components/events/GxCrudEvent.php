@@ -57,9 +57,9 @@ class GxCrudEvent extends \yii\base\Event
     private $prevent = false;
     
     /**
-     * @var boolean indicates if CRUD action is forced
+     * @var boolean indicates if CRUD action is pushd
      */
-    private $force = false;
+    private $push = false;
 
     /**
      * Indicates if create action was successful
@@ -115,9 +115,13 @@ class GxCrudEvent extends \yii\base\Event
         return $this->prevent;
     }
     
-    public function isForced()
+    /**
+     * Indicates if LOAD is pushed
+     * @return boolean
+     */
+    public function isPushed()
     {
-        return $this->force;
+        return $this->push;
     }
 
     /**
@@ -129,11 +133,11 @@ class GxCrudEvent extends \yii\base\Event
     }
     
     /**
-     * Forces CRUD action
+     * Pushes LOAD operation
      */
-    public function force()
+    public function push()
     {
-        $this->force = true;
+        $this->push = true;
     }
 
 }

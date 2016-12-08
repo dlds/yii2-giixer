@@ -216,10 +216,10 @@ abstract class GxCrudHandler extends \yii\base\Component
     {
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
-        if ($event->model && ($event->model->load($event->input, $scope) || $event->isForced())) {
+        if ($event->model && ($event->model->load($event->input, $scope) || $event->isPushed())) {
             $this->trigger(self::EVENT_BEFORE_CHANGE, $event);
 
-            if (!$event->isPrevented() || $event->isForced()) {
+            if (!$event->isPrevented()) {
                 $event->result = $event->model->save();
             }
 
@@ -234,7 +234,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      */
     protected function deleteModel(GxCrudEvent &$event)
     {
-        if ($event->model && (!$event->isPrevented() || $event->isForced())) {
+        if ($event->model && !$event->isPrevented()) {
             $event->result = $event->model->delete();
         }
     }
