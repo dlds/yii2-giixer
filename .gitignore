@@ -9,3 +9,4 @@ netbeans/*
 /vendor/
 /nbproject/
 !/assets/giixer.js
+.netbeans.xml
