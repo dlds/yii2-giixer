@@ -140,7 +140,7 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
      */
     public function load($data, $formName = null)
     {
-        $this->loadMutations($data, $formName = null);
+        $this->loadMutations($data, $formName);
 
         return parent::load($data, $formName);
     }
