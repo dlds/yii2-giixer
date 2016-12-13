@@ -133,6 +133,18 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
 <?php endforeach; ?>
         ];
     }
+<?php if($generator->generateMutation): ?>
+    
+    /**
+     * @inheritdoc
+     */
+    public function load($data, $formName = null)
+    {
+        $this->loadMutations($data, $formName = null);
+
+        return parent::load($data, $formName);
+    }
+<?php endif; ?>    
 <?php foreach ($relations as $name => $relation): ?>
 
     /**
