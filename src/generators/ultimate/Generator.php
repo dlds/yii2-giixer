@@ -449,7 +449,11 @@ class Generator extends \yii\gii\generators\model\Generator
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generategallerybehavior').is(':checked');
                     }"],
-                [['alwaysAssignableTableName'], 'validateAlwaysAssignableBehavior'],
+                [['alwaysAssignableTableName'], 'validateAlwaysAssignableBehavior', 'when' => function($model) {
+                    return $model->generateAlwaysAssignableBehavior;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generatealwaysassignablebehavior').is(':checked');
+                    }"],
                 [['alwaysAssignableTableName'], 'filter', 'filter' => 'trim'],
                 [['alwaysAssignableTableName'], 'validateTableName', 'when' => function($model) {
                     return $model->generateAlwaysAssignableBehavior;
@@ -983,6 +987,11 @@ class Generator extends \yii\gii\generators\model\Generator
 
         $cls = $this->getClassName($this->alwaysAssignableTableName);
         $clsFqn = ModelHelper::root($this->helperModel->getClass(ModelHelper::RK_MODEL_CM, $cls));
+
+        if (!class_exists($clsFqn)) {
+            $this->addError($attribute, sprintf('Target table model class (%s) does not exist', $cls));
+            return false;
+        }
 
         $traits = class_uses($clsFqn);
 
