@@ -39,6 +39,7 @@ yii.giixer = (function ($) {
                 'form .field-generator-mutationjointablename',
                 'form .field-generator-mutationsourcetablename',
                 'form .field-generator-mutationignoredformattributes',
+                'form .field-generator-mutationbehavioractiveattribute'
             ];
             initOnChangeVisibilityToggle(generateMutationToggler, generateMutationTogglerTargets, ':checked');
 
@@ -75,6 +76,7 @@ yii.giixer = (function ($) {
             var generateGalleryBehaviorToggler = $('form #generator-generategallerybehavior');
             var generateGalleryBehaviorTogglerTargets = [
                 'form .field-generator-gallerytablename',
+                'form .field-generator-gallerybehaviorattruploads',
             ];
             initOnChangeVisibilityToggle(generateGalleryBehaviorToggler, generateGalleryBehaviorTogglerTargets, ':checked');
             

@@ -126,6 +126,11 @@ class Generator extends \yii\gii\generators\model\Generator
      * @var string gallery table name
      */
     public $galleryTableName = 'core_image';
+    
+    /**
+     * @var string gallery behavior attr uploads
+     */
+    public $galleryBehaviorAttrUploads = 'attachments';
 
     /**
      * @var boolean indicates if default behavior should be generated
@@ -437,7 +442,8 @@ class Generator extends \yii\gii\generators\model\Generator
                     return $model->generateSortableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
-                    }"],
+                    }"],    
+                //[['galleryBehaviorAttrUploads'], 'string'],
                 [['galleryTableName'], 'filter', 'filter' => 'trim'],
                 [['galleryTableName'], 'validateTableName', 'when' => function($model) {
                     return $model->generateGalleryBehavior;
@@ -1196,6 +1202,7 @@ class Generator extends \yii\gii\generators\model\Generator
                 'versions' => sprintf('%s::getVersions()', $helperClassName),
                 'extension' => sprintf('%s::getExtension()', $helperClassName),
                 'tableName' => $this->galleryTableName,
+                'attrUploads' => $this->galleryBehaviorAttrUploads,
             ];
         }
 

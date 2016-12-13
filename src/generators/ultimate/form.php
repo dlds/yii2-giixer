@@ -115,6 +115,11 @@ echo $form->field($generator, 'recordPrintAttr');
                 <?= $form->field($generator, 'galleryTableName') ?>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $form->field($generator, 'galleryBehaviorAttrUploads') ?>
+            </div>
+        </div>
     </div>
 </div>
 <div class="row">
