@@ -71,6 +71,11 @@ class Generator extends \yii\gii\generators\model\Generator
     public $mutationIgnoredFormAttributes;
 
     /**
+     * @var string mutation active attr
+     */
+    public $mutationBehaviorActiveAttribute;
+
+    /**
      * @var boolean indicates if sluggable behavior should be generated
      */
     public $generateSluggableBehavior = false;
@@ -397,6 +402,11 @@ class Generator extends \yii\gii\generators\model\Generator
                 }],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
                 [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
+                [['mutationBehaviorActiveAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
+                    return $model->generateMutation;
+                }, 'whenClient' => "function (attribute, value) {
+                        return $('#generator-generatemutation').is(':checked');
+                    }"],
                 [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
                     return $model->generateSluggableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
@@ -1160,6 +1170,10 @@ class Generator extends \yii\gii\generators\model\Generator
                 ],
                 'attrs' => $mutationableAttrs,
             ];
+
+            if ($this->mutationBehaviorActiveAttribute) {
+                $behaviors[Module::BEHAVIOR_NAME_MUTATION]['attrActive'] = $this->mutationBehaviorActiveAttribute;
+            }
         }
 
         if ($this->generateGalleryBehavior) {

@@ -30,8 +30,11 @@ echo $form->field($generator, 'recordPrintAttr');
             <div class="col-md-6">
                 <?= $form->field($generator, 'mutationSourceTableName') ?>
             </div>
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <?= $form->field($generator, 'mutationIgnoredFormAttributes') ?>
+            </div>
+            <div class="col-md-6">
+                <?= $form->field($generator, 'mutationBehaviorActiveAttribute') ?>
             </div>
         </div>
     </div>
