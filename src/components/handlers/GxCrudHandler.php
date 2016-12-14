@@ -44,6 +44,7 @@ abstract class GxCrudHandler extends \yii\base\Component
     const EVENT_BEFORE_READ = 'e_before_read';
     const EVENT_BEFORE_UPDATE = 'e_before_update';
     const EVENT_BEFORE_DELETE = 'e_before_delete';
+    const EVENT_BEFORE_FIND = 'e_before_find';
     const EVENT_BEFORE_CHANGE = 'e_before_change';
     const EVENT_BEFORE_LOAD = 'e_before_load';
 
@@ -199,7 +200,11 @@ abstract class GxCrudHandler extends \yii\base\Component
     {
         $class = $this->model;
 
-        $event->model = $class::findOne($event->id);
+        $event->query = $class::queryOne($event->id);
+
+        $this->trigger(self::EVENT_BEFORE_FIND, $event);
+
+        $event->model = $event->query->one();
 
         if (GxCrudEvent::TYPE_READ == $event->type) {
             $event->result = (boolean) $event->model;

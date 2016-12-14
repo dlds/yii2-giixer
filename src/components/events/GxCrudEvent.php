@@ -52,10 +52,15 @@ class GxCrudEvent extends \yii\base\Event
     public $model;
 
     /**
+     * @var \yii\db\ActiveQuery
+     */
+    public $query;
+
+    /**
      * @var boolean indicates if CRUD action should be prevented
      */
     private $prevent = false;
-    
+
     /**
      * @var boolean indicates if CRUD action is pushd
      */
@@ -114,7 +119,7 @@ class GxCrudEvent extends \yii\base\Event
     {
         return $this->prevent;
     }
-    
+
     /**
      * Indicates if LOAD is pushed
      * @return boolean
@@ -131,7 +136,7 @@ class GxCrudEvent extends \yii\base\Event
     {
         $this->prevent = true;
     }
-    
+
     /**
      * Pushes LOAD operation
      */

@@ -152,4 +152,13 @@ abstract class GxActiveRecord extends ActiveRecord
         return \yii\helpers\StringHelper::basename(parent::className());
     }
 
+    /**
+     * @inheritdoc
+     * @return static ActiveQuery
+     */
+    public static function queryOne($condition)
+    {
+        return static::findByCondition($condition);
+    }
+
 }
