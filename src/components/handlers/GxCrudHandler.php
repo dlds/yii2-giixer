@@ -33,12 +33,6 @@ abstract class GxCrudHandler extends \yii\base\Component
      */
     protected $model;
 
-    // AFTER events
-    const EVENT_AFTER_CREATE = 'e_after_create';
-    const EVENT_AFTER_READ = 'e_after_read';
-    const EVENT_AFTER_UPDATE = 'e_after_update';
-    const EVENT_AFTER_DELETE = 'e_after_delete';
-    const EVENT_AFTER_CHANGE = 'e_after_change';
     // BEFORE events
     const EVENT_BEFORE_CREATE = 'e_before_create';
     const EVENT_BEFORE_READ = 'e_before_read';
@@ -47,7 +41,14 @@ abstract class GxCrudHandler extends \yii\base\Component
     const EVENT_BEFORE_FIND = 'e_before_find';
     const EVENT_BEFORE_CHANGE = 'e_before_change';
     const EVENT_BEFORE_LOAD = 'e_before_load';
-
+    // AFTER events
+    const EVENT_AFTER_CREATE = 'e_after_create';
+    const EVENT_AFTER_READ = 'e_after_read';
+    const EVENT_AFTER_UPDATE = 'e_after_update';
+    const EVENT_AFTER_DELETE = 'e_after_delete';
+    const EVENT_AFTER_FIND = 'e_after_find';
+    const EVENT_AFTER_CHANGE = 'e_after_change';
+    
     /**
      * Initializes CRUD handler
      * @throws \yii\base\ErrorException
@@ -206,6 +207,8 @@ abstract class GxCrudHandler extends \yii\base\Component
 
         $event->model = $event->query->one();
 
+        $this->trigger(self::EVENT_AFTER_FIND, $event);
+        
         if (GxCrudEvent::TYPE_READ == $event->type) {
             $event->result = (boolean) $event->model;
         }

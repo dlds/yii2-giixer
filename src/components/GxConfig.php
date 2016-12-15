@@ -5,8 +5,8 @@ namespace dlds\giixer\components;
 class GxConfig
 {
 
-    const FE = 1;
-    const BE = 2;
+    const FE = 'fe';
+    const BE = 'be';
 
     /**
      * Retrieves config definitions
