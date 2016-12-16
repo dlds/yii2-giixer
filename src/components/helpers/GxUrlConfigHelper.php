@@ -11,7 +11,7 @@ class GxUrlConfigHelper extends \dlds\giixer\components\GxConfig
      */
     public static function cfgHosts($scope = self::FE)
     {
-        return static::definition(static::hosts(self::FE));
+        return static::definition(static::hosts($scope));
     }
 
     /**

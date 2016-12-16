@@ -140,6 +140,19 @@ abstract class GxActiveRecord extends ActiveRecord
     }
 
     /**
+     * Retrieves class attribute as parameter
+     * ---
+     * Useful for url parameters, form parameters
+     * ---
+     * @param type $name
+     * @return type
+     */
+    public static function param($name)
+    {
+        return GxModelHelper::param(static::baseName(), $name);
+    }
+
+    /**
      * Retrieves class name without namespace
      * ---
      * Calls parent method parent::className and remove namespece using StringHelepr
@@ -153,7 +166,7 @@ abstract class GxActiveRecord extends ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * Retrieves query for single record
      * @return static ActiveQuery
      */
     public static function queryOne($condition)

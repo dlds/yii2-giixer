@@ -29,6 +29,11 @@ trait GxSearchHandlerTrait
     private $_params = [];
 
     /**
+     * @var \yii\data\ActiveDataProvider
+     */
+    protected $dp = null;
+
+    /**
      * @inheritdoc
      */
     public function __construct($params = [])
@@ -45,11 +50,36 @@ trait GxSearchHandlerTrait
     }
 
     /**
+     * Proceses preloading data provider
+     * @return type
+     */
+    public function doPreload(array $query = [])
+    {
+        $this->dp = $this->getDataProvider($query);
+
+        return $this;
+    }
+
+    /**
      * Retrieves data provider for given query data
      * @param array $query given query params
      * @return \yii\data\ActiveDataProvider data provider
      */
     public function getDataProvider(array $query = [])
+    {
+        if (!$this->dp || !empty($query)) {
+            $this->dp = $this->dataProvider($query);
+        }
+
+        return $this->dp;
+    }
+
+    /**
+     * Retrieves data provider
+     * @param array $query
+     * @return \yii\data\ActiveDataProvider
+     */
+    protected function dataProvider(array $query = [])
     {
         $event = new GxSearchEvent(['params' => ArrayHelper::merge($this->_params, $query)]);
 

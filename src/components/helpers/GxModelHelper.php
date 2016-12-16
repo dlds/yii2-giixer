@@ -140,6 +140,17 @@ class GxModelHelper
     }
 
     /**
+     * Retrieves parameter definition
+     * @param string $class
+     * @param string $name
+     * @return string
+     */
+    public static function param($class, $name)
+    {
+        return sprintf('%s[%s]', $class, $name);
+    }
+
+    /**
      * Pulls primary key if given entity is \yii\base\Model
      * @param \yii\base\Model $entity
      * @param boolan $throwException
