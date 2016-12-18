@@ -191,7 +191,7 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
     public function getAssignedImageCover()
     {
         return $this->hasOne(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
-                ->where(['type' => <?= ComponentHelper::root($generator->helperComponent->getClass(ModelHelper::RK_HELPER_IMAGE)) ?>::getType()])
+                ->where(['owner_type' => <?= ComponentHelper::root($generator->helperComponent->getClass(ModelHelper::RK_HELPER_IMAGE)) ?>::getType()])
                 ->orderBy(['rank' => SORT_ASC]);
     }
 
@@ -202,7 +202,7 @@ abstract class <?= ModelHelper::basename($generator->helperModel->getClass(Model
     public function getAssignedImages()
     {
         return $this->hasMany(\dlds\galleryManager\GalleryImageProxy::className(), ['owner_id' => 'id'])
-                ->where(['type' => <?= ComponentHelper::root($generator->helperComponent->getClass(ModelHelper::RK_HELPER_IMAGE)) ?>::getType()]);
+                ->where(['owner_type' => <?= ComponentHelper::root($generator->helperComponent->getClass(ModelHelper::RK_HELPER_IMAGE)) ?>::getType()]);
     }
 <?php endif; ?>
 
