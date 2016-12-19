@@ -126,7 +126,7 @@ class Generator extends \yii\gii\generators\model\Generator
      * @var string gallery table name
      */
     public $galleryTableName = 'core_image';
-    
+
     /**
      * @var string gallery behavior attr uploads
      */
@@ -442,7 +442,7 @@ class Generator extends \yii\gii\generators\model\Generator
                     return $model->generateSortableBehavior;
                 }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
-                    }"],    
+                    }"],
                 //[['galleryBehaviorAttrUploads'], 'string'],
                 [['galleryTableName'], 'filter', 'filter' => 'trim'],
                 [['galleryTableName'], 'validateTableName', 'when' => function($model) {
@@ -778,6 +778,32 @@ class Generator extends \yii\gii\generators\model\Generator
         }
 
         return $rules;
+    }
+
+    /**
+     * Retrieves relation keys
+     * @param type $table
+     * @param type $asDefinition
+     */
+    public function getPrimaryKey($table = null, $asDefinition = false)
+    {
+        if (!$table) {
+            $table = $this->tableName;
+        }
+
+        $schema = $this->getTableSchema($table);
+
+        $pk = $schema->primaryKey;
+
+        if (count($pk) > 1 && !$asDefinition) {
+            throw new \yii\base\Exception('Generator::getPrimaryKey is not supported for composite key.');
+        }
+
+        if ($pk && $asDefinition) {
+            return $pk;
+        }
+
+        return ArrayHelper::getValue($pk, 0);
     }
 
     /**
