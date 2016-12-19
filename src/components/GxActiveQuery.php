@@ -51,6 +51,17 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
     }
 
     /**
+     * Sanitazes given keyword
+     * @param string $keyword
+     */
+    public static function sanitaze($keyword)
+    {
+        $invalids = ['*', ';', '"', '(', ')', '[', ']', '-', '+', '>', '<', '@', '`', '~', '^', '{', '}', '&', ',', '.', '?', '-', '_', ':', '!', '§', '/', '\\', '|', '%'];
+
+        return str_replace($invalids, '', $keyword);
+    }
+
+    /**
      * Retrieves assigned model class
      * @return \yii\db\ActiveRecord
      */
