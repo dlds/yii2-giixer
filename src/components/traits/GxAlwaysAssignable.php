@@ -4,7 +4,7 @@ namespace dlds\giixer\components\traits;
 
 use yii\helpers\ArrayHelper;
 
-trait GxAlwaysAssignable
+trait GxAlwaysAssignableTrait
 {
 
     /**
