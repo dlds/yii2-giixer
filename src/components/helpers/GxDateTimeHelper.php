@@ -184,6 +184,53 @@ class GxDateTimeHelper
      */
     private static function boundsRules($interval)
     {
+        switch ($interval) {
+            case self::UNIX_WEEK:
+                return [
+                    self::BOUND_MIN => [
+                        // Go to midnight
+                        'monday this week'
+                    ],
+                    self::BOUND_MAX => [
+                        // Go to tommorow
+                        'next monday midnight',
+                        // Adjust from the next day to the end of the day, per original question
+                        '1 second ago',
+                    ],
+                ];
+            case self::UNIX_MONTH:
+                return [
+                    self::BOUND_MIN => [
+                        // Go to first day of current month
+                        'first day of this month midnight',
+                    ],
+                    self::BOUND_MAX => [
+                        // Go to last day of current month
+                        'first day of next month midnight',
+                        // Adjust from the next day to the end of the day, per original question
+                        '1 second ago',
+                    ],
+                ];
+            case self::UNIX_YEAR:
+                return [
+                    self::BOUND_MIN => [
+                        // Go to first day of this year
+                        'first day of January',
+                        // Go to midnight
+                        'midnight',
+                    ],
+                    self::BOUND_MAX => [
+                        // Go to last day of this year
+                        'last day of December',
+                        // Go to next day
+                        'next day',
+                        // Adjust from the next day to the end of the day, per original question
+                        '1 second ago',
+                    ],
+                ];
+        }
+
+        // default for UNIX_DAY interval
         return [
             self::BOUND_MIN => [
                 // Go to midnight
