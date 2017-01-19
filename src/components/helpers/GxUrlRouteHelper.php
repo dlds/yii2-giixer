@@ -86,7 +86,7 @@ class GxUrlRouteHelper
         if ($strict) {
             $params = \Yii::$app->request->queryParams;
 
-            if (array_diff($route, $params)) {
+            if (static::getParams($route) != $params) {
                 return false;
             }
         }
