@@ -31,14 +31,23 @@ abstract class GxHandler extends \yii\base\Component
     const EVENT_BEFORE_LOAD = 'e_before_load';
 
     /**
+     * @var string ActiveRecord classname
+     */
+    protected $model;
+
+    /**
      * Initializes CRUD handler
      * @throws \yii\base\ErrorException
      */
-    public function __construct()
+    public function __construct($model = false)
     {
-        $class = $this->modelClass();
+        if (!$model) {
+            $model = $this->modelClass();
+        }
 
-        if (!is_subclass_of($class, \yii\base\Model::className())) {
+        $this->model = $model;
+
+        if (!is_subclass_of($this->model, \yii\base\Model::className())) {
             throw new \yii\base\ErrorException('Invalid model class. Method "getModelClass" has to retrieve Model descendant class.');
         }
     }
@@ -72,7 +81,7 @@ abstract class GxHandler extends \yii\base\Component
      */
     protected function processModel(GxEvent &$event, $scope = null)
     {
-        $class = $this->modelClass();
+        $class = $this->model;
 
         // instantiate new class
         $event->model = new $class;
@@ -80,7 +89,7 @@ abstract class GxHandler extends \yii\base\Component
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
         // load data into model
-        if ($event->model && $event->model->load($event->input, $scope)) {
+        if ($event->model && ($event->model->load($event->input, $scope) || $event->isPushed())) {
             // if model is valid run validCallback otherwise notValidCallback
             if ($event->model->validate()) {
                 $this->validCallback($event);

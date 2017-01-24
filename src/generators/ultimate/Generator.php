@@ -1027,8 +1027,8 @@ class Generator extends \yii\gii\generators\model\Generator
 
         $traits = class_uses($clsFqn);
 
-        if (!in_array(\dlds\giixer\components\traits\GxAlwaysAssignable::class, $traits)) {
-            $this->addError($attribute, sprintf('Target table model (%s) must use %s', $cls, \dlds\giixer\components\traits\GxAlwaysAssignable::class));
+        if (!in_array(\dlds\giixer\components\traits\GxAlwaysAssignableTrait::class, $traits)) {
+            $this->addError($attribute, sprintf('Target table model (%s) must use %s', $cls, \dlds\giixer\components\traits\GxAlwaysAssignableTrait::class));
             return false;
         }
 

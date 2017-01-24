@@ -59,12 +59,17 @@ class GxCrudEvent extends \yii\base\Event
     /**
      * @var boolean indicates if CRUD action should be prevented
      */
-    private $prevent = false;
+    private $_prevent = false;
 
     /**
      * @var boolean indicates if CRUD action is pushd
      */
-    private $push = false;
+    private $_push = false;
+
+    /**
+     * @var array assigned entries
+     */
+    private $_assigned = [];
 
     /**
      * Indicates if create action was successful
@@ -117,7 +122,7 @@ class GxCrudEvent extends \yii\base\Event
      */
     public function isPrevented()
     {
-        return $this->prevent;
+        return $this->_prevent;
     }
 
     /**
@@ -126,7 +131,7 @@ class GxCrudEvent extends \yii\base\Event
      */
     public function isPushed()
     {
-        return $this->push;
+        return $this->_push;
     }
 
     /**
@@ -134,7 +139,7 @@ class GxCrudEvent extends \yii\base\Event
      */
     public function prevent()
     {
-        $this->prevent = true;
+        $this->_prevent = true;
     }
 
     /**
@@ -142,7 +147,26 @@ class GxCrudEvent extends \yii\base\Event
      */
     public function push()
     {
-        $this->push = true;
+        $this->_push = true;
+    }
+
+    /**
+     * Assignes new entry to current event
+     * @param string $key
+     * @param mixed $entry
+     */
+    public function addEntry($key, $entry)
+    {
+        $this->_assigned[$key] = $entry;
+    }
+
+    /**
+     * Retrieves assigned entry
+     * @param string $key
+     */
+    public function getEntry($key)
+    {
+        return \yii\helpers\ArrayHelper::getValue($this->_assigned, $key);
     }
 
 }

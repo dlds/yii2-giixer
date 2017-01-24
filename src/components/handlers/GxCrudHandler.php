@@ -28,11 +28,6 @@ use dlds\giixer\components\events\GxCrudEvent;
 abstract class GxCrudHandler extends \yii\base\Component
 {
 
-    /**
-     * @var string ActiveRecord classname
-     */
-    protected $model;
-
     // BEFORE events
     const EVENT_BEFORE_CREATE = 'e_before_create';
     const EVENT_BEFORE_READ = 'e_before_read';
@@ -48,7 +43,12 @@ abstract class GxCrudHandler extends \yii\base\Component
     const EVENT_AFTER_DELETE = 'e_after_delete';
     const EVENT_AFTER_FIND = 'e_after_find';
     const EVENT_AFTER_CHANGE = 'e_after_change';
-    
+
+    /**
+     * @var string ActiveRecord classname
+     */
+    protected $model;
+
     /**
      * Initializes CRUD handler
      * @throws \yii\base\ErrorException
@@ -208,7 +208,7 @@ abstract class GxCrudHandler extends \yii\base\Component
         $event->model = $event->query->one();
 
         $this->trigger(self::EVENT_AFTER_FIND, $event);
-        
+
         if (GxCrudEvent::TYPE_READ == $event->type) {
             $event->result = (boolean) $event->model;
         }

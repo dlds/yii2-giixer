@@ -69,19 +69,68 @@ class GxModelHelper
      * @param string $validator name of rule validator the attrs are defined in
      * @param array $attrs names of attributes which will be removed
      */
+    public static function pullAttrValidationRules($rules, array $attrs)
+    {
+        $result = [];
+        
+        foreach ($rules as $i => &$rule) {
+
+            if (!is_array($rule[0])) {
+                $rule[0] = (array) $rule[0];
+            }
+
+            foreach ($rule[0] as $j => $attr) {
+                if (!in_array($attr, $attrs)) {
+                    ArrayHelper::remove($rule[0], $j);
+                }
+            }
+            
+            if(!empty($rule[0])) {
+                $result[] = $rules[$i];
+            }
+        }
+        
+        return $result;
+    }
+
+    /**
+     * Removes validation of given attributes from given rules
+     * ---
+     * The most common use of this method is when you want to have 
+     * columns 'created_at' and 'updated_at' automatically filled by timestamps
+     * but these columns are required by DB schema so cannot be NULL (empty) see below
+     * ---
+     * self::removeValidationRules($rules, 'required', ['created_at', 'updated_at']);
+     * ===
+     * @param array $rules model rules from which attrs will be removed
+     * @param string $validator name of rule validator the attrs are defined in
+     * @param array $attrs names of attributes which will be removed
+     */
     public static function removeValidationRules(&$rules, $validator, array $attrs = [])
     {
         foreach ($rules as $i => &$rule) {
-            if ($validator === $rule[1]) {
-                if (empty($attrs)) {
-                    ArrayHelper::remove($rules, $i);
-                } else {
-                    foreach ($rule[0] as $j => $attr) {
-                        if (in_array($attr, $attrs)) {
-                            ArrayHelper::remove($rule[0], $j);
-                        }
-                    }
+
+            if ($validator !== $rule[1]) {
+                continue;
+            }
+
+            if (empty($attrs)) {
+                ArrayHelper::remove($rules, $i);
+                continue;
+            }
+
+            if (!is_array($rule[0])) {
+                $rule[0] = (array) $rule[0];
+            }
+
+            foreach ($rule[0] as $j => $attr) {
+                if (in_array($attr, $attrs)) {
+                    ArrayHelper::remove($rule[0], $j);
                 }
+            }
+
+            if (empty($rule[0])) {
+                ArrayHelper::remove($rules, $i);
             }
         }
     }
@@ -94,13 +143,15 @@ class GxModelHelper
      */
     public static function removeScenarioAttributes(&$scenarios, $name, array $attrs = [])
     {
-        if (isset($scenarios[$name])) {
-            foreach ($attrs as $attr) {
-                $key = array_search($attr, $scenarios[$name]);
+        if (!isset($scenarios[$name])) {
+            return false;
+        }
 
-                if (false !== $key) {
-                    ArrayHelper::remove($scenarios[$name], $key);
-                }
+        foreach ($attrs as $attr) {
+            $key = array_search($attr, $scenarios[$name]);
+
+            if (false !== $key) {
+                ArrayHelper::remove($scenarios[$name], $key);
             }
         }
     }
@@ -114,16 +165,21 @@ class GxModelHelper
     public static function setAttributesUnsafe(&$scenarios, $name, array $attrs = [])
     {
         if (isset($scenarios[$name])) {
-            foreach ($attrs as $attr) {
-                $key = array_search($attr, $scenarios[$name]);
+            return false;
+        }
 
-                if (false !== $key) {
-                    $value = $scenarios[$name][$key];
+        foreach ($attrs as $attr) {
 
-                    if (!StringHelper::startsWith($value, '!')) {
-                        $scenarios[$name][$key] = sprintf('!%s', $value);
-                    }
-                }
+            $key = array_search($attr, $scenarios[$name]);
+
+            if (false === $key) {
+                continue;
+            }
+
+            $value = $scenarios[$name][$key];
+
+            if (!StringHelper::startsWith($value, '!')) {
+                $scenarios[$name][$key] = sprintf('!%s', $value);
             }
         }
     }

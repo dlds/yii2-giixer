@@ -33,6 +33,16 @@ class GxEvent extends \yii\base\Event
     protected $result;
 
     /**
+     * @var boolean indicates if CRUD action should be prevented
+     */
+    private $_prevent = false;
+
+    /**
+     * @var boolean indicates if CRUD action is pushd
+     */
+    private $_push = false;
+
+    /**
      * Indicates if status holder holds true
      * @return boolean
      */
@@ -55,6 +65,49 @@ class GxEvent extends \yii\base\Event
     public function setFail()
     {
         $this->result = false;
+    }
+
+    /**
+     * Indicates if action was processed
+     * @return boolean
+     */
+    public function isProcessed()
+    {
+        return null !== $this->result;
+    }
+
+    /**
+     * Indicates if action is prevented
+     * @return boolean
+     */
+    public function isPrevented()
+    {
+        return $this->_prevent;
+    }
+
+    /**
+     * Indicates if LOAD is pushed
+     * @return boolean
+     */
+    public function isPushed()
+    {
+        return $this->_push;
+    }
+
+    /**
+     * Prevents action
+     */
+    public function prevent()
+    {
+        $this->_prevent = true;
+    }
+
+    /**
+     * Pushes LOAD operation
+     */
+    public function push()
+    {
+        $this->_push = true;
     }
 
 }
