@@ -75,6 +75,43 @@ trait GxSearchHandlerTrait
     }
 
     /**
+     * Indicates if specific attributes is active
+     * ---
+     * Means that serach handler use this attribute to filter entries
+     * ---
+     * @param string $name
+     * @return boolean
+     */
+    public function isAttrActive($name)
+    {
+        if (isset($this->$name) && $this->$name) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Indicates if specific attributes group is active
+     * ---
+     * Means that serach handler use one of this group attribute to filter entries
+     * ---
+     * @param string $name
+     * @return boolean
+     */
+    public function isAttrGroupActive($name)
+    {
+        $attrs = ArrayHelper::getValue(static::attrGroups(), $name, []);
+
+        foreach ($attrs as $attr) {
+            if (isset($this->$attr) && $this->$attr) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Retrieves data provider
      * @param array $query
      * @return \yii\data\ActiveDataProvider
@@ -101,6 +138,15 @@ trait GxSearchHandlerTrait
     protected function applyDefaultSearchQuery(\yii\data\ActiveDataProvider &$dataProvider)
     {
         // custom default query
+    }
+
+    /**
+     * Attributes group
+     * @return type
+     */
+    protected static function attrGroups()
+    {
+        return [];
     }
 
 }
