@@ -41,7 +41,7 @@ trait GxAnswerRequestTrait
      * @param array $params
      * @return string
      */
-    public function tryAjaxAnswer($view, $params)
+    public function tryAjaxAnswer($view, $params, $ajxCondition = true)
     {
         if (!\Yii::$app->request->isAjax) {
 
@@ -50,7 +50,7 @@ trait GxAnswerRequestTrait
         }
 
         // e.g. 'login/_form'
-        return $this->renderAjax($this->_answerView($view, true), $params);
+        return $this->ajaxAnswer($view, $params, $ajxCondition);
     }
 
     /**

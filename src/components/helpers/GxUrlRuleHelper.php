@@ -47,7 +47,7 @@ abstract class GxUrlRuleHelper extends UrlRule
         ];
 
         $definition = static::getHost($host);
-
+        
         if ($definition) {
             $rule['host'] = $definition;
         }
