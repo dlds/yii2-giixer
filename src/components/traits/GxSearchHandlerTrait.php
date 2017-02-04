@@ -24,14 +24,19 @@ trait GxSearchHandlerTrait
 {
 
     /**
+     * @var \yii\data\ActiveDataProvider
+     */
+    protected $dp = null;
+
+    /**
      * @var array global search params
      */
     private $_params = [];
 
     /**
-     * @var \yii\data\ActiveDataProvider
+     * @var array assigned route
      */
-    protected $dp = null;
+    private $_route = null;
 
     /**
      * @inheritdoc
@@ -61,6 +66,15 @@ trait GxSearchHandlerTrait
     }
 
     /**
+     * Assignes url routes to search handler
+     * @param array $route
+     */
+    public function assignRoute(array $route)
+    {
+        $this->_route = $route;
+    }
+
+    /**
      * Retrieves data provider for given query data
      * @param array $query given query params
      * @return \yii\data\ActiveDataProvider data provider
@@ -72,6 +86,15 @@ trait GxSearchHandlerTrait
         }
 
         return $this->dp;
+    }
+
+    /**
+     * Retrieves assigned route
+     * @return array
+     */
+    public function getRoute()
+    {
+        return $this->_route;
     }
 
     /**

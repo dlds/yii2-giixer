@@ -63,15 +63,15 @@ trait GxAnswerRequestTrait
         if (!is_array($definition)) {
 
             // ['ajax-full-path', 'standart-full-path']
-            $views = explode('#', $definition);
+            $views = explode('||', $definition);
 
             // if # is not occured try another pattern
             if (count($views) != 2) {
 
                 // ['standart-full-path//ajax-view-path']
-                $parts = explode('//', $definition);
+                $parts = explode('&&', $definition);
 
-                $ajax = str_replace('//', '/', $definition);
+                $ajax = str_replace('&&', '/', $definition);
 
                 $views = [
                     $ajax,
