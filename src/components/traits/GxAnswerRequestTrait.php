@@ -37,7 +37,7 @@ trait GxAnswerRequestTrait
     /**
      * Tries ajax response when request is also ajax
      * otherwise sends normal response
-     * @param array|string $view [ajaxView, originView] or 'originPart/ajaxPart'
+     * @param string $view [originView||ajaxView] or 'originPart&&ajaxPart'
      * @param array $params
      * @return string
      */
@@ -62,25 +62,25 @@ trait GxAnswerRequestTrait
     {
         if (!is_array($definition)) {
 
-            // ['ajax-full-path', 'standart-full-path']
+            // ['standart-full-path', 'ajax-full-path']
             $views = explode('||', $definition);
 
             // if # is not occured try another pattern
             if (count($views) != 2) {
 
-                // ['standart-full-path//ajax-view-path']
+                // ['standart-view-part//ajax-view-part']
                 $parts = explode('&&', $definition);
 
                 $ajax = str_replace('&&', '/', $definition);
 
                 $views = [
-                    $ajax,
                     ArrayHelper::getValue($parts, 0, $ajax),
+                    $ajax,
                 ];
             }
         }
 
-        return $condition ? $views[0] : $views[1];
+        return $condition ? $views[1] : $views[0];
     }
 
 }
