@@ -83,9 +83,8 @@ abstract class GxHandler extends \yii\base\Component
     {
         $class = $this->model;
 
-        // instantiate new class
-        $event->model = new $class;
-
+        $event->model = $this->instantiateModel($this->model);
+        
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
         // load data into model
@@ -97,6 +96,16 @@ abstract class GxHandler extends \yii\base\Component
                 $this->notValidCallback($event);
             }
         }
+    }
+
+    /**
+     * Instantiate appropriate model
+     * @param string $class
+     * @return \yii\base\Model
+     */
+    protected function instantiateModel($class)
+    {
+        return new $class;
     }
 
     /**
