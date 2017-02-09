@@ -117,6 +117,15 @@ class GxCrudEvent extends \yii\base\Event
     }
 
     /**
+     * Indicates if action was success
+     * @return boolean
+     */
+    public function isSuccess()
+    {
+        return $this->result;
+    }
+
+    /**
      * Indicates if action is prevented
      * @return boolean
      */
