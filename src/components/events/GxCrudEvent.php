@@ -160,6 +160,14 @@ class GxCrudEvent extends \yii\base\Event
     }
 
     /**
+     * Sets result to fail
+     */
+    public function fail()
+    {
+        $this->result = false;
+    }
+
+    /**
      * Assignes new entry to current event
      * @param string $key
      * @param mixed $entry

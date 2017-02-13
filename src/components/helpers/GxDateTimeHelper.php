@@ -105,6 +105,66 @@ class GxDateTimeHelper
     }
 
     /**
+     * Retrieves years count based on given timestamp
+     * @param int $ts
+     * @return round(int
+     */
+    public static function countYears($ts)
+    {
+        return round($ts / self::UNIX_YEAR);
+    }
+
+    /**
+     * Retrieves months count based on given timestamp
+     * @param int $ts
+     * @return round(int
+     */
+    public static function countMonths($ts)
+    {
+        return round($ts / self::UNIX_MONTH);
+    }
+
+    /**
+     * Retrieves weeks count based on given timestamp
+     * @param int $ts
+     * @return round(int
+     */
+    public static function countWeeks($ts)
+    {
+        return round($ts / self::UNIX_WEEK);
+    }
+
+    /**
+     * Retrieves days count based on given timestamp
+     * @param int $ts
+     * @return round(int
+     */
+    public static function countDays($ts)
+    {
+        return round($ts / self::UNIX_DAY);
+    }
+
+    /**
+     * Retrieves hours count based on given timestamp
+     * @param int $ts
+     * @return round(int
+     */
+    public static function countHours($ts)
+    {
+        return round($ts / self::UNIX_HOUR);
+    }
+
+    /**
+     * Retrieves mins count based on given timestamp
+     * @param int $ts
+     * @return round(int
+     */
+    public static function countMins($ts)
+    {
+        return round($ts / self::UNIX_MIN);
+    }
+
+    /**
      * Retrieves midnights count between two timestamps
      * @param int $since timestmap 1
      * @param int $to timestmap 2
