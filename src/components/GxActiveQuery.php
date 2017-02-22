@@ -67,7 +67,7 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
      * @param $alias
      * @return string
      */
-    public static function as($origin, $alias)
+    public static function sqlAlias($origin, $alias)
     {
         return sprintf('%s as %s', $origin, $alias);
     }
