@@ -62,6 +62,17 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
     }
 
     /**
+     * Retrieves alias command
+     * @param string $origin
+     * @param $alias
+     * @return string
+     */
+    public static function as($origin, $alias)
+    {
+        return sprintf('%s as %s', $origin, $alias);
+    }
+
+    /**
      * Retrieves assigned model class
      * @return \yii\db\ActiveRecord
      */
