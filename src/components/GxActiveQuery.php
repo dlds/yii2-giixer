@@ -12,7 +12,6 @@ namespace dlds\giixer\components;
 /**
  * GxActiveQuery is the base class for query classes.
  *
-
  * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
 abstract class GxActiveQuery extends \yii\db\ActiveQuery
@@ -21,7 +20,7 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
     /**
      * Attaches required queries to be able to show recordPrint
      * without another db call
-     * @see GxActiveRecord::getRecordPrint() 
+     * @see GxActiveRecord::getRecordPrint()
      * @return \dlds\giixer\components\GxActiveQuery
      */
     public function queryRecordPrint()
@@ -38,6 +37,17 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
     public function activeDataProvider($config = [])
     {
         return new \yii\data\ActiveDataProvider(\yii\helpers\ArrayHelper::merge(['query' => $this], $config));
+    }
+
+    /**
+     * Sets invalid condition to prevent selecting any data
+     * @return GxActiveQuery
+     */
+    public function noData()
+    {
+        $this->andWhere('1=2');
+
+        return $this;
     }
 
     /**
