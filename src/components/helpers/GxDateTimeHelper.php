@@ -178,6 +178,107 @@ class GxDateTimeHelper
     }
 
     /**
+     * Retrieves first day of this month
+     * @param null $timestamp
+     * @param string $timezone
+     * @return int
+     */
+    public static function monthFirstDay($timestamp = null, $timezone = 'Europe/Prague')
+    {
+        if(!$timestamp) {
+            $timestamp = time();
+        }
+
+        $dtNow = new \DateTime();
+
+        // Set a non-default timezone if needed
+        $dtNow->setTimezone(new \DateTimeZone($timezone));
+
+        $dtNow->setTimestamp($timestamp);
+
+        $dtNow->modify('first day of this month midnight');
+
+        return $dtNow->getTimestamp();
+    }
+
+    /**
+     * Retrieves last day of this month
+     * @param null $timestamp
+     * @param string $timezone
+     * @return int
+     */
+    public static function monthLastDay($timestamp = null, $timezone = 'Europe/Prague')
+    {
+        if(!$timestamp) {
+            $timestamp = time();
+        }
+
+        $dtNow = new \DateTime();
+
+        // Set a non-default timezone if needed
+        $dtNow->setTimezone(new \DateTimeZone($timezone));
+
+        $dtNow->setTimestamp($timestamp);
+
+        $dtNow->modify('last day of this month');
+        $dtNow->modify('next day midnight');
+        $dtNow->modify('1 second ago');
+
+        return $dtNow->getTimestamp();
+    }
+    
+    /**
+     * Retrieves first day of next month
+     * @param null $timestamp
+     * @param string $timezone
+     * @return int
+     */
+    public static function nextMonthFirstDay($timestamp = null, $timezone = 'Europe/Prague')
+    {
+        if(!$timestamp) {
+            $timestamp = time();
+        }
+
+        $dtNow = new \DateTime();
+
+        // Set a non-default timezone if needed
+        $dtNow->setTimezone(new \DateTimeZone($timezone));
+
+        $dtNow->setTimestamp($timestamp);
+
+        $dtNow->modify('first day of next month midnight');
+
+        return $dtNow->getTimestamp();
+    }
+
+    /**
+     * Retrieves last day of next month
+     * @param null $timestamp
+     * @param string $timezone
+     * @return int
+     */
+    public static function nextMonthLastDay($timestamp = null, $timezone = 'Europe/Prague')
+    {
+        if(!$timestamp) {
+            $timestamp = time();
+        }
+
+        $dtNow = new \DateTime();
+
+        // Set a non-default timezone if needed
+        $dtNow->setTimezone(new \DateTimeZone($timezone));
+
+        $dtNow->setTimestamp($timestamp);
+
+        $dtNow->modify('last day of next month');
+        $dtNow->modify('next day midnight');
+        $dtNow->modify('1 second ago');
+
+        return $dtNow->getTimestamp();
+    }
+
+
+    /**
      * Indicates if given born timestampe is in age or older then given age
      * @param int $age
      * @param int $born
