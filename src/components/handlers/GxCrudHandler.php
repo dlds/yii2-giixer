@@ -10,6 +10,9 @@
 namespace dlds\giixer\components\handlers;
 
 use dlds\giixer\components\events\GxCrudEvent;
+use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 /**
  * This is base CRUD handler class used
@@ -167,7 +170,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      */
     public function notFoundFallback()
     {
-        throw new \yii\web\NotFoundHttpException;
+        throw new NotFoundHttpException();
     }
 
     /**
@@ -176,7 +179,16 @@ abstract class GxCrudHandler extends \yii\base\Component
      */
     public function notProcessableFallback()
     {
-        throw new \yii\web\UnprocessableEntityHttpException;
+        throw new UnprocessableEntityHttpException();
+    }
+
+    /**
+     * Processed when action is forbbiden
+     * @return string model class
+     */
+    public function notAllowedFallback()
+    {
+        throw new ForbiddenHttpException();
     }
 
     /**
@@ -210,7 +222,7 @@ abstract class GxCrudHandler extends \yii\base\Component
         $this->trigger(self::EVENT_AFTER_FIND, $event);
 
         if (GxCrudEvent::TYPE_READ == $event->type) {
-            $event->result = (boolean) $event->model;
+            $event->result = (boolean)$event->model;
         }
     }
 
