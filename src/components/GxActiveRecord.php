@@ -16,7 +16,6 @@ use dlds\giixer\components\helpers\GxModelHelper;
 /**
  * GxActiveRecord is the base class for classes representing relational data in terms of objects.
  *
-
  * @author Jiri Svoboda <jiri.svoboda@dlds.cz>
  */
 abstract class GxActiveRecord extends ActiveRecord
@@ -36,7 +35,19 @@ abstract class GxActiveRecord extends ActiveRecord
      */
     public function __toString()
     {
-        return (string) $this->getRecordPrint();
+        return (string)$this->getRecordPrint();
+    }
+
+    /**
+     * Clears all AR attributes
+     */
+    public function clearActiveAttributes()
+    {
+        $attrs = $this->activeAttributes();
+
+        foreach ($attrs as $attr) {
+            $this->$attr = null;
+        }
     }
 
     /**
