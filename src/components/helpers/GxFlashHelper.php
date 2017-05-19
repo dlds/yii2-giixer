@@ -15,7 +15,7 @@ use dlds\metronic\widgets\Alert;
 /**
  * This is basic flash message helper class
  * ---
- * Defines method to easily manipulate with application 
+ * Defines method to easily manipulate with application
  * session flash messages
  * @see http://www.yiiframework.com/doc-2.0/guide-runtime-sessions-cookies.html#flash-data
  */
@@ -95,7 +95,7 @@ class GxFlashHelper
     /**
      * Indicates if appropriate flash is set
      * ---
-     * Indicates if at least one of given flash identificators 
+     * Indicates if at least one of given flash identificators
      * is set in current session.
      * ---
      * @param array $keys given flashes identification
@@ -103,7 +103,7 @@ class GxFlashHelper
      */
     public static function has(array $keys)
     {
-        return (boolean) self::search($keys);
+        return (boolean)self::search($keys);
     }
 
     /**
@@ -112,8 +112,8 @@ class GxFlashHelper
      * Used when you do not know which flash message exists and
      * which not and you want to check multiple flash identification.
      * ---
-     * Below example tries to find and retrieve 'fail_flash' message, 
-     * if it does not exist method tries to find 'fail_success' and even 
+     * Below example tries to find and retrieve 'fail_flash' message,
+     * if it does not exist method tries to find 'fail_success' and even
      * that not exists it retrieves 'Nothing found' content.
      * ---
      * GxFlashHelper::search(['fail_flash', 'success_flash], 'Nothing found.');
@@ -202,11 +202,11 @@ class GxFlashHelper
      * @param \yii\base\Model $model
      * @return string
      */
-    public static function alertValidation(\yii\base\Model $model)
+    public static function alertValidation(\yii\base\Model $model, array $options = [])
     {
         return static::alert($model->hasErrors(), [
-                'type' => static::error(),
-                'body' => Html::errorSummary($model),
+            'type' => static::error(),
+            'body' => Html::errorSummary($model, $options),
         ]);
     }
 
@@ -228,13 +228,13 @@ class GxFlashHelper
         $type = static::valueBy($rules);
 
         return static::alert(static::has(array_keys($rules)), [
-                'type' => $type,
-                'body' => static::search(array_keys($rules)),
+            'type' => $type,
+            'body' => static::search(array_keys($rules)),
         ]);
     }
 
     /**
-     * Retrieves translated flash message 
+     * Retrieves translated flash message
      * using default giixer translation category
      * @param string $key
      * @return string translated message
