@@ -107,6 +107,19 @@ class GxFlashHelper
     }
 
     /**
+     * Indicates if appropriate flash is set
+     * ---
+     * Indicates if any flash identificators
+     * is set in current session.
+     * ---
+     * @return boolean
+     */
+    public static function hasAny()
+    {
+        return (boolean)self::search([self::FLASH_INFO, self::FLASH_SUCCESS, self::FLASH_WARNING, self::FLASH_ERROR]);
+    }
+
+    /**
      * Retrieves flash which is occured as first
      * ---
      * Used when you do not know which flash message exists and
