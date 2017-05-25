@@ -83,6 +83,11 @@ class Module extends \yii\gii\Module
     public $relAliases = [];
 
     /**
+     * @var array inverse relation name aliases
+     */
+    public $relInverseAliases = [];
+
+    /**
      * @var array messages categories rules
      */
     public $messages = [];

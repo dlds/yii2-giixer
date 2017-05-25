@@ -304,6 +304,11 @@ class Generator extends \yii\gii\generators\model\Generator
     public $relAliases;
 
     /**
+     * @var array inverse relation name aliases
+     */
+    public $relInverseAliases;
+
+    /**
      * Inits generator
      */
     public function init()
@@ -346,6 +351,12 @@ class Generator extends \yii\gii\generators\model\Generator
 
         if ($relAliases) {
             $this->relAliases = $relAliases;
+        }
+
+        $relInverseAliases = Yii::$app->getModule('gii')->relInverseAliases;
+
+        if ($relInverseAliases) {
+            $this->relInverseAliases = $relInverseAliases;
         }
 
         $this->namespaces = Yii::$app->getModule('gii')->namespaces;
@@ -392,86 +403,86 @@ class Generator extends \yii\gii\generators\model\Generator
         GxModelHelper::removeValidationRules($rules, 'validateModelClass', ['modelClass']);
 
         return ArrayHelper::merge([
-                [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
-                [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
-                [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
-                [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateAlwaysAssignableBehavior', 'generateSortableBehavior'], 'boolean'],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function($model) {
-                    return $model->generateMutation;
-                }, 'whenClient' => "function (attribute, value) {
+            [['modelClass'], 'validateModelClass', 'skipOnEmpty' => true],
+            [['recordPrintAttr'], 'validateRecordPrintAttr', 'skipOnEmpty' => true],
+            [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => true],
+            [['generateMutation', 'generateSluggableBehavior', 'sluggableBehaviorEnsureUnique', 'sluggableBehaviorImutable', 'generateTimestampBehavior', 'generateGalleryBehavior', 'generateAlwaysAssignableBehavior', 'generateSortableBehavior'], 'boolean'],
+            [['mutationJoinTableName', 'mutationSourceTableName'], 'filter', 'filter' => 'trim'],
+            [['mutationJoinTableName', 'mutationSourceTableName'], 'required', 'when' => function ($model) {
+                return $model->generateMutation;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatemutation').is(':checked');
                     }"],
-                [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
-                    return trim($model->mutationIgnoredFormAttributes);
-                }],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
-                [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
-                [['mutationBehaviorActiveAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function($model) {
-                    return $model->generateMutation;
-                }, 'whenClient' => "function (attribute, value) {
+            [['mutationIgnoredFormAttributes'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function ($model) {
+                return trim($model->mutationIgnoredFormAttributes);
+            }],
+            [['mutationJoinTableName', 'mutationSourceTableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
+            [['mutationJoinTableName', 'mutationSourceTableName'], 'validateTableName'],
+            [['mutationBehaviorActiveAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'mutationJoinTableName'], 'when' => function ($model) {
+                return $model->generateMutation;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatemutation').is(':checked');
                     }"],
-                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function($model) {
-                    return $model->generateSluggableBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'required', 'when' => function ($model) {
+                return $model->generateSluggableBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
-                    return $model->generateSluggableBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['sluggableBehaviorSourceAttribute', 'sluggableBehaviorTargetAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function ($model) {
+                return $model->generateSluggableBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesluggablemutation').is(':checked');
                     }"],
-                [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
-                    return $model->generateTimestampBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function ($model) {
+                return $model->generateTimestampBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'required', 'when' => function($model) {
-                    return $model->generateTimestampBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['timestampCreatedAtAttribute', 'timestampUpdatedAtAttribute'], 'required', 'when' => function ($model) {
+                return $model->generateTimestampBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatetimestampbehavior').is(':checked');
                     }"],
-                [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
-                [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function($model) {
-                    return $model->generateSortableBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['sortableIndexAttribute', 'sortableRestrictionsAttribute', 'sortableKeyAttribute'], 'string'],
+            [['sortableColumnAttribute'], 'validateAttributeExistence', 'params' => ['tblAttr' => 'tableName'], 'when' => function ($model) {
+                return $model->generateSortableBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
-                [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function($model) {
-                    return $model->generateSortableBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['sortableIndexAttribute', 'sortableColumnAttribute'], 'required', 'when' => function ($model) {
+                return $model->generateSortableBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatesortablebehavior').is(':checked');
                     }"],
-                //[['galleryBehaviorAttrUploads'], 'string'],
-                [['galleryTableName'], 'filter', 'filter' => 'trim'],
-                [['galleryTableName'], 'validateTableName', 'when' => function($model) {
-                    return $model->generateGalleryBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            //[['galleryBehaviorAttrUploads'], 'string'],
+            [['galleryTableName'], 'filter', 'filter' => 'trim'],
+            [['galleryTableName'], 'validateTableName', 'when' => function ($model) {
+                return $model->generateGalleryBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generategallerybehavior').is(':checked');
                     }"],
-                [['galleryTableName'], 'required', 'when' => function($model) {
-                    return $model->generateGalleryBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['galleryTableName'], 'required', 'when' => function ($model) {
+                return $model->generateGalleryBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generategallerybehavior').is(':checked');
                     }"],
-                [['alwaysAssignableTableName'], 'validateAlwaysAssignableBehavior', 'when' => function($model) {
-                    return $model->generateAlwaysAssignableBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['alwaysAssignableTableName'], 'validateAlwaysAssignableBehavior', 'when' => function ($model) {
+                return $model->generateAlwaysAssignableBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatealwaysassignablebehavior').is(':checked');
                     }"],
-                [['alwaysAssignableTableName'], 'filter', 'filter' => 'trim'],
-                [['alwaysAssignableTableName'], 'validateTableName', 'when' => function($model) {
-                    return $model->generateAlwaysAssignableBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['alwaysAssignableTableName'], 'filter', 'filter' => 'trim'],
+            [['alwaysAssignableTableName'], 'validateTableName', 'when' => function ($model) {
+                return $model->generateAlwaysAssignableBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatealwaysassignablebehavior').is(':checked');
                     }"],
-                [['alwaysAssignableTableName'], 'required', 'when' => function($model) {
-                    return $model->generateAlwaysAssignableBehavior;
-                }, 'whenClient' => "function (attribute, value) {
+            [['alwaysAssignableTableName'], 'required', 'when' => function ($model) {
+                return $model->generateAlwaysAssignableBehavior;
+            }, 'whenClient' => "function (attribute, value) {
                         return $('#generator-generatealwaysassignablebehavior').is(':checked');
                     }"],
-                ], $rules);
+        ], $rules);
     }
 
     /**
@@ -690,7 +701,7 @@ class Generator extends \yii\gii\generators\model\Generator
 
             $classAliases = ArrayHelper::getValue($this->relAliases, BaseHelper::basename($this->helperModel->getClass(ModelHelper::RK_MODEL_CM)));
 
-            // if relation alias does not exists just replace origin definition with sanitazed
+            // if relation alias does not exist just replace origin definition with sanitazed
             if (!$classAliases || !isset($classAliases[$key])) {
                 $relations[$this->tableName][$key][0] = $sanitazed;
                 continue;
@@ -704,6 +715,32 @@ class Generator extends \yii\gii\generators\model\Generator
 
             // sanitaze relation alias
             $relations[$this->tableName][$classAliases[$key]][0] = $sanitazed;
+        }
+
+        $relInversAliases = ArrayHelper::getValue($this->relInverseAliases, BaseHelper::basename($this->helperModel->getClass(ModelHelper::RK_MODEL_CM)));
+
+        if ($relInversAliases) {
+
+            $definitions = ArrayHelper::getValue($relations, $this->tableName, []);
+
+            // sanitaze all inverse rlations
+            foreach ($definitions as $key => $rules) {
+
+                // if inverse relation alias does not exist - continue to next definition
+                if (!isset($relInversAliases[$key])) {
+                    continue;
+                }
+
+                $result = preg_replace($this->inverseAliasPattern(), $this->inverseAliasPattern($relInversAliases[$key]), $rules[0], 1);
+
+                if(!$result) {
+                    continue;
+                }
+
+                // sanitaze relation alias
+                $relations[$this->tableName][$key][0] = $result;
+            }
+
         }
 
         // add default indicationr relation
@@ -725,6 +762,21 @@ class Generator extends \yii\gii\generators\model\Generator
         }
 
         return $relations;
+    }
+
+    /**
+     * Inverse alias pattern
+     * @return string
+     */
+    protected function inverseAliasPattern($alias = null)
+    {
+        $prefix = '->inverseOf';
+
+        if ($alias) {
+            return sprintf("%s('%s');", $prefix, lcfirst($alias));
+        }
+
+        return sprintf("/%s\('([a-zA-Z]+)'\);$/", $prefix);
     }
 
     /**
@@ -761,7 +813,7 @@ class Generator extends \yii\gii\generators\model\Generator
         $rules = parent::generateRules($table);
 
         foreach ($rules as $key => $rule) {
-            $rules[$key] = preg_replace_callback("/[A-Za-z]+::className\(\)/", function($matches) {
+            $rules[$key] = preg_replace_callback("/[A-Za-z]+::className\(\)/", function ($matches) {
 
                 $match = ArrayHelper::getValue($matches, 0);
 
@@ -1463,7 +1515,7 @@ class Generator extends \yii\gii\generators\model\Generator
         } else {
             // No I18N, replace placeholders by real words, if any
             if (!empty($placeholders)) {
-                $phKeys = array_map(function($word) {
+                $phKeys = array_map(function ($word) {
                     return '{' . $word . '}';
                 }, array_keys($placeholders));
                 $phValues = array_values($placeholders);
