@@ -16,6 +16,10 @@ namespace dlds\giixer\components;
  */
 abstract class GxActiveQuery extends \yii\db\ActiveQuery
 {
+    /**
+     * @var string
+     */
+    private $_alias;
 
     /**
      * Attaches required queries to be able to show recordPrint
@@ -57,7 +61,25 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
      */
     protected function col($name)
     {
-        return helpers\GxModelHelper::col($this->modelTable(), $name);
+        $alias = $this->_alias;
+
+        if (!$alias) {
+            $alias = $this->modelTable();
+        }
+
+        return helpers\GxModelHelper::col($alias, $name);
+    }
+
+    /**
+     * @inheritdoc
+     * @param string $alias
+     * @return $this
+     */
+    public function alias($alias)
+    {
+        $this->_alias = $alias;
+
+        return parent::alias($alias);
     }
 
     /**
