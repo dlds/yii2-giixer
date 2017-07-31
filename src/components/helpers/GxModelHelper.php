@@ -9,6 +9,7 @@
 
 namespace dlds\giixer\components\helpers;
 
+use yii\db\BaseActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
 
@@ -208,17 +209,17 @@ class GxModelHelper
 
     /**
      * Pulls primary key if given entity is \yii\base\Model
-     * @param \yii\base\Model $entity
+     * @param BaseActiveRecord|int $entity
      * @param boolan $throwException
-     * @return \yii\base\Model
+     * @return int
      * @throws \InvalidArgumentException
      */
-    public static function pullPk($entity, $throwException = true)
+    public static function pullPk($entity, $throwException = false)
     {
-        if (!($entity instanceof \yii\base\Model)) {
+        if (!($entity instanceof BaseActiveRecord)) {
 
             if ($throwException) {
-                throw new \InvalidArgumentException('Given entity is not "\yii\base\Model" class descendant.');
+                throw new \InvalidArgumentException('Given entity is not "\yii\db\BaseActiveRecord" class descendant.');
             }
 
             return $entity;

@@ -77,7 +77,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      * ---
      * @param array $attrs given attributes
      * @param string $scope given scope for massive assignment
-     * @return instance|null
+     * @return GxCrudEvent
      */
     public function create(array $attrs, $scope = null)
     {
@@ -99,7 +99,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      * where all information about action result is stored
      * ---
      * @param int|array $pk given primary key
-     * @return instance | null if model was not found
+     * @return GxCrudEvent if model was not found
      */
     public function read($pk)
     {
@@ -123,7 +123,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      * @param int|array $pk given primary key
      * @param array $attrs given attributes
      * @param string $scope given scope for massive assignment
-     * @return instance | null
+     * @return GxCrudEvent
      */
     public function update($pk, array $attrs, $scope = null)
     {
@@ -147,7 +147,7 @@ abstract class GxCrudHandler extends \yii\base\Component
      * where all information about action result is stored
      * ---
      * @param int|array $pk given primary key
-     * @return boolean
+     * @return GxCrudEvent
      */
     public function delete($pk)
     {

@@ -12,6 +12,7 @@ namespace dlds\giixer\components;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use dlds\giixer\components\helpers\GxModelHelper;
+use yii\helpers\StringHelper;
 
 /**
  * GxActiveRecord is the base class for classes representing relational data in terms of objects.
@@ -31,26 +32,6 @@ abstract class GxActiveRecord extends ActiveRecord
     // </editor-fold>
 
     /**
-     * Retrieves models representing column
-     */
-    public function __toString()
-    {
-        return (string)$this->getRecordPrint();
-    }
-
-    /**
-     * Clears all AR attributes
-     */
-    public function clearActiveAttributes()
-    {
-        $attrs = $this->activeAttributes();
-
-        foreach ($attrs as $attr) {
-            $this->$attr = null;
-        }
-    }
-
-    /**
      * @inheritdoc
      */
     public function load($data, $formName = null)
@@ -62,6 +43,102 @@ abstract class GxActiveRecord extends ActiveRecord
         }
 
         return parent::load($data, $formName);
+    }
+
+    /**
+     * Retrieves model default string representation
+     * This is used when AR is being printed as a string
+     * @return mixed
+     */
+    public function getRecordPrint()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * Retrieves models representing column
+     */
+    public function __toString()
+    {
+        return (string)$this->getRecordPrint();
+    }
+
+    /**
+     * Retrieves class name without namespace
+     * ---
+     * Calls parent method parent::className and remove namespece using StringHelepr
+     * ---
+     * @see \yii\helpers\StringHelper
+     * @return string
+     */
+    public static function baseName()
+    {
+        return \yii\helpers\StringHelper::basename(parent::className());
+    }
+
+    /**
+     * Retrieves AR column name
+     * @param $column
+     * @return string
+     */
+    public static function colName($column)
+    {
+        return sprintf('%s.%s', static::tableName(), $column);
+    }
+
+    /**
+     * Retrieves class attribute as parameter
+     * ---
+     * Useful for url parameters, form parameters
+     * ---
+     * @param type $name
+     * @return type
+     */
+    public static function paramName($name)
+    {
+        return sprintf('%s[%s]', StringHelper::basename(static::className()), $name);
+    }
+
+    /**
+     * Retrieves query for single record
+     * @return static ActiveQuery
+     */
+    public static function queryOne($condition)
+    {
+        return static::findByCondition($condition);
+    }
+
+    /**
+     * Queries only single column
+     * @param $name
+     * @param \Closure|null $callback
+     * @return array
+     */
+    public static function queryColumn($name, \Closure $callback = null)
+    {
+        $query = static::find()->select($name);
+
+        if (is_callable($callback)) {
+            call_user_func($callback, $query);
+        }
+
+        return $query->column();
+    }
+
+    /**
+     * Creates multiple models base on given data
+     * @param array $data
+     * @return array
+     */
+    public static function factoryAll(array $data)
+    {
+        $records = [];
+
+        foreach ($data as $row) {
+            $records[] = new static($row);
+        }
+
+        return $records;
     }
 
     /**
@@ -83,14 +160,18 @@ abstract class GxActiveRecord extends ActiveRecord
     }
 
     /**
-     * Retrieves model default string representation
-     * This is used when AR is being printed as a string
-     * @return mixed
+     * Clears all AR attributes
      */
-    public function getRecordPrint()
+    public function clearActiveAttributes()
     {
-        return $this->primaryKey;
+        $attrs = $this->activeAttributes();
+
+        foreach ($attrs as $attr) {
+            $this->$attr = null;
+        }
     }
+
+    // <editor-fold defaultstate="collapsed" desc="Validation & Scenarios methods">
 
     /**
      * Removes validation rule from given rules
@@ -122,35 +203,24 @@ abstract class GxActiveRecord extends ActiveRecord
     {
         GxModelHelper::setAttributesUnsafe($scenarios, $name, $attrs);
     }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="TO BE DEPRECATED methods">
 
     /**
-     * Instantiate multiple models
-     * @param array $data given data
+     * === TO BE DEPRECATED ===
+     * Queries only single column
+     * @param $name
+     * @param \Closure|null $callback
      * @return array
      */
-    public static function instantiateMultiple(array $data)
-    {
-        $records = [];
-
-        foreach ($data as $row) {
-            $records[] = new static($row);
-        }
-
-        return $records;
-    }
-
     public static function column($name, \Closure $callback = null)
     {
-        $query = static::find()->select($name);
-
-        if (is_callable($callback)) {
-            call_user_func($callback, $query);
-        }
-
-        return $query->column();
+        return static::queryColumn($name, $callback);
     }
 
     /**
+     * === TO BE DEPRECATED ===
      * Retrieves class attribute as parameter
      * ---
      * Useful for url parameters, form parameters
@@ -160,29 +230,20 @@ abstract class GxActiveRecord extends ActiveRecord
      */
     public static function param($name)
     {
-        return GxModelHelper::param(static::baseName(), $name);
+        return static::paramName($name);
     }
 
     /**
-     * Retrieves class name without namespace
-     * ---
-     * Calls parent method parent::className and remove namespece using StringHelepr
-     * ---
-     * @see \yii\helpers\StringHelper
-     * @return string
+     * === TO BE DEPRECATED ===
+     * Instantiate multiple models
+     * @param array $data given data
+     * @return array
      */
-    public static function baseName()
+    public static function instantiateMultiple(array $data)
     {
-        return \yii\helpers\StringHelper::basename(parent::className());
+        return static::factoryAll($data);
     }
+    // </editor-fold>
 
-    /**
-     * Retrieves query for single record
-     * @return static ActiveQuery
-     */
-    public static function queryOne($condition)
-    {
-        return static::findByCondition($condition);
-    }
 
 }

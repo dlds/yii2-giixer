@@ -22,6 +22,61 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
     private $_alias;
 
     /**
+     * @inheritdoc
+     * @param string $alias
+     * @return $this
+     */
+    public function alias($alias)
+    {
+        $this->_alias = $alias;
+
+        return parent::alias($alias);
+    }
+
+    /**
+     * Retrieves alias command
+     * @param string $origin
+     * @param $alias
+     * @return string
+     */
+    public static function sqlAlias($origin, $alias)
+    {
+        return sprintf('%s as %s', $origin, $alias);
+    }
+
+    /**
+     * Retrieves column name together with model table name
+     * @param string $name
+     * @return string
+     */
+    public function colName($name, $quotes = false)
+    {
+        $alias = $this->_alias;
+
+        if (!$alias) {
+            $alias = $this->modelTable();
+        }
+
+        if ($quotes) {
+            $name = static::quote($name);
+            $alias = static::quote($al);
+            $alias = `$alias`;
+        }
+        return sprintf('%s.%s', $alias, $name);
+    }
+
+    /**
+     * Sets invalid condition to prevent selecting any data
+     * @return GxActiveQuery
+     */
+    public function noData()
+    {
+        $this->andWhere('1=2');
+
+        return $this;
+    }
+
+    /**
      * Attaches required queries to be able to show recordPrint
      * without another db call
      * @see GxActiveRecord::getRecordPrint()
@@ -44,45 +99,6 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
     }
 
     /**
-     * Sets invalid condition to prevent selecting any data
-     * @return GxActiveQuery
-     */
-    public function noData()
-    {
-        $this->andWhere('1=2');
-
-        return $this;
-    }
-
-    /**
-     * Retrieves column name together with model table name
-     * @param string $name
-     * @return string
-     */
-    protected function col($name)
-    {
-        $alias = $this->_alias;
-
-        if (!$alias) {
-            $alias = $this->modelTable();
-        }
-
-        return helpers\GxModelHelper::col($alias, $name);
-    }
-
-    /**
-     * @inheritdoc
-     * @param string $alias
-     * @return $this
-     */
-    public function alias($alias)
-    {
-        $this->_alias = $alias;
-
-        return parent::alias($alias);
-    }
-
-    /**
      * Sanitazes given keyword
      * @param string $keyword
      */
@@ -94,15 +110,28 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
     }
 
     /**
-     * Retrieves alias command
-     * @param string $origin
-     * @param $alias
+     * Quotes input
+     * @param $input
      * @return string
      */
-    public static function sqlAlias($origin, $alias)
+    public static function quote($input)
     {
-        return sprintf('%s as %s', $origin, $alias);
+        return sprintf('`%s`', $input);
     }
+
+    // <editor-fold defaultstate="collapsed" desc="TO BE DEPRECATED methods">
+
+    /**
+     * === TO BE DEPRECATED ===
+     * Retrieves column name together with model table name
+     * @param string $name
+     * @return string
+     */
+    protected function col($name)
+    {
+        return $this->colName($name);
+    }
+    // </editor-fold>
 
     /**
      * Retrieves assigned model class

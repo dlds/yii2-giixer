@@ -296,9 +296,9 @@ class GxDateTimeHelper
 
     /**
      * Retrieves timestamp bounds
-     * @param type $timestamp
-     * @param type $interval
-     * @return type
+     * @param int $timestamp
+     * @param int $interval
+     * @return array
      */
     public static function bounds($timestamp, $interval = self::UNIX_DAY, $timezone = 'Europe/Prague')
     {
