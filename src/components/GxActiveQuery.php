@@ -106,7 +106,7 @@ abstract class GxActiveQuery extends \yii\db\ActiveQuery
     {
         $invalids = ['*', ';', '"', '(', ')', '[', ']', '-', '+', '>', '<', '@', '`', '~', '^', '{', '}', '&', ',', '.', '?', '-', '_', ':', '!', '§', '/', '\\', '|', '%'];
 
-        return str_replace($invalids, '', $keyword);
+        return trim(str_replace($invalids, '', $keyword));
     }
 
     /**
