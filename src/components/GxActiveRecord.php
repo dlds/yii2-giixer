@@ -9,9 +9,9 @@
 
 namespace dlds\giixer\components;
 
+use dlds\giixer\components\helpers\GxModelHelper;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
-use dlds\giixer\components\helpers\GxModelHelper;
 use yii\helpers\StringHelper;
 
 /**
@@ -169,6 +169,32 @@ abstract class GxActiveRecord extends ActiveRecord
         foreach ($attrs as $attr) {
             $this->$attr = null;
         }
+    }
+
+    /**
+     * Finds ActiveRecord instance(s) by the given condition.
+     * This method is internally called by [[findOne()]] and [[findAll()]].
+     * @param mixed $condition please refer to [[findOne()]] for the explanation of this parameter
+     * @return ActiveQueryInterface the newly created [[ActiveQueryInterface|ActiveQuery]] instance.
+     * @throws InvalidConfigException if there is no primary key defined
+     * @internal
+     */
+    protected static function findByCondition($condition)
+    {
+        $query = static::find();
+
+        if (!ArrayHelper::isAssociative($condition)) {
+            // query by primary key
+            $primaryKey = static::primaryKey();
+            if (isset($primaryKey[0])) {
+                $pk = static::tableName() . '.' . $primaryKey[0];
+                $condition = [$pk => $condition];
+            } else {
+                throw new InvalidConfigException('"' . get_called_class() . '" must have a primary key.');
+            }
+        }
+
+        return $query->andWhere($condition);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Validation & Scenarios methods">
