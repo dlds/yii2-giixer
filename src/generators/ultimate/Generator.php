@@ -776,7 +776,7 @@ class Generator extends \yii\gii\generators\model\Generator
             return sprintf("%s('%s');", $prefix, lcfirst($alias));
         }
 
-        return sprintf("/%s\('([a-zA-Z]+)'\);$/", $prefix);
+        return sprintf("/%s\('([a-zA-Z0-9]+)'\);$/", $prefix);
     }
 
     /**
