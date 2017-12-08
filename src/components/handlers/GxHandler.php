@@ -12,7 +12,7 @@ namespace dlds\giixer\components\handlers;
 use dlds\giixer\components\events\GxEvent;
 
 /**
- * This is basic handler class used 
+ * This is basic handler class used
  * for invoking validation on appropriate model class and
  * based on validation result call appropriate callback
  * ---
@@ -84,7 +84,7 @@ abstract class GxHandler extends \yii\base\Component
         $class = $this->model;
 
         $event->model = $this->instantiateModel($this->model);
-        
+
         $this->trigger(self::EVENT_BEFORE_LOAD, $event);
 
         // load data into model
@@ -105,6 +105,10 @@ abstract class GxHandler extends \yii\base\Component
      */
     protected function instantiateModel($class)
     {
+        if (is_object($class)) {
+            return $class;
+        }
+
         return new $class;
     }
 
